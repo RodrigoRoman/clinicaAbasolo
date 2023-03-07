@@ -32,17 +32,23 @@ mongoose.connect(dbUrl, {
     useUnifiedTopology: true,
     useFindAndModify: false
 });
-function convertUTCDateToLocalDate(date) {
-
-    invdate = new Date(`${date.toLocaleString('en-US', { timeZone: 'America/Mexico_City' })} GMT`)
-    
-    // and the diff is 5 hours
-    var diff = date.getTime() - invdate.getTime();
-    
-    // so 12:00 in Toronto is 17:00 UTC
-    return new Date(date.getTime() - diff); // needs to substract
-    
-}
+function getMexicoCityTime() {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      hour12: false,
+      timeZone: "America/Mexico_City",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    });
+    const timeStr = formatter.format(now);
+    const [hour, minute, second] = timeStr.split(":");
+    const mexicoCityTime = new Date();
+    mexicoCityTime.setUTCHours(hour);
+    mexicoCityTime.setUTCMinutes(minute);
+    mexicoCityTime.setUTCSeconds(second);
+    return mexicoCityTime;
+  }
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
@@ -142,7 +148,7 @@ app.use(
 //Seed date point from which start to count supplies to be resupplied
 Refill.countDocuments(function (err, count) {
     if (!err && count === 0) {
-        const nDate = new Date(convertUTCDateToLocalDate(new Date))
+        const nDate = getMexicoCityTime()
         let point = new Refill({
             name:"datePoint",
             setPoint:nDate,
