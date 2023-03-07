@@ -1,0 +1,65 @@
+<% layout('layouts/boilerplate')%>
+<%
+function makeDMYHour(date){
+  const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+  y : date.getUTCFullYear(),h:date.getUTCHours(), min:(((""+date.getUTCMinutes()).length>1)?date.getUTCMinutes():"0"+date.getUTCMinutes())};
+  return  ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d)+ "/" + newDate.m+ "/" + newDate.y+ "   "+newDate.h+":"+newDate.min;
+}
+function makeIputableDate(date){
+  const newDate = {d:date.getDate(), m : date.getMonth()+1,// JavaScript months are 0-11
+  y : date.getFullYear(),h:date.getHours(), min:(((""+date.getMinutes()).length>1)?date.getMinutes():"0"+date.getMinutes())};
+  return   newDate.y+'-' + newDate.m+'-'+((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d)+"T"+newDate.h+":"+newDate.min;
+}
+d = patient.admissionDate
+%>
+<div class="row">
+    <h1 class="text-center">Editar perfil de paciente</h1>
+    <div class="col-md-6 offset-md-3">
+        <form action="/patients/<%=patient._id%>?_method=PUT" method="POST" novalidate class="validated-form">
+            <div class="mb-3">
+                <label class="form-label" for="name">Nombre del paciente</label>
+                <input class="form-control" type="text" id="name" name="patient[name]" value = "<%=patient.name%>" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="admission">Fecha de Ingreso</label></br>
+                <input type="datetime-local" id="admission" name="patient[admissionDate]" value = "<%=patient.admissionDate.toISOString().substring(0,16)%>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="phone">Telefono</label>
+                <input class="form-control" type="number" id="phone" name="patient[phone]" value = "<%=patient.phone%>" >
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" type="email" id="email" name="patient[email]" value = "<%=patient.email%>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="address">Dirección</label>
+                <input class="form-control" type="text" id="address" name="patient[address]" value = "<%=patient.address%>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="room">Cuarto</label>
+                <input class="form-control" type="text" id="room" name="patient[cuarto]" value = "<%=patient.cuarto%>" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="age">Edad</label>
+                <input class="form-control" type="number" id="age" name="patient[edad]" value = <%=patient.edad%>>
+            </div>
+            <!-- <div class="mb-3">
+                <label class="form-label" for="rfc">RFC</label>
+                <input class="form-control" type="number" id="rfc" name="patient[rfc]" value = <%=patient.rfc%> required>
+            </div> -->
+            <div class="mb-3">
+                <label class="form-label" for="description">Diagnóstico</label>
+                <textarea class="form-control" type="text" id="description" name="patient[diagnosis]"><%=patient.diagnosis%></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="doctor">Medico Tratante</label>
+                <input class="form-control" type="text" id="doctor" name="patient[treatingDoctor]" value = "<%=patient.treatingDoctor%>" >
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success">Actualizar</button>
+            </div>
+        </form>
+        <a href="/patients">Pacientes</a>
+    </div>
+</div>

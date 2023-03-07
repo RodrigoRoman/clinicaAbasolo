@@ -1,0 +1,788 @@
+
+
+/* remove padding */
+.pad{
+  padding: 0px 0px 0px 0px !important;
+  margin: 0px 0px 0px 0px !important;
+}
+
+.scrollDiv {
+  height:800px;
+  overflow-y: scroll;
+}
+
+.image_print{
+  position:absolute;
+  top:80px;
+  left:20px;
+  width:330px;
+  height: 120px;
+}
+
+
+div.row.customClass {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+div.row.customClass [class*="col-md"] {
+  display: inline-block;
+  float: none; /* Very important */
+}
+
+
+.equalTable  td:nth-child(1) {
+  width: 70%;
+}
+.equalTable td:nth-child(2) {
+  width: 30%;
+}
+
+#searchTableModal  td:nth-child(1) {
+  width: 20%;
+}
+#searchTableModal td:nth-child(2) {
+  width: 20%;
+}
+#searchTableModal td:nth-child(3) {
+  width: 20%;
+}
+#searchTableModal td:nth-child(4) {
+  width: 20%;
+}
+#searchTableModal td:nth-child(5) {
+  width: 20%;
+}
+/* ------- search group */
+#searchTable  td:nth-child(1) {
+  width: 20%;
+}
+#searchTable td:nth-child(2) {
+  width: 20%;
+}
+#searchTable td:nth-child(3) {
+  width: 20%;
+}
+#searchTable td:nth-child(4) {
+  width: 20%;
+}
+#searchTable td:nth-child(5) {
+  width: 20%;
+}
+
+.sticky1 table { min-width: 90%; }
+
+/*The next 3 sections make the magic happen*/
+.sticky1 thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.sticky1 tbody {
+    display: block;
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.sticky1 td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/*Use the following to make sure cols align correctly*/
+.sticky1 table, tr, th, td {
+    border-collapse: collapse;
+}
+
+
+/*Set your columns to where you want them to be, skip the one that you can have resize to any width*/
+.sticky1 th:nth-child(1), .sticky1 td:nth-child(1) {
+    width: 15%;
+}
+.sticky1 th:nth-child(2), .sticky1 td:nth-child(2) {
+    width: 15%;
+}
+.sticky1 th:nth-child(3), .sticky1 td:nth-child(3) {
+    width: 15%;
+}
+.sticky1 th:nth-child(4),.sticky1 td:nth-child(4) {
+    width: 10%;
+}
+.sticky1 th:nth-child(5),.sticky1 td:nth-child(5) {
+    width: 20%;
+}
+.sticky1 th:nth-child(6),.sticky1 td:nth-child(6) {
+  width: 15%;
+}
+.sticky1 th:nth-child(7), .sticky1 td:nth-child(7) {
+  width: 20%;
+}
+
+
+
+
+.sticky2 table { min-width: 600px; }
+
+/*The next 3 sections make the magic happen*/
+.sticky2 thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.sticky2 tbody {
+    display: block;
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.sticky2 td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/*Use the following to make sure cols align correctly*/
+.sticky2 table, tr, th, td {
+    border-collapse: collapse;
+}
+
+
+/*Set your columns to where you want them to be, skip the one that you can have resize to any width*/
+.sticky2 th:nth-child(1),td:nth-child(1) {
+  width: 10%;
+}
+.sticky2 th:nth-child(2),td:nth-child(2) {
+  width: 30%;
+}
+.sticky2 th:nth-child(3),td:nth-child(3) {
+  width: 30%;
+}
+.sticky2 th:nth-child(4),td:nth-child(4) {
+  width: 13%;
+}
+.sticky2 th:nth-child(5),td:nth-child(5) {
+width: 12%;
+}
+.sticky2 th:nth-child(6),td:nth-child(6) {
+  width: 17%;
+}
+
+  /* index card */
+.border {
+    border-width:3px !important;
+  }
+
+.index_card {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80%;
+    max-height: 75%;
+}
+.index_card_p {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80%;
+    max-height: 100%;
+}
+#search_group{
+  width:100%;
+}
+#search_val{
+  width:100%;
+}
+
+
+
+/*Changes to "a tag" for bootstrap*/
+#searchList a {
+    text-decoration: none !important
+
+  }
+#searchList a:hover{
+    color: black !important;
+    font-weight: 500 !important;
+  }
+
+/* Buttons*/
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  height: 60px;
+  width: 60px;
+  outline: black;
+  background-size: 100%, 100%;
+  border-radius: 50%;
+  border: 1px solid black;
+  background-image: none;
+}
+
+.carousel-control-next-icon:after
+{
+  content: '>';
+  font-size: 35px;
+  color:  rgb(78, 77, 77);
+}
+
+.carousel-control-prev-icon:after {
+  content: '<';
+  font-size: 35px;
+  color: rgb(78, 77, 77);
+}
+
+/*input number customized*/
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    transform: rotate(90deg);
+    height: 80px;
+    opacity: 0;
+}
+
+.quantity-wrapper {
+    position: relative;
+}
+
+.quantity-wrapper:after {
+    content: "+";
+    position: absolute;
+    right: 5px;
+    height: 100%;
+    top: 8px;
+    pointer-events: none;
+}
+
+.quantity-wrapper:before {
+    content: "-";
+    position: absolute;
+    left: 5px;
+    height: 100%;
+    top: 8px;
+}
+/*images styling*/
+
+.index_img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80%;
+    max-height: 30%;
+}
+.edit_img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100px;
+  height: 100px;
+}
+
+.card_img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 150px;
+    height: 150px;
+}
+
+
+
+/*button - +*/
+input[type="number"] {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
+  
+  .number-input {
+    border: 0;
+    display: inline-flex;
+  }
+  
+  .number-input,
+  .number-input * {
+    box-sizing: border-box;
+  }
+  
+  .number-input button {
+    outline:none;
+    -webkit-appearance: none;
+    background-color: transparent;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    margin: 0;
+    position: relative;
+    box-shadow: 0px 0px 1px #474747;
+      border-radius: 50%;
+  }
+  
+  .number-input button:before,
+  .number-input button:after {
+    display: inline-block;
+    position: absolute;
+    content: '';
+    width: 0.7rem;
+    height: 2px;
+    background-color: #212121;
+    transform: translate(-50%, -50%);
+  }
+  .number-input button.plus:after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+.number-input button:hover {background-color: #c8ccc8}
+
+.number-input button:active {
+  background-color: #c8ccc8;
+  box-shadow: 0 1px #666;
+  transform: translateY(0.2px);
+}
+  
+  .number-input input[type=number] {
+    font-family: sans-serif;
+    max-width: 2rem;
+    max-height: 2rem;
+    padding: .1rem;
+    border: none;
+    border-width: 0 2px;
+    font-size: 1.3rem;
+    height: 2rem;
+    font-weight: bold;
+    text-align: center;
+    color:#9be3df;
+  }
+
+  #searchList{
+    background-color:white;
+    border-radius:10px;
+    box-shadow: 3px 3px 2px 3px rgba(0, 0, 0, 0.2);
+    
+  }
+
+  #searchList tr td:last-child{
+    border:0
+  }
+
+  #dtBasicExample{
+    position:absolute !important;
+    top: 180px !important;
+    z-index:-100 !important;
+  }
+
+ /* copy of close class from bootstrap for independence */
+ .closeAlert {
+  float: right;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: .5;
+}
+
+.closeAlert:hover {
+  color: #000;
+  text-decoration: none;
+}
+
+.closeAlert:not(:disabled):not(.disabled):hover, .closeAlert:not(:disabled):not(.disabled):focus {
+  opacity: .75;
+}
+
+
+button.closeAlert {
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+}
+
+a.closeAlert.disabled {
+  pointer-events: none;
+}
+
+/* custom selector */
+.selectWrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #bbb;
+  border-radius: 2px;
+  background:#FFFFFF url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2211%22%20height%3D%2211%22%20viewBox%3D%220%200%2011%2011%22%3E%3Cpath%20d%3D%22M4.33%208.5L0%201L8.66%201z%22%20fill%3D%22%2300AEA9%22%2F%3E%3C%2Fsvg%3E') right 13px center no-repeat;
+}
+
+.selectWrapper select {
+      padding: 12px 40px 12px 20px;
+      font-size: 18px;
+      line-height: 18px;
+      width: 100%;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+      background-image: none;
+      -webkit-appearance: none;
+      outline: none;
+      cursor: pointer;
+      -moz-appearance: none;
+      text-indent: 0.01px;
+      text-overflow: ellipsis;
+  }
+
+  /* split row in halves */
+
+  .list-group-item.left-side,
+.list-group-item.right-side {
+  margin: 0 0 -1px;
+  float: left;
+  width: 50%;
+  border-bottom-width:0px;
+}
+
+.split-items .list-group-item.left-side{
+  border-top-right-radius:0px;
+  border-bottom-right-radius:0px;
+}
+
+.split-items .list-group-item.right-side{
+  border-top-left-radius:0px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+  border-top-right-radius:4px;
+  border-left: 0;
+}
+
+/* services index card class */
+.card_container{
+  font-size: 9px;
+  width: 100%
+}
+
+.card_ind{
+  perspective: 150em;
+  -moz-perspective: 150em;
+  position: relative;
+  height: 52em; }
+  .card__side {
+    height: 52em;
+    transition: all .8s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0 1.5em 4em rgba(0, 0, 0, 0.15); }
+    .card__side--front {
+      background-color: #fff; }
+    .card__side--back {
+      transform: rotateY(180deg); }
+      .card__side--back-1 {
+        background-image: linear-gradient(to right bottom, #233c53, #2296e4); }
+      .card__side--back-2 {
+        background-image: linear-gradient(to right bottom, #233c53, #2296e4); }
+  .card_ind:hover .card__side--front {
+    transform: rotateY(-180deg); }
+  .card_ind:hover .card__side--back {
+    transform: rotateY(0); }
+  .card__picture {
+    background-size: cover;
+    height: 21em;
+    background-blend-mode: screen;
+    -webkit-clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px; }
+    .card__picture--1 {
+      background-image: linear-gradient(to right bottom, rgba(240, 243, 247, 0.85), rgba(49, 64, 196, 0.85)), url(https://images.unsplash.com/photo-1576671081803-5dcb9836dc61?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1237&q=80);
+      background-position:0, 1em; 
+    }
+    .card__picture--2 {
+      background-image: linear-gradient(to right bottom,#233c53, #2296e4), url(https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60) }
+  .card__picture_admin {
+    background-size: cover;
+    height: 21em;
+    background-blend-mode: screen;
+    -webkit-clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px; }
+    .card__pictureAdmin--1 {
+      background-image: linear-gradient(to right bottom, rgba(235, 238, 241, 0.85), #86aa78), url(https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80);
+      background-position:0, 1em; 
+    }
+    .card__pictureAdmin--2 {
+      background-image: linear-gradient(to right bottom,#eaeff3, #338125), url(https://images.unsplash.com/photo-1598931032977-a19d3c6254c0?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=2691&q=80) }
+    .card__pictureAdmin--3 {
+      background-image: linear-gradient(to right bottom,#e0e5eb, #045202), url(https://images.unsplash.com/photo-1564939558297-fc396f18e5c7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80) }
+
+  .card__heading {
+    font-size: 2.3em;
+    font-weight: 300;
+    text-transform: uppercase;
+    text-align: right;
+    color: #fff;
+    position: absolute;
+    top: 7em;
+    right: 0.3em;
+    width: 80%; }
+  .card__heading-span {
+    padding: 0.1em 0.3em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone; }
+    .card__heading-span--1 {
+      background-image: linear-gradient(to right bottom, #2296e4, #233c53) };
+    .card__heading-span--2 {
+      background-image: linear-gradient(to right bottom,#2296e4, #233c53 ) };
+  .card__details {
+    padding: 1em; }
+    .card__details ul {
+      list-style: none;
+      width: 80%;
+      margin: 0 2em; }
+      .card__details ul li {
+        text-align: center;
+        font-size: 1.5em;
+        padding: 1em; }
+        .card__details ul li:not(:last-child) {
+          border-bottom: 1px solid #eee; }
+  .card__cta {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    text-align: center; }
+  .card__back-box {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 8em; }
+  .card__back_title {
+    font-size: 2.3rem;
+    font-weight: 100; }
+  @media only screen and (max-width: 50.25em), only screen and (hover: none) {
+    .card_ind {
+      height: auto;
+      border-radius: 3px;
+      background-color: #fff;
+      box-shadow: 0 1.5em 4em rgba(0, 0, 0, 0.15); }
+      .card__side {
+        height: auto;
+        position: relative;
+        box-shadow: none; }
+        .card__side--back {
+          transform: rotateY(0);
+          clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%); }
+      .card_ind:hover .card__side--front {
+        transform: rotateY(0); }
+      .card__details {
+        padding: 1em 3em; }
+      .card__cta {
+        position: relative;
+        top: 0%;
+        left: 0;
+        transform: translate(0);
+        width: 80%;
+        padding: 7em 4em 4em 4em; }
+      .card__back-box {
+        margin-bottom: 3em; }
+      .card__price-title {
+        font-size: 4em; } }
+
+
+/* Button for index cards */
+
+.bt_container{
+  font-size: 7px;
+}
+
+.bt, .bt:link, .bt:visited {
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 1.5em 4em;
+  display: inline-block;
+  border-radius: 10em;
+  transition: all .2s;
+  position: relative;
+  font-size: 1.6em;
+  border: none;
+  cursor: pointer; }
+
+.bt:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 1em 2em rgba(0, 0, 0, 0.2); }
+  .bt:hover::after {
+    transform: scaleX(1.4) scaleY(1.6);
+    opacity: 0; }
+
+.bt:active, .bt:focus {
+  outline: none;
+  transform: translateY(-1px);
+  box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.2); }
+
+.bt--white {
+  background-color: #fff;
+  color: #777; }
+  .bt--white::after {
+    background-color: #fff; }
+
+.bt::after {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  border-radius: 10em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  transition: all .4s; }
+
+.bt--animated {
+  animation: moveInBottom .5s ease-out .75s;
+  animation-fill-mode: backwards; }
+
+.bt-text:link, .bt-text:visited {
+  font-size: 1.6em;
+  color: #55c57a;
+  display: inline-block;
+  text-decoration: none;
+  border-bottom: 1px solid #55c57a;
+  padding: 3px;
+  transition: all .2s; }
+
+.bt-text:hover {
+  background-color: #55c57a;
+  color: #fff;
+  box-shadow: 0 1em 2em rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px); }
+
+.bt-text:active {
+  box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.15);
+  transform: translateY(0); }
+
+
+
+/* Button Toggle */
+.df-switch {
+  margin-top: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+.btn-toggle {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.btn-toggle {
+  margin: 0 0rem;
+  padding: 0;
+  position: relative;
+  border: none;
+  height: 1.5rem;
+  width: 3.5rem;
+  border-radius: 1.5rem;
+  color: #6b7381;
+  background: #0885da;
+}
+.btn-toggle:focus,
+.btn-toggle.focus,
+.btn-toggle:focus.active,
+.btn-toggle.focus.active {
+  outline: none;
+}
+.btn-toggle:before,
+.btn-toggle:after {
+  line-height: 1.5rem;
+  width: 4rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: absolute;
+  bottom: 0;
+  transition: opacity 0.25s;
+}
+.btn-toggle:before {
+  font-family: "Font Awesome 5 Free";  
+  font-weight: 1.5rem;
+  font-size: 1.5rem;
+
+	content: "\f2f2";
+  left: -4rem;
+  color: #109fff;
+}
+.btn-toggle:after {
+  font-family: "Font Awesome 5 Free";  
+  content: '\f28b';
+  font-weight: 1.5rem;
+  font-size: 1.5rem;
+  right: -4.5rem;
+  opacity: 0.5;
+  color: #808080;
+}
+.btn-toggle > .inner-handle {
+  border-radius: 13px;
+  width: 40px;
+  height: 13px;
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  background-color: #0f71bd;
+  box-shadow: inset 1px 1px 2px -1px black;
+}
+.btn-toggle.active > .inner-handle {
+  background-color: #808080;
+}
+.btn-toggle > .handle:before {
+  content: "";
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  top: 35%;
+  left: 11px;
+  background-image: radial-gradient(circle at center, #0785da 5px, transparent 5px);
+  background-size: 10px 10px;
+  background-repeat: no-repeat;
+}
+.btn-toggle.active > .handle:before {
+  background-image: radial-gradient(circle at center, #808080 5px, transparent 5px);
+}
+.btn-toggle > .handle {
+  position: absolute;
+  top: -0.2875rem;
+  left: 0.3875rem;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 1.125rem;
+  background: #fff;
+  transition: left 0.25s;
+  border: 1px solid #ccc;
+}
+.btn-toggle.active {
+  transition: background-color 0.25s;
+}
+.btn-toggle.active > .handle {
+  left: 2.4175rem;
+  transition: left 0.25s;
+}
+.btn-toggle.active:before {
+  opacity: 0.5;
+}
+.btn-toggle.active:after {
+  opacity: 1;
+  color: #808080;
+}
+.btn-toggle.active {
+  background-color: #808080;
+}

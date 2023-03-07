@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinica San Roman</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+    <script src="/javascripts/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/app.css">
+</head>
+<%
+function numberCommas(x) {
+    return (x)?x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","):x;
+}
+function makeDMY(date){
+  const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+  y : date.getUTCFullYear()};
+  return  ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d)+ "/" + newDate.m+ "/" + newDate.y;
+}
+let patientNoHonorary = patient.filter((el)=>{
+    return (el.class != "Honorarios" && el.class != "Honorarios Medicos")
+});
+
+let honoraries = patient.filter((el)=>{
+    return (el.class == "Honorarios" || el.class == "Honorarios Medicos")
+});
+
+let newPatient = patientNoHonorary.concat(honoraries);
+%>
+ <%- include('../partials/navbar')%>
+    <body>
+        <div class = "toPDF">
+            <div class="jumbotron">
+                <div class="container mt-4">
+                    <div class="row justify-content-center ">
+                        <div  class = "col-5"></div>
+                        <div class = "col-6">
+                            <h6 class = "text-center pl-2"> Administracion</h6>
+                            <h5 class = "text-center pl-2">
+                                Clinica San Roman
+                            </h5>
+                            <h5 class="text-center text-nowrap pl-2 ">Estado de Cuenta</h5>
+                            <br><br> 
+                            <img src="/imgs/clinicaSR_img.jpg" class = "image_print" alt="clinica">
+                            <!-- <h1 class="display-4"><%=patient[0].patientName%></h1> -->
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row justify-content-between border">
+                        <div class="col-5 reduced">
+                            <p class = "">Admisión: <%= makeDMY(patient[0].admissionDate)%></p>
+                            <p class = "">Paciente: <%= patient[0].patientName%></p>
+                        </div>
+                        <div class="col-5 reduced">
+                            <p class = "">Medico tratante: <%= patient[0].treatingDoctor%></p>
+                            <p class = "">Diagnostico: <%= patient[0].diagnosis%></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class = "m-4 p-4">
+                <table class="table table-borderless" id="simple_table">
+                    <thead class="thead-dark">
+                        <tr class="border-bottom border-dark reduced">  
+                            <th scope="col"><h6>Clase</h6></th>
+                            <th scope="col"><h6>Nombre</h6></th> 
+                            <th scope="col"><h6>Cantidad</h6></th>  
+                            <th scope="col"><h6>Precio Unitario</h6></th>
+                            <th scope="col"><h6>Subtotal</h6></th>
+                        </tr>  
+                    </thead>
+                    <tbody>
+                    <%let prev_class= "", subtotal_class = 0, sub_amount = 0,total = 0; 
+                    newPatient.forEach(function(item,index){%>
+                            <tr class = 'subRed'>  
+                                <th><%=item.class%></th> 
+                                <th></th> 
+                                <th></th>  
+                                <th></th>
+                                <th></th>
+                                <th></th> 
+                            </tr>
+                        <%
+                            sub_amount = 0; subtotal_class = 0;
+                        let price = 0;
+                        (item.amount).forEach(function(amnt,i){
+                            if(item.service_type == "supply"){price = item.sell_price[i]}else{price = item.price[i]}
+                            let item_subtotal = +(price * amnt).toFixed(3);%>
+                        <tr class = "reduced">  
+                            <td></td>
+                            <td><%=item.serviceName[i]%></td> 
+                            <td><%=Math.round(amnt)%></td>  
+                            <td>$<%=numberCommas(price)%></td>
+                            <td>$<%=numberCommas(item_subtotal)%></td>  
+                        </tr> 
+                        <%
+                        sub_amount += amnt;subtotal_class += item_subtotal;
+                        total += item_subtotal;
+                        subtotal_class = +(subtotal_class).toFixed(3)
+                    })%>
+                        <tr class = "subRed border">  
+                            <th></th>
+                            <th scope="row">Subtotal</th>  
+                            <th scope="row"><%=Math.round(sub_amount)%></th>  
+                            <th scope="row"></th>  
+                            <th scope="row">$<%=numberCommas(subtotal_class)%></th> 
+                        </tr>
+                <%})%>
+                    </tbody> 
+                </table> 
+                <div>
+                    <%total = +(total).toFixed(3)%>
+                    <h5 class = "float-right border border-secondary rounded"><span class = "mx-2 my-2">Total: $<%=numberCommas(total)%></span></h5>
+                </div>
+            </div>
+        </div>        
+ </body> 
+ 
+</html>

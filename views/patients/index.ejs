@@ -1,0 +1,206 @@
+<% layout('layouts/boilerplate')%>
+
+<%
+function makeYMD(date){
+const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+y : date.getUTCFullYear()};
+return  newDate.y+ "-" + ((newDate.m.toString().length>1)?newDate.m:"0"+newDate.m)+ "-" + ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d);
+}
+function makeHour(date){
+  const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+  y : date.getUTCFullYear(),h:date.getUTCHours(), min:(((""+date.getUTCMinutes()).length>1)?date.getUTCMinutes():"0"+date.getUTCMinutes())};
+  return  (newDate.h+":"+newDate.min);
+}
+function convertUTCDateToLocalDate(date) {
+    invdate = new Date(`${new Date(date).toLocaleString('en-US', { timeZone: 'America/Mexico_City' })} GMT`)
+    // and the diff is 5 hours
+    var diff = date.getTime() - invdate.getTime();
+    // so 12:00 in Toronto is 17:00 UTC
+    return new Date(date.getTime() - diff); // needs to substract
+ }
+
+patients.sort((a, b) => (a.discharged) ? 1 : -1)
+%>
+<div class="container">   
+    <div class="container">
+        <div class="row">
+          <div class="col d-flex text-center flex-column justify-content-between"> 
+            <lottie-player src="/lotties/patients_lot.json" onclick="myFunction()" background="transparent"  speed="1"  style="width: 300px; height: 300px;" loop  autoplay></lottie-player>
+          </div>
+          <div class="col d-flex text-center flex-column justify-content-between"> 
+            <div></div>
+   
+            <h1 class= "display-3 font-weight-bold text-center">Pacientes</h1>
+            <div></div>
+
+            </div>
+          <div class="col d-flex  text-center flex-column justify-content-between">
+            <!-- <div class="row justify-content-around mb-4"> -->
+                    <div></div>
+                    <div class="mr- ml-5">
+                        <a class="btn btn-info " href="/patients/new">
+                            <div class="col">
+                                <div class="row d-flex text-center flex-row justify-content-between"> 
+                                    <lottie-player src="/lotties/register.json" onclick="myFunction()" background="transparent"  speed="1"  style="width: 200px; height: 100px;" loop  autoplay></lottie-player>
+                                </div>
+                                <div class="row ml-3 d-flex text-center flex-row justify-content-between"> 
+                                    Registrar Paciente
+                                </div>
+                                <!-- <div class="col d-flex text-center flex-column justify-content-between">
+                                </div> -->
+                            </div>
+                        </a> 
+                    </div>
+                    <select class="btn btn-outline-primary custom-select custom-select-lg mb-3" >
+                        <option selected>Ordenar por:</option>
+                        <option id= "byName" value="name">Nombre</option>
+                        <option id= "byDoctor" value="doctor">Medico Tratante</option>
+                        <option id= "byDisease" value="disease">Padecimiento</option>
+                    </select>
+                    <div></div>
+            <!-- </div> -->
+          </div>
+          <!-- <div class="col d-flex mt-4 flex-column justify-content-between">
+            <button type="button" class="float-left btn btn-primary btn-sm apply_dates">Aplicar fechas</button>
+          </div> -->
+        </div>
+    </div>
+    
+    <!-- <img src="/imgs/pacientes.png" class = "image_print" alt="clinica"> -->
+    <div class = "container mb-4">
+        <div class = "row offset-sm-2 justify-content-md-center">
+            <div class="col col-lg-10">
+                <div class = "btn-group mr-2" id = "search_group">
+                <input class="input-group-text mr-2" id = "search_val" type="text" name="search" placeholder="Buscar" aria-label="Search">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="patients row scrollDiv mt-4">
+    <%for (let patient of patients){%>
+        <div class="col-md-6">
+            <%let borderColor = (patient.discharged)?"secondary":"primary"%>
+            <div class="card index_card_p mb-4 border border-<%=borderColor%>">
+                <div class="row">
+                    <div class="container">
+                        <div class="col-md-16">
+                            <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };%>
+                            <div class="card-body">
+                                <div class="row justify-content-between">
+                                    <div class="col-7">
+                                        <h3 class="card-title"><%= patient.name %> </h3>
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-2">
+                                    <%if(patient.cuarto){%>
+                                        <h3 class="card-title border border-<%=borderColor%> rounded-circle p-3 float-right"><%= patient.cuarto %> </h3>
+                                    <%}%>
+                                    </div>
+                                  </div>
+                                  <!-- <h4 class="card-title text-muted">Fecha de ingreso: <%= patient.admissionDate.toLocaleString('en-US', { timeZone: 'America/Mexico_City' }) %> </h4> -->
+
+                                <h4 class="card-title text-muted">Fecha de ingreso: <%= patient.admissionDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.admissionDate) %>  </h4>
+                                <%if(patient.discharged){%>
+                                    <h4 class="card-title text-muted">Fecha de egreso: <%= patient.dischargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.dischargedDate) %> </h4>
+                                <%}%>
+                                <ul class="list-group list-group-flush mb-4">
+                                    <li class="list-group-item">Email: <%= patient.email%></li>
+                                    <li class="list-group-item">Telefono: <%= patient.phone%> </li>
+                                    <%if(patient.edad){%>
+                                        <li class="list-group-item">Edad: <%= patient.edad%> </li>
+                                    <%}%>
+                                    <li class="list-group-item">Agregado por:  <%= patient.author.username%></li>
+                                    <li class="list-group-item">Medico tratante:  <%= patient.treatingDoctor%></li>
+                                    <li class="list-group-item text-muted">Diagnostico: <%= patient.diagnosis%></li>
+                                </ul>
+                                <%if(!patient.discharged){%>
+                                    <a class="btn btn-primary" href="/patients/<%=patient._id%>">Ver cuenta</a>
+                                    <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"){%>
+                                        <form class="d-inline" action="/patients/<%=patient._id%>?_method=DELETE" method="POST">
+                                            <button type="button" class="float-right btn btn-outline-danger mx-1 my-1 btn-sm" data-toggle="modal" data-target="#a<%=patient._id%>">
+                                                <i class="fas fa-trash"></i>
+                                              </button>
+                                              <div class="modal fade" id="a<%=patient._id%>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                  <div class="modal-content">
+                                                    <div class="modal-header">
+                                                      <h5 class="modal-title" id="exampleModalLabel">Borrar Paciente</h5>
+                                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                      </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Los cambios no son reversibles.
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-edit"></i></button>
+                                                      <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                        </form>
+ 
+                                        <a class="float-right btn btn-outline-secondary mx-1 my-1 btn-sm" href="/patients/<%=patient._id%>/edit"><i class="fas fa-edit"></i></a>
+                                    <%}%>
+                                <%}else{%>
+                                    <%
+                                    const b = patient.admissionDate.toISOString().substr(0,10);
+                                    const e = patient.dischargedDate.toISOString().substr(0,10)
+                                    %>
+                                    <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"){%>
+                                    <a href = "/patients/<%=patient._id%>/dischargedPDF">
+                                        <button type="button" class="btn btn-outline-secondary">Ver cuenta</button>
+                                    </a>
+                                    <%}%>
+                                <%}%>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }%>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+      <div class="col d-flex text-center flex-column justify-content-between">
+        <label>De</label>
+        <input type="date" name="beginDay" id = "beginDate" value = "2020-10-02" class="form-control">
+      </div>
+      <div class="col d-flex text-center flex-column justify-content-between">
+        <label>Hasta</label>
+        <input type="date" name="endDay"  id = "endDate" value = "<%=makeYMD(new Date)%>" class="form-control">
+      </div>
+      <div class="col d-flex mt-4 flex-column justify-content-between">
+        <button type="button" class="float-left btn btn-primary btn-sm apply_dates">Aplicar fechas</button>
+      </div>
+    </div>
+</div>
+
+<div class = "container">
+    <div class="row my-3 pagination customClass" >
+        <div class="btn-group float-right" role="group" aria-label="First group">
+            <%if(page >1){%>
+                <a onclick="foundPatients(this)" alt="<%=page-1%>"  class="btn btn-light " role="button" aria-pressed="true"><i class="fas fa-arrow-circle-left"></i></a>
+            <%}%>
+            <%for(let step = 1; step < pages+1; step++) {
+                let act = (step == page)?"active":"";%>
+                <a onclick="foundPatients(this)" alt="<%=step%>" class="btn btn-light <%=act%>" role="button" aria-pressed="true"><%=step%></a>
+            <%}%>
+            <%if(page+1 <= pages){%>
+                <a onclick="foundPatients(this)" alt="<%=page+1%>"  class="btn btn-light " role="button" aria-pressed="true"><i class="fas fa-arrow-circle-right"></i></a>
+            <%}%>
+        </div>
+    </div>
+</div>
+<script src="/javascripts/search_in_patients.js" />
+<script>
+function myFunction() {
+  alert("I am an alert box!");
+}
+</script>

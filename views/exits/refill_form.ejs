@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinica San Roman</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+    <script src="/javascripts/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/app.css">
+</head>
+<%
+function makeDMY(date){
+  const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+  y : date.getUTCFullYear()};
+  return  ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d)+ "/" + newDate.m+ "/" + newDate.y;
+}
+function makeDMYHour(date){
+  const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+  y : date.getUTCFullYear(),h:date.getUTCHours(), min:(((""+date.getUTCMinutes()).length>1)?date.getUTCMinutes():"0"+date.getUTCMinutes())};
+  return  ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d)+ "/" + newDate.m+ "/" + newDate.y+ "   "+newDate.h+":"+newDate.min;
+}
+//Array with supplies to be refilled
+let refill_location = {};
+transactions.forEach(element => {
+    if(element.service.service_type == "supply"){
+    let trans = { 
+            name: element.service.name,
+            class: element.service.class,
+            consumtionDate: element.consumtionDate,
+            principle: element.service.principle,
+            expiration: element.service.expiration,
+            amount: element.amount,
+            author:element.addedBy.username,
+            patient: element.patient.name
+                }
+    if(element.location in refill_location){
+        refill_location[element.location].push(trans);
+    }else{
+        refill_location[element.location] = [trans]
+    }
+}
+});
+for(let zone in refill_location){
+    refill_location[zone]= refill_location[zone].sort((a,b)=>a.class.localeCompare(b.class,"es",{sensitivity:'base'}));
+    let prev_c = '';
+    let zone_order_list = [];
+    let class_sort_list = [];
+    for(let tr of refill_location[zone]){
+        if(prev_c != tr.class){
+            prev_c = tr.class;
+            zone_order_list = zone_order_list.concat(class_sort_list.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:'base'})));
+            class_sort_list = [];
+        }
+        class_sort_list.push(tr)
+    }
+    zone_order_list = zone_order_list.concat(class_sort_list.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:'base'})));
+    refill_location[zone] = zone_order_list;
+}
+%>
+ <%- include('../partials/navbar')%>
+    <body>
+        <div class = "toPDF">
+            <div class="jumbotron">
+                <div class = "m-4 p-4">
+                    <%  for (const property in refill_location) {%>
+                        <table class="table table-borderless sticky1" id="simple_table">
+                            <thead class="thead-dark">
+                                <tr class="border-bottom border-dark">  
+                                    <th scope ="col"><h3></h3></th>
+                                    <!-- <th scope="col"><h3></h3></th>  -->
+                                    <th scope="col"><h3><%=property%></h3></th>  
+                                    <!-- <th scope="col"><h3></h3></th>
+                                    <th scope="col"><h3></h3></th> -->
+                                    <th scope="col"><h3></h3></th>
+                                </tr>  
+                            </thead>
+                            <tbody>
+                                <tr>  
+                                    <th>Nombre</th> 
+                                    <th>Principio</th> 
+                                    <th>Cantidad</th>  
+                                    <th>Caducidad</th>
+                                    <th>Agregado</th>
+                                    <th>Usuario</th>
+                                    <th>Paciente</th>
+                                </tr>
+                            <%
+                            refill_location[property].forEach(function(item,index){%>
+                                <%console.log(item)%>
+                                <tr>  
+                                    <td><%=item.name%></td> 
+                                    <td><%=item.principle%></td>  
+                                    <td><%=item.amount%></td>  
+                                    <td><%=makeDMY(item.expiration)%></td>
+                                    <td><%=makeDMYHour(item.consumtionDate)%></td>  
+                                    <td><%=item.author%></td> 
+                                    <td><%=item.patient%></td>
+                                </tr> 
+                            <%})%>
+                            </tbody> 
+                        </table> 
+                    <%}%>
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-6">
+                                <%if(entrega || recibe){%>
+                                    <h2>Entrega: <%=entrega%><h2>
+                                    <h2>Recibe: <%=recibe%><h2></h2>
+                                <%}else{%>
+                                <form action="/exits/refill" method="POST" novalidate class="validated-form">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="entrega">Entrega:</label>
+                                        <input class="form-control" value = " "type="text" id="entrega" name="refill[entrega]" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="recibe">Recibe:</label>
+                                        <input class="form-control" value = " "type="text" id="recibe" name="refill[recibe]" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button type = "submit" class="btn btn-outline-secondary">Crear PDF</button>
+                                    </div>
+                                </form>
+                                <%}%>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+            <div class="container mx-3 ">
+                <form action="/exits/refill?_method=PUT" method="POST" novalidate class="validated-form">
+                    <div class="float-right mb-4">
+                        <button type = "submit" class="btn btn-danger">Reiniciar lista</button>
+                    </div>
+                </form>  
+            </div>   
+ </body> 
+ 
+</html>
