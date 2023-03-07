@@ -3,7 +3,7 @@ const { cloudinary } = require("../cloudinary");
 const Transaction = require('../models/transaction');
 const { listenerCount } = require('../models/exit');
 function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched strings
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
   }
 
   function getMexicoCityTime() {
