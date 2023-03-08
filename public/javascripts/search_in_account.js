@@ -335,7 +335,7 @@ function editService(event) {
   let preVal = $(this).parent().parent().parent().find(".item-amount").text();
   $(this).parent().parent().parent().find(".item-amount").replaceWith( `<input type = "number" value = "${preVal}" class = "amountEdit">` );
   $(this).parent().parent().parent().find(".buttons").replaceWith( `<span class = "float-right buttons">
-          <button type="button"  class="accept-item btn btn-sm mr-4 btn-outline-primary">Aceptar</button></span>` );
+          <button type="button"  class="accept-item btn btn-sm mr-4 btn-outline-success">Aceptar</button></span>` );
 };
 
 

@@ -49,7 +49,7 @@ function foundPatients(event) {
         $.each(response.patients.sort((a, b) => (a.discharged) ? 1 : -1), function(){
             console.log('search in patients!!!')
             patientsContent+= '<div class="col-md-6">'
-            let borderColor = (this.discharged)?"secondary":"primary";
+            let borderColor = (this.discharged)?"secondary":"success";
             patientsContent+=`
             <div class="card index_card_p mb-4 border border-`+borderColor+`">
                 <div class="row">
@@ -82,7 +82,7 @@ function foundPatients(event) {
                                     <li class="list-group-item text-muted">Diagnostico: `+this.diagnosis+`</li>
                                 </ul>`
                                 if(!this.discharged){
-                                    patientsContent+=`<a class="btn btn-primary" href="/patients/`+this._id+`">Ver cuenta</a>
+                                    patientsContent+=`<a class="btn btn-success" href="/patients/`+this._id+`">Ver cuenta</a>
                                     <form class="d-inline" action="/patients/`+this._id+`?_method=DELETE" method="POST">
                                         <button class="float-right btn btn-outline-danger mx-1 my-1 btn-sm"><i class="fas fa-trash"></i></button>
                                     </form>

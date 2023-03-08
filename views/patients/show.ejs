@@ -8,11 +8,14 @@
   const beginD = '<%-JSON.stringify(begin)%>';
   const endD = '<%-JSON.stringify(end)%>';
 </script>
+<div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
+  <div class="pop-up-container "><h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px"><%=patient.name%></h5> </div>
+  </div>
 <div class = "container">
   <div class = "btn-group mr-2" id = "search_group">
     <input class="input-group-text mr-2" id = "search_val" type="text" name="search" placeholder="Search" aria-label="Search">
     <input type="date" id="expirDate" name="expiration">
-    <button class="btn btn-outline-primary" id = "search" type="submit" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-search"></i></button>
+    <button class="btn btn-outline-success" id = "search" type="submit" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-search"></i></button>
   </div>
   <!-- //search preview table -->
   <div id = "searchList">
@@ -45,7 +48,7 @@ let total = 0;
 let nonTimeElements = patientCar.filter(el=>!(timeUnits.includes(el.unit)));
 let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
 %> 
-<div><h1 class="text-center display-4"><%=patient.name%></h1></div>
+
 <div class="row justify-content-center" id = "account-table">
   <div class="col-12 overflow-auto ">
     <table id="accountrStatus" class="table table-responsive-sm sticky1">
@@ -260,7 +263,7 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
     </div>
     <div class="col-2">
       <div class="row">
-        <button type="button" class="btn btn-primary apply_dates">Aplicar fechas</button>
+        <button type="button" class="btn btn-success apply_dates">Aplicar fechas</button>
       </div>
     </div>
   </div>

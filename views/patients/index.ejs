@@ -29,8 +29,10 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
           </div>
           <div class="col d-flex text-center flex-column justify-content-between"> 
             <div></div>
-   
-            <h1 class= "display-3 font-weight-bold text-center">Pacientes</h1>
+            <div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
+              <div class="pop-up-container "><h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px">PACIENTES</h5> </div>
+              </div>
+            <!-- <h1 class= "display-3 font-weight-bold text-center">Pacientes</h1> -->
             <div></div>
 
             </div>
@@ -51,7 +53,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                             </div>
                         </a> 
                     </div>
-                    <select class="btn btn-outline-primary custom-select custom-select-lg mb-3" >
+                    <select class="btn btn-outline-success custom-select custom-select-lg mb-3" >
                         <option selected>Ordenar por:</option>
                         <option id= "byName" value="name">Nombre</option>
                         <option id= "byDoctor" value="doctor">Medico Tratante</option>
@@ -61,7 +63,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
             <!-- </div> -->
           </div>
           <!-- <div class="col d-flex mt-4 flex-column justify-content-between">
-            <button type="button" class="float-left btn btn-primary btn-sm apply_dates">Aplicar fechas</button>
+            <button type="button" class="float-left btn btn-success btn-sm apply_dates">Aplicar fechas</button>
           </div> -->
         </div>
     </div>
@@ -81,7 +83,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
     <div class="patients row scrollDiv mt-4">
     <%for (let patient of patients){%>
         <div class="col-md-6">
-            <%let borderColor = (patient.discharged)?"secondary":"primary"%>
+            <%let borderColor = (patient.discharged)?"secondary":"success"%>
             <div class="card index_card_p mb-4 border border-<%=borderColor%>">
                 <div class="row">
                     <div class="container">
@@ -116,7 +118,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                                     <li class="list-group-item text-muted">Diagnostico: <%= patient.diagnosis%></li>
                                 </ul>
                                 <%if(!patient.discharged){%>
-                                    <a class="btn btn-primary" href="/patients/<%=patient._id%>">Ver cuenta</a>
+                                    <a class="btn btn-success" href="/patients/<%=patient._id%>">Ver cuenta</a>
                                     <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"){%>
                                         <form class="d-inline" action="/patients/<%=patient._id%>?_method=DELETE" method="POST">
                                             <button type="button" class="float-right btn btn-outline-danger mx-1 my-1 btn-sm" data-toggle="modal" data-target="#a<%=patient._id%>">
@@ -177,7 +179,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
         <input type="date" name="endDay"  id = "endDate" value = "<%=makeYMD(new Date)%>" class="form-control">
       </div>
       <div class="col d-flex mt-4 flex-column justify-content-between">
-        <button type="button" class="float-left btn btn-primary btn-sm apply_dates">Aplicar fechas</button>
+        <button type="button" class="float-left btn btn-success btn-sm apply_dates">Aplicar fechas</button>
       </div>
     </div>
 </div>
