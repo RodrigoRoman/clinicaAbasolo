@@ -47,11 +47,10 @@ function foundPatients(event) {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         patientsContent+=`<div class="patients row scrollDiv mt-4">`
         $.each(response.patients.sort((a, b) => (a.discharged) ? 1 : -1), function(){
-            console.log('search in patients!!!')
             patientsContent+= '<div class="col-md-6">'
             let borderColor = (this.discharged)?"#7f8a88":this.author.color;
             patientsContent+=`
-            <div class="card index_card_p mb-4 border border-`+borderColor+`"style="border-color:`+borderColor+`!important;>
+            <div class="card index_card_p mb-4 border border-`+borderColor+`"style="border-color:`+borderColor+`!important;">
                 <div class="row">
                     <div class="container">
                         <div class="col-md-16">

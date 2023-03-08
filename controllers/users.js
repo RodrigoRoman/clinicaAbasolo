@@ -11,10 +11,10 @@ module.exports.register = async (req, res, next) => {
         const { email, username, password,keyword } = req.body;
         let user;
         if(keyword == "administracionAlta"){
-            user = new User({ email, username, role:"directAdmin",color:"#00FFAA"});
+            user = new User({ email, username, role:"directAdmin",color:"#00FF00"});
         }
         if(keyword == "administracion1" || keyword == "medico"){
-            user = new User({ email, username, role:"dinamicAdmin",color: randomColor()});
+            user = new User({ email, username, role:"dinamicAdmin",color: randomColor({luminosity:'light'})});
         }
         if(keyword == "enfermeria"){
             user = new User({ email, username, role:"nurse",color:"#00FF00"});

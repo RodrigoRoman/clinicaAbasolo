@@ -459,7 +459,7 @@ module.exports.refillFormPDF = async (req,res) =>{
     // await page.goto(
     //     `http://localhost:3000/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
     //       waitUntil: 'networkidle0'});
-    await page.goto(`https://clinicaabasolo.up.railway.app//exits/refill?entrega=${entrega}&recibe=${recibe}`,{
+    await page.goto(`https://clinicaabasolo.up.railway.app/exits/refill?entrega=${entrega}&recibe=${recibe}`,{
                 waitUntil: 'networkidle0'});
     // await page.goto(`http://localhost:3000/exits/refill?entrega=${entrega}&recibe=${recibe}`,{
     //             waitUntil: 'networkidle0'});

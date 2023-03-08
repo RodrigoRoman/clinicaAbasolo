@@ -83,7 +83,8 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
     <div class="patients row scrollDiv mt-4">
     <%for (let patient of patients){%>
         <div class="col-md-6">
-            <%let borderColor = (patient.discharged)?"#7f8a88":currentUser.color%>
+            <%
+              let borderColor = (patient.discharged)?"#7f8a88":patient.author.color%>
             <div class="card index_card_p mb-4 border border-<%=borderColor%>" style="border-color:<%=borderColor%> !important;">
                 <div class="row">
                     <div class="container">
