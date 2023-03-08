@@ -444,7 +444,7 @@ module.exports.dischAccountPDF = async (req,res) =>{
     
     // await page.goto(`https://pure-brushlands-42473.herokuapp.com/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
     //     waitUntil: 'networkidle0'}); 
-    await page.goto(`https://clinicaabasolo.up.railway.app//patients/${req.params.id}/showDischarged`,{
+    await page.goto(`https://clinicaabasolo.up.railway.app/patients/${req.params.id}/showDischarged`,{
         waitUntil: 'networkidle0'});          // go to site
     // await page.goto(
     //     `http://localhost:3000/patients/${req.params.id}/showDischarged`,{
