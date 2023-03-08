@@ -49,9 +49,9 @@ function foundPatients(event) {
         $.each(response.patients.sort((a, b) => (a.discharged) ? 1 : -1), function(){
             console.log('search in patients!!!')
             patientsContent+= '<div class="col-md-6">'
-            let borderColor = (this.discharged)?"secondary":"success";
+            let borderColor = (this.discharged)?"#7f8a88":this.author.color;
             patientsContent+=`
-            <div class="card index_card_p mb-4 border border-`+borderColor+`">
+            <div class="card index_card_p mb-4 border border-`+borderColor+`"style="border-color:`+borderColor+`!important;>
                 <div class="row">
                     <div class="container">
                         <div class="col-md-16">
@@ -64,12 +64,13 @@ function foundPatients(event) {
                                 <div class="col-1"></div>
                                 <div class="col-2">`
                                     if(this.cuarto){
-                                        patientsContent+=` <h3 class="card-title border border-`+borderColor+` rounded-circle p-3 float-right">`+this.cuarto+`</h3>`
+                                        patientsContent+=` <h3 class="card-title border border-`+borderColor+` rounded-circle p-3 float-right"style="border-color:`+borderColor+`!important">`+this.cuarto+`</h3>`
                                     }
                                     patientsContent+=` </div>
                                     </div>
                                 <h4 class="card-title text-muted">Fecha de ingreso:`+ new Date(this.admissionDate).toLocaleDateString('es-ES', options)+`</h4>`
                                 if(this.discharged){
+                                    
                                     patientsContent+=`<h4 class="card-title text-muted">Fecha de egreso:`+ new Date(this.dischargedDate).toLocaleDateString('es-ES', options)+`</h4>`
                                 }
                                 patientsContent+=`<ul class="list-group list-group-flush mb-4">

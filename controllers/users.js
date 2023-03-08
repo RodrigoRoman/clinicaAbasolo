@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const randomColor = require('randomcolor');
+
 
 module.exports.renderRegister = (req, res) => {
     res.render('users/register');
@@ -8,14 +10,14 @@ module.exports.register = async (req, res, next) => {
     try {
         const { email, username, password,keyword } = req.body;
         let user;
-        if(keyword == "sroleAdmin2497direct"){
-            user = new User({ email, username, role:"directAdmin"});
+        if(keyword == "administracionAlta"){
+            user = new User({ email, username, role:"directAdmin",color:"#00FFAA"});
         }
-        if(keyword == "sroleAdminDinamico"){
-            user = new User({ email, username, role:"dinamicAdmin"});
+        if(keyword == "administracion1" || keyword == "medico"){
+            user = new User({ email, username, role:"dinamicAdmin",color: randomColor()});
         }
         if(keyword == "enfermeria"){
-            user = new User({ email, username, role:"nurse"});
+            user = new User({ email, username, role:"nurse",color:"#00FF00"});
         }
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
