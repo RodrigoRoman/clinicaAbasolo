@@ -392,12 +392,12 @@ module.exports.accountToPDF = async (req,res) =>{
     //     waitUntil: 'networkidle0'}); 
     // await page.goto(`https://warm-forest-49475.herokuapp.com/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
     //     waitUntil: 'networkidle0'});          // go to site
-    // await page.goto(
-    //     `https://clinicaabasolo.up.railway.app//patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
-    //       waitUntil: 'networkidle0'});
     await page.goto(
-    `http://localhost:3000/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
-        waitUntil: 'networkidle0'});
+        `https://clinicaabasolo.up.railway.app//patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
+          waitUntil: 'networkidle0'});
+    // await page.goto(
+    // `http://localhost:3000/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
+    //     waitUntil: 'networkidle0'});
 
     const dom = await page.$eval('.toPDF', (element) => {
         return element.innerHTML
