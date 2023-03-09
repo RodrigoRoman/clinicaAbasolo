@@ -70,7 +70,6 @@ function foundPatients(event) {
                             <div class="card-body">
                               <div class="row justify-content-between">
                                 <div class="col-7">
-
                                 <h3 class="card-title">`+this.name+` </h3>
                                 </div>
                                 <div class="col-1"></div>
