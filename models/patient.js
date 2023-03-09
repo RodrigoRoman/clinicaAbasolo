@@ -7,6 +7,7 @@ const PatientSchema = new Schema({
     name: { type: String, required:true },
     phone: { type: Number},
     cuarto:{type:String},
+    payed:{type:Boolean, default: false},
     edad:{type:Number},
     email: { type: String},
     address: { type: String},
@@ -14,9 +15,14 @@ const PatientSchema = new Schema({
     diagnosis: { type: String},
     treatingDoctor: { type: String },
     admissionDate: { type: Date, default: Date.now},
+    chargedDate: { type: Date, default: Date.now},
     discharged: { type: Boolean, default: false},
     dischargedDate:{ type: Date},
     author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    receivedBy: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     },

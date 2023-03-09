@@ -109,7 +109,14 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                                     <h4 class="card-title text-muted">Fecha de egreso: <%= patient.dischargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.dischargedDate) %> </h4>
                                 <%}%>
                                 <ul class="list-group list-group-flush mb-4">
-                                    <li class="list-group-item">Email: <%= patient.email%></li>
+                                  <%if(patient.payed && (currentUser.role == 'directAdmin')){
+                                    if(patient.discharged != true){
+                                    %>
+                                    <li class="list-group-item  border border-danger">Cobrada por: <%= patient.receivedBy.username%>  <%= patient.chargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.chargedDate)%></li>
+                                    <%}else{%>
+                                      <li class="list-group-item ">Cobrada por: <%= patient.receivedBy.name%><%= patient.chargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.chargedDate)%></li>
+
+                                      <%}}%>
                                     <li class="list-group-item">Telefono: <%= patient.phone%> </li>
                                     <%if(patient.edad){%>
                                         <li class="list-group-item">Edad: <%= patient.edad%> </li>

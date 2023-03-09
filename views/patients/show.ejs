@@ -205,6 +205,12 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
         <form class="d-inline" action="/patients/<%=patient._id%>/discharge?_method=PUT" method="POST">
           <button class="btn btn-outline-warning ml-1">Dar de alta</button>
         </form>
+        <%if(patient.payed == false){%>
+        <form class="d-inline" action="/patients/<%=patient._id%>/pay?_method=PUT" method="POST">
+          <button class="btn btn-outline-danger ml-1">Cobrada <i class="fas fa-dollar-sign"></i></button>
+        </form>
+        <%}%>
+
       <%}%>
     </div>
   </div>
@@ -234,6 +240,7 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
       </div>
     </div>
   </div>
+
 
   <div class="col-12 my-4 d-flex justify-content-center">
     <div class="col-6">

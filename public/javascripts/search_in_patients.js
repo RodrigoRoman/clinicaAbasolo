@@ -23,6 +23,19 @@ const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript mon
 y : date.getUTCFullYear()};
 return  newDate.y+ "-" + ((newDate.m.toString().length>1)?newDate.m:"0"+newDate.m)+ "-" + ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d);
 }
+function makeHour(dateString) {
+    const date = new Date(dateString);
+    const options = { hour: 'numeric', minute: 'numeric', hour12: false };
+    return date.toLocaleTimeString('en-US', options);
+  }
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getUTCFullYear();
+    const month = ('0' + (date.getUTCMonth() + 1)).slice(-2);
+    const day = ('0' + date.getUTCDate()).slice(-2);
+    return `${day}/${month}/${year}`;
+  }
 // Fill table with data
 function foundPatients(event) {
     
@@ -72,8 +85,21 @@ function foundPatients(event) {
                                     
                                     patientsContent+=`<h4 class="card-title text-muted">Fecha de egreso:`+ new Date(this.dischargedDate).toLocaleDateString('es-ES', options)+`</h4>`
                                 }
-                                patientsContent+=`<ul class="list-group list-group-flush mb-4">
-                                    <li class="list-group-item">Email: `+this.email+`</li>
+                                patientsContent+=`<ul class="list-group list-group-flush mb-4">`
+                                
+                                if (this.payed ) {
+                                    if (!this.discharged) {
+                                      patientsContent += `<li class="list-group-item border border-danger">Cobrada por: ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
+                                      ${makeHour(this.chargedDate)} 
+                                     
+                                       </li>`;
+                                    } else {
+                                    patientsContent += `<li class="list-group-item border ">Cobrada por: ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
+                                    ${makeHour(this.chargedDate)} 
+                                         </li>`;
+                                    }
+                                  }
+                                      patientsContent+=`
                                     <li class="list-group-item">Telefono: `+this.phone+`</li>
                                     <li class="list-group-item">RFC: `+this.rfc+`</li>
                                     <li class="list-group-item">Dirección: `+this.address+`</li>

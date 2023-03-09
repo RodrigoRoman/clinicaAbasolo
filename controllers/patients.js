@@ -26,7 +26,7 @@ module.exports.index = async (req, res) => {
     const resPerPage = 30;
     const page = parseInt(req.params.page) || 1;
     let {search,sorted} = req.query;
-    const patients = await Patient.find({}).limit(resPerPage).sort({discharged: 1, admissionDate: 1}).populate("author");
+    const patients = await Patient.find({}).limit(resPerPage).sort({discharged: 1, admissionDate: 1}).populate("author").populate("receivedBy");
     const count =  await Patient.countDocuments({});
     res.render('patients/index',{patients,"page":page, pages: Math.ceil(count / resPerPage),
     numOfResults: count,search:req.query.search,sorted:sorted})
@@ -46,7 +46,7 @@ module.exports.searchAllPatients = async (req, res) => {
         ];
     begin = new Date(begin+"T00:00:01.000Z")
     end = new Date(end+"T23:59:01.000Z")
-    let patients = await Patient.find({$or:dbQueries,admissionDate:{$gte:begin,$lte:end}}).limit(resPerPage*3).sort({discharged: 1, admissionDate: 1}).populate("author");
+    let patients = await Patient.find({$or:dbQueries,admissionDate:{$gte:begin,$lte:end}}).limit(resPerPage*3).sort({discharged: 1, admissionDate: 1}).populate("author").populate("receivedBy");
     let numPatients = patients.length;
     begin = req.query.begin;
     end = req.query.end;
@@ -95,12 +95,30 @@ module.exports.renderEditForm = async (req, res) => {
     res.render("patients/edit", { patient });
 }
 
+
 module.exports.updatePatient = async (req, res) => {
     const { id } = req.params;
     req.body.patient.admissionDate = new Date(req.body.patient.admissionDate+':00.000Z');
     const patient = await Patient.findByIdAndUpdate(id, { ...req.body.patient });
     await patient.save();
     req.flash('success', 'Paciente actualizado correctamente!');
+    res.redirect(`/patients`)
+}
+
+
+module.exports.updatePayedPatient = async (req, res) => {
+    const { id } = req.params;
+    const patient = await Patient.findById(id).populate({
+        path: 'servicesCar',
+        populate: {
+          path: 'service',
+        },
+      });
+    patient.payed = true;
+    patient.chargedDate = getMexicoCityTime();
+    patient.receivedBy = req.user;
+    await patient.save();
+    req.flash('success', 'Cuenta cobrada!');
     res.redirect(`/patients`)
 }
 

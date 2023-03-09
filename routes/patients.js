@@ -29,6 +29,8 @@ router.route('/:id')
     .put(isLoggedIn,isDinamicDirectAdmin, validatePatient, catchAsync(patients.updatePatient))
     .delete(isLoggedIn, isDinamicDirectAdmin, catchAsync(patients.deletePatient))
 
+router.route('/:id/pay')
+    .put(isLoggedIn,catchAsync(patients.updatePayedPatient))
 
 router.get('/:id/edit', isLoggedIn,isDinamicDirectAdmin, catchAsync(patients.renderEditForm))
 
