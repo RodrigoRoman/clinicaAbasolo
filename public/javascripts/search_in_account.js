@@ -159,17 +159,11 @@ function populateTable(event) {
         let dateColor = defineBorder(diff_months(new Date(this.expiration) , nDate)/12);
         tableContent += '<td><small alt ='+this._id+' class="text-muted border border-'+dateColor+' px-1 py-1 d-inline-block"> Cad: ' + makeDMY(new Date(this.expiration))+ '</small></td>';
         tableContent += `<td><select class="btn btn-outline-secondary btn-sm custom-select custom-select-sm mt-1" >
-        <option selected id= "central" value="Central">Central</option>
-        <option id= "urgencias" value="Urgencias">Urgencias</option>
-        <option id= "endoscopia" value="Endoscopia">Endoscopia</option>
-        <option id= "cpre" value="CPRE">CPRE</option>
-        <option id= "CarroURG" value="Carro de Urgencias">Carro Urgencias</option>
-        <option id= "CarroCentral" value="Carro de Central">Carro Central</option>
-        <option id= "CarQX" value="CarQX">Carro de QX</option>
-        <option id= "CarToco" value="Carro de Toco">Carro TOCO</option>
-        <option id= "Quirofano" value="Quirofano">Quirofano</option>
-        <option id= "Parto" value="Parto">Parto</option>
-        <option id= "Bodega" value="Bodega">Bodega</option>
+        <option selected id="central" value="Central">Central de enfermeria</option>
+<option id="urgencias" value="Urgencias">Urgencias</option>
+<option id="quirofano" value="Quirofano">Quirofano</option>
+<option id="farmacia1" value="Farmacia1">Farmacia1</option>
+<option id="farmacia2" value="Farmacia2">Farmacia2</option>
     </select>
       </td>
       `;
@@ -215,17 +209,11 @@ function populateTableModal(event) {
         tableContent += '<td><small alt ='+this._id+' class="text-muted border border-'+dateColor+' px-1 py-1 d-inline-block"> Cad: ' + makeDMY(new Date(this.expiration))+ '</small></td>';
         tableContent += `<td>
         <select class="btn btn-outline-secondary custom-select btn-sm custom-select-sm mt-1" >
-        <option selected id= "central" value="Central">Central</option>
-        <option id= "urgencias" value="Urgencias">Urgencias</option>
-        <option id= "endoscopia" value="Endoscopia">Endoscopia</option>
-        <option id= "cpre" value="CPRE">CPRE</option>
-        <option id= "CarroURG" value="Carro de Urgencias">Carro Urgencias</option>
-        <option id= "CarroCentral" value="Carro de Central">Carro Central</option>
-        <option id= "CarQX" value="CarQX">Carro de QX</option>
-        <option id= "CarToco" value="Carro de Toco">Carro TOCO</option>
-        <option id= "Quirofano" value="Quirofano">Quirofano</option>
-        <option id= "Parto" value="Parto">Parto</option>
-        <option id= "Bodega" value="Bodega">Bodega</option>
+        <option selected id="central" value="Central">Central de enfermeria</option>
+<option id="urgencias" value="Urgencias">Urgencias</option>
+<option id="quirofano" value="Quirofano">Quirofano</option>
+<option id="farmacia1" value="Farmacia1">Farmacia1</option>
+<option id="farmacia2" value="Farmacia2">Farmacia2</option>
     </select>
              </td>
                           `;
