@@ -17,7 +17,6 @@ function getMexicoCityTime() {
   }
   
   
-
 function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
   }
@@ -29,7 +28,7 @@ module.exports.index = async (req, res) => {
     const patients = await Patient.find({})
     .sort({ discharged: 1, admissionDate: -1 })
     .limit(resPerPage)
-    .populate("author");   
+    .populate("author").populate('receivedBy');
     const count =  await Patient.countDocuments({});
     res.render('patients/index',{patients,"page":page, pages: Math.ceil(count / resPerPage),
     numOfResults: count,search:req.query.search,sorted:sorted})
@@ -88,6 +87,54 @@ module.exports.createPatient = async (req, res, next) => {
     res.redirect("/patients")
 }
 
+module.exports.createPatientConsultation = async (req, res, next) => {
+    const patient = new Patient(req.body.patient);
+    const nDate = getMexicoCityTime();
+    patient.author = req.user._id;
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    
+hour = nDate.getUTCHours(); // Get the hour component of the datetime
+ minutes = nDate.getUTCMinutes(); // Get the minutes component of the datetime
+  amOrPm = hour >= 12 ? 'PM' : 'AM'; // Determine whether the time is in the AM or PM
+ formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert the hour to 12-hour format
+ formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; 
+ formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
+ formattedMonth = nDate.getUTCMonth() <10?`0${nDate.getUTCMonth()}`:nDate.getUTCMonth();
+ formattedDay = nDate.getUTCDate() <10?`0${nDate.getUTCDate()}`:nDate.getUTCDate();
+    patient.name = 'Consulta: '+req.user.username+' '+formattedDay+'/'+formattedMonth+'/'+nDate.getUTCFullYear()+" - "+formattedTime;
+    patient.cuarto = 'Consultorio';
+    patient.treatingDoctor = req.user.username;
+    patient.diagnosis = 'Consulta'
+    patient.admissionDate = nDate;
+    await patient.save();
+    req.flash('success', 'Nueva consulta');
+    res.redirect(`/patients/${patient.id}`)
+}
+
+module.exports.createPharmacySale= async (req, res, next) => {
+    const patient = new Patient(req.body.patient);
+    const nDate = getMexicoCityTime();
+    patient.author = req.user._id;
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+hour = nDate.getUTCHours(); // Get the hour component of the datetime
+ minutes = nDate.getUTCMinutes(); // Get the minutes component of the datetime
+  amOrPm = hour >= 12 ? 'PM' : 'AM'; // Determine whether the time is in the AM or PM
+ formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert the hour to 12-hour format
+ formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; 
+ formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
+ formattedMonth = nDate.getUTCMonth() <10?`0${nDate.getUTCMonth()}`:nDate.getUTCMonth();
+ formattedDay = nDate.getUTCDate() <10?`0${nDate.getUTCDate()}`:nDate.getUTCDate();
+    patient.name = 'Venta de Farmacia:  '+req.user.username+' '+formattedDay+'/'+formattedMonth+'/'+nDate.getUTCFullYear()+" - "+formattedTime;
+    patient.cuarto = 'Farmacia';
+    patient.treatingDoctor = ' ';
+    patient.diagnosis = 'Farmacia'
+    patient.admissionDate = nDate;
+    await patient.save();
+    req.flash('success', 'Venta de farmacia creada');
+    res.redirect(`/patients/${patient.id}`)
+}
+
+
 module.exports.renderEditForm = async (req, res) => {
     const { id } = req.params;
     const patient = await Patient.findById(id);
@@ -122,7 +169,7 @@ module.exports.updatePayedPatient = async (req, res) => {
     patient.receivedBy = req.user;
     await patient.save();
     req.flash('success', 'Cuenta cobrada!');
-    res.redirect(`/patients`)
+    res.redirect(`/patients/${patient.id}`)
 }
 
 module.exports.dischargePatient = async (req, res) => {

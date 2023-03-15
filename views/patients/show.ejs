@@ -1,5 +1,7 @@
 
 <% layout('layouts/boilerplate')%>
+<script type="text/javascript" src="https://printjs.crabbly.com/print.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://printjs.crabbly.com/print.css" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script>
   const patient_id = <%-str_id%>;  
@@ -193,28 +195,26 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
 
       const b = begin.toISOString().substring(0,10);
       const e = end.toISOString().substring(0,10);
-      console.log('begin');
-      console.log(b);
-      console.log('end');
-      console.log(e)
       %>
-      <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"){%>
+      <%if(currentUser.role == "directAdmin" || currentUser.role == "caja"){%>
         <a href = "/patients/<%=patient._id%>/makePDF?begin=<%=b%>&end=<%=e%>&name=<%=patient.name%>">
           <button type="button" class="btn btn-outline-secondary"><i class="fas fa-file-pdf"></i></button>
         </a>
+        <%if(currentUser.role == 'directAdmin'){%>
         <form class="d-inline" action="/patients/<%=patient._id%>/discharge?_method=PUT" method="POST">
           <button class="btn btn-outline-warning ml-1">Dar de alta</button>
         </form>
-        <%if(patient.payed == false){%>
+        <%}if(patient.payed == false){%>
         <form class="d-inline" action="/patients/<%=patient._id%>/pay?_method=PUT" method="POST">
           <button class="btn btn-outline-danger ml-1">Cobrada <i class="fas fa-dollar-sign"></i></button>
         </form>
-        <%}%>
-
-      <%}%>
+        <%}else{%>
+          <button class="btn btn-outline-info ml-1" onclick="printTicket();"><i class="fas fa-print"></i>Ticket</button>
+      <%}}%>
     </div>
   </div>
 </div>
+
 
 
 

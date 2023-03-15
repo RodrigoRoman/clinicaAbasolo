@@ -18,6 +18,9 @@ router.get('/searchPatients',isLoggedIn,catchAsync(patients.searchAllPatients))
 
 router.get('/new', isLoggedIn, patients.renderNewForm)
 
+router.get('/newConsultation', isLoggedIn, patients.createPatientConsultation)
+router.get('/newPharmacySale',isLoggedIn, patients.createPharmacySale)
+
 //SHOW ROUTE FOR PRODUCTS
 
 router.route('/:id/discharge')

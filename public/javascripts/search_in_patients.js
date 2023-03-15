@@ -13,6 +13,7 @@ $(".apply_dates").on("click",foundPatients);
 
 //======== Functions=====
 
+
 //function for truncating string to n characters
 function truncate(str, n){
     return (str.length > n) ? str.substr(0, n-1) + '...' : str;
@@ -86,7 +87,7 @@ function foundPatients(event) {
                                 }
                                 patientsContent+=`<ul class="list-group list-group-flush mb-4">`
                                 
-                                if (this.payed ) {
+                                if (this.payed) {
                                     if (!this.discharged) {
                                       patientsContent += `<li class="list-group-item border border-danger">Cobrada por: ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
                                       ${makeHour(this.chargedDate)} 

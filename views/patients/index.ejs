@@ -39,20 +39,55 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
           <div class="col d-flex  text-center flex-column justify-content-between">
             <!-- <div class="row justify-content-around mb-4"> -->
                     <div></div>
-                    <div class="mr- ml-5">
-                        <a class="btn btn-info " href="/patients/new">
-                            <div class="col">
-                                <div class="row d-flex text-center flex-row justify-content-between"> 
-                                    <lottie-player src="/lotties/register.json" onclick="myFunction()" background="transparent"  speed="1"  style="width: 200px; height: 100px;" loop  autoplay></lottie-player>
+                    <%if(currentUser.role == 'medico'){ %>
+                      <div class="mr- ml-5">
+                          <a class="btn btn-info " href="/patients/newConsultation">
+                              <div class="col">
+                                  <div class="row d-flex text-center flex-row justify-content-between"> 
+                                      <lottie-player src="/lotties/register.json" background="transparent"  speed="1"  style="width: 200px; height: 100px;" loop  autoplay></lottie-player>
+                                  </div>
+                                  <div class="row ml-3 d-flex text-center flex-row justify-content-between"> 
+                                      Nueva Consulta
+                                  </div>
+                                  <!-- <div class="col d-flex text-center flex-column justify-content-between">
+                                  </div> -->
+                              </div>
+                          </a> 
+                      </div>
+                    <%}else{
+                      if(currentUser.role == 'caja'){ %>
+                        <div class="mr- ml-5">
+                            <a class="btn btn-info " href="/patients/newPharmacySale">
+                                <div class="col">
+                                    <div class="row d-flex text-center flex-row justify-content-between"> 
+                                        <lottie-player src="/lotties/register.json" background="transparent"  speed="1"  style="width: 200px; height: 100px;" loop  autoplay></lottie-player>
+                                    </div>
+                                    <div class="row ml-3 d-flex text-center flex-row justify-content-between"> 
+                                        Nueva Venta
+                                    </div>
+                                    <!-- <div class="col d-flex text-center flex-column justify-content-between">
+                                    </div> -->
                                 </div>
-                                <div class="row ml-3 d-flex text-center flex-row justify-content-between"> 
-                                    Registrar Paciente
-                                </div>
-                                <!-- <div class="col d-flex text-center flex-column justify-content-between">
-                                </div> -->
-                            </div>
-                        </a> 
-                    </div>
+                            </a> 
+                        </div>
+                      <%}else{%>
+
+                      <div class="mr- ml-5">
+                          <a class="btn btn-info " href="/patients/new">
+                              <div class="col">
+                                  <div class="row d-flex text-center flex-row justify-content-between"> 
+                                      <lottie-player src="/lotties/register.json" background="transparent"  speed="1"  style="width: 200px; height: 100px;" loop  autoplay></lottie-player>
+                                  </div>
+                                  <div class="row ml-3 d-flex text-center flex-row justify-content-between"> 
+                                      Registrar Paciente
+                                  </div>
+                                  <!-- <div class="col d-flex text-center flex-column justify-content-between">
+                                  </div> -->
+                              </div>
+                          </a> 
+                      </div>
+                    <%}
+                  }%>
                     <select class="btn btn-outline-success custom-select custom-select-lg mb-3" >
                         <option selected>Ordenar por:</option>
                         <option id= "byName" value="name">Nombre</option>
@@ -79,7 +114,6 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
         </div>
     </div>
     
-    
     <div class="patients row scrollDiv mt-4">
     <%for (let patient of patients){%>
         <div class="col-md-6">
@@ -92,6 +126,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                             <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };%>
                             <div class="card-body">
                                 <div class="row justify-content-between">
+                                  
                                     <div class="col-7">
                                         <h3 class="card-title"><%= patient.name %> </h3>
                                     </div>
@@ -111,6 +146,8 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                                 <ul class="list-group list-group-flush mb-4">
                                   <%if(patient.payed && (currentUser.role == 'directAdmin')){
                                     if(patient.discharged != true){
+                                      console.log('paciente')
+                                      console.log(patient)
                                     %>
                                     <li class="list-group-item  border border-danger">Cobrada por: <%= patient.receivedBy.username%>  <%= patient.chargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.chargedDate)%></li>
                                     <%}else{%>
@@ -213,4 +250,5 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
 function myFunction() {
   alert("I am an alert box!");
 }
+
 </script>

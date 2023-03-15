@@ -37,6 +37,7 @@
     "puppeteer-core": "^5.5.0",
     "randomcolor": "^0.6.2",
     "sanitize-html": "^1.27.4",
+    "serialport": "^10.5.0",
     "signature_pad": "^3.0.0-beta.4"
   }
 }

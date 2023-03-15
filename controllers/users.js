@@ -13,11 +13,14 @@ module.exports.register = async (req, res, next) => {
         if(keyword == "administracionAlta"){
             user = new User({ email, username, role:"directAdmin",color:"#00FF00"});
         }
-        if(keyword == "administracion1" || keyword == "medico"){
-            user = new User({ email, username, role:"dinamicAdmin",color: randomColor({luminosity:'light'})});
+        if(keyword == "administracion1" || keyword == "cajaAbasolo"){
+            user = new User({ email, username, role:"caja",color:"#00DDAA"});
         }
         if(keyword == "enfermeria"){
             user = new User({ email, username, role:"nurse",color:"#00FF00"});
+        }
+        if(keyword == "MedicoAbasolo"){
+            user = new User({ email, username, role:"medico",color: randomColor({luminosity:'light'})});
         }
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
