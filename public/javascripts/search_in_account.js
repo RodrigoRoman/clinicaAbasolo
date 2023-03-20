@@ -84,7 +84,6 @@ dateNow = getMexicoCityTime()
  formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add a leading zero to minutes if necessary
  formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
 
-
 // Add patient name and services to the ticket body
 printData2 = new Uint8Array([
   0x1B, 0x61, 0x00, // Align text to left
@@ -192,6 +191,7 @@ async function printTicket() {
     console.error(error);
   }
 }
+
 //Aqui termina la parte del ticket ]]]]]]]]]]]
 
 // plus minus buttons from input
