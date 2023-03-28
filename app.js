@@ -107,10 +107,12 @@ const scriptSrcUrls = [
     "https://cdnjs.cloudflare.com",
     "http://www.shieldui.com/",
     "https://rawgit.com/",
+    'http://192.168.1.114/',
     "https://warm-forest-49475.herokuapp.com",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome",
     "https://pure-brushlands-42473.herokuapp.com",
-    "https://unpkg.com/"
+    "https://unpkg.com/",
+    "ws://192.168.1.114/"
 
 ];
 const styleSrcUrls = [
@@ -128,6 +130,7 @@ app.use(
     helmet.contentSecurityPolicy({
         directives: {
             defaultSrc: ["'self'"],
+      connectSrc: ["'self'", "http://192.168.1.114:9100/print-ticket"],
             scriptSrc: ["'unsafe-eval'","'unsafe-inline'", "'self'", ...scriptSrcUrls],
             styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
             workerSrc: ["'self'", "blob:"],

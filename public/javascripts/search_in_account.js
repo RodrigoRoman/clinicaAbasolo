@@ -16,181 +16,242 @@ $(document).ready(function() {
   $("#beginDate").val(makeYMD(new Date(JSON.parse(beginD))));
 });
 
-//FUNCTION CALLS 
+
+
+function printTicket() {
+ serviceUUID = '00001101-0000-1000-8000-00805f9b34fb'; // Replace with your printer's Bluetooth Service UUID
+ characteristicUUID = '00001101-0000-1000-8000-00805f9b34fc'; 
+  // Convert the ticket content to Uint8Array
+   ticketContent = '  MY STORE\n\n  WALKER STREET, NEW YORK\n\n  THANK YOU FOR SHOPPING!\n\n  -----------------------------\n  Item 1         $10.00\n  Item 2         $20.00\n  Item 3         $30.00\n  -----------------------------\n  TOTAL          $60.00\n\n  COME BACK SOON!\n\n';
+
+   ESC = '\x1B';
+   initPrinterCmd = `${ESC}@`;
+   setEncodingCmd = `${ESC}t${1}`; // 1 = UTF-8 encoding
+
+  // ESC/POS commands for setting the font size, aligning the text, and printing the content
+   setSizeCmd = `${ESC}!${48}`; // 48 = 2x height and 2x width
+   setAlignCmd = `${ESC}a${1}`; // 1 = center alignment
+
+  // Combine the ESC/POS commands into a single Uint8Array
+   ticketData = new Uint8Array(
+    new TextEncoder().encode(`${initPrinterCmd}${setEncodingCmd}${setSizeCmd}${setAlignCmd}${ticketContent}`)
+  );
+
+  // Request the Bluetooth device and connect to the printer service
+  navigator.bluetooth.requestDevice({
+    filters: [{
+      services: ['0000ffe1-0000-1000-8000-00805f9b34fb'] // Use the FFE1 UUID for the printer service
+    }]
+  }).then(device => {
+    return device.gatt.connect();
+  }).then(server => {
+    return server.getPrimaryService('0000ffe1-0000-1000-8000-00805f9b34fb');
+  }).then(service => {
+    return service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+  }).then(characteristic => {
+    // Send the ticket data to the printer
+    return characteristic.writeValue(ticketData);
+  }).then(() => {
+    console.log('Ticket printed successfully');
+  }).catch(error => {
+    console.error('Failed to print ticket:', error);
+  });
+}
+
+
+
+
+ 
+
+  // socket.addEventListener('open', function (event) {
+  //   console.log('WebSocket connection established');
+  // });
+  
+  // socket.addEventListener('message', function (event) {
+  //   console.log('Message from server:', event.data);
+  // });
+  
+  // socket.addEventListener('close', function (event) {
+  //   console.log('WebSocket connection closed');
+  // });
+  
+  
+
+// }
 
 // [[[[[[[[[[[[[[ A partir de aqui empieza la impresion del ticket:
-const vendorId =0x1a86; // USB vendor ID for EC Line printers
-const productId = 0x7584; /// USB product ID for EC Line EC-PM-58110 printer
+// const vendorId =0x1a86; // USB vendor ID for EC Line printers
+// const productId = 0x7584; /// USB product ID for EC Line EC-PM-58110 printer
 
 
- printData1 = new Uint8Array([
-  0x1B, 0x40, // Initialize the printer
-  0x1B, 0x21, 0x20, // Set the font size to double height
-  0x1B, 0x61, 0x01, // Align text to center
-  0x43, 0x4C, 0x49, 0x4E, 0x49, 0x43, 0x41, 0x20, 0x41, 0x42, 0x41, 0x53, 0x4F, 0x4C, 0x4F, // CLINICA ABASOLO
-  0x0A, // Print a line feed
-  0x0A, // Print a line feed
-  0x1B, 0x61, 0x01, // Align text to center
-  0x1B, 0x21, 0x00, // Set font size to normal
-  0x43, 0x2E, 0x20, 0x41, 0x62, 0x61, 0x73, 0x6F, 0x6C, 0x6F, 0x20, 0x32, 0x37, 0x2C, // Address line 1: C. Abasolo 27,
-  0x0A, // Print a line feed
-  0x5A, 0x6F, 0x6E, 0x61, 0x20, 0x43, 0x65, 0x6E, 0x74, 0x72, 0x6F, 0x2C, 0x20, 0x33, 0x38, 0x38, 0x30, 0x30, // Address line 2: Zona Centro, 38800
-  0x0A, // Print a line feed
-  0x4D, 0x6F, 0x72, 0x6F, 0x6C, 0x65, 0x6F, 0x6E, 0x2C, 0x20, 0x47, 0x74, 0x6F, 0x2E, // Address line 3: Moroleon, Gto.
-  0x0A, // Print a line feed
-  0x0A, // Print a line feed
-  0x0A, // Print a line feed
-  0x54, 0x65, 0x6C, 0x65, 0x66, 0x6F, 0x6E, 0x6F, 0x3A, 0x20, 0x34, 0x34, 0x35, 0x20, 0x34, 0x35, 0x37, 0x20, 0x34, 0x34, 0x31, 0x37, 0x0A, // "Telefono: 445 457 4417"
+//  printData1 = new Uint8Array([
+//   0x1B, 0x40, // Initialize the printer
+//   0x1B, 0x21, 0x20, // Set the font size to double height
+//   0x1B, 0x61, 0x01, // Align text to center
+//   0x43, 0x4C, 0x49, 0x4E, 0x49, 0x43, 0x41, 0x20, 0x41, 0x42, 0x41, 0x53, 0x4F, 0x4C, 0x4F, // CLINICA ABASOLO
+//   0x0A, // Print a line feed
+//   0x0A, // Print a line feed
+//   0x1B, 0x61, 0x01, // Align text to center
+//   0x1B, 0x21, 0x00, // Set font size to normal
+//   0x43, 0x2E, 0x20, 0x41, 0x62, 0x61, 0x73, 0x6F, 0x6C, 0x6F, 0x20, 0x32, 0x37, 0x2C, // Address line 1: C. Abasolo 27,
+//   0x0A, // Print a line feed
+//   0x5A, 0x6F, 0x6E, 0x61, 0x20, 0x43, 0x65, 0x6E, 0x74, 0x72, 0x6F, 0x2C, 0x20, 0x33, 0x38, 0x38, 0x30, 0x30, // Address line 2: Zona Centro, 38800
+//   0x0A, // Print a line feed
+//   0x4D, 0x6F, 0x72, 0x6F, 0x6C, 0x65, 0x6F, 0x6E, 0x2C, 0x20, 0x47, 0x74, 0x6F, 0x2E, // Address line 3: Moroleon, Gto.
+//   0x0A, // Print a line feed
+//   0x0A, // Print a line feed
+//   0x0A, // Print a line feed
+//   0x54, 0x65, 0x6C, 0x65, 0x66, 0x6F, 0x6E, 0x6F, 0x3A, 0x20, 0x34, 0x34, 0x35, 0x20, 0x34, 0x35, 0x37, 0x20, 0x34, 0x34, 0x31, 0x37, 0x0A, // "Telefono: 445 457 4417"
   
-]);
+// ]);
 
-// Extract data from patient and servicesCar objects
-// const { name, servicesCar } = JSON.parse(pat);
-const formatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+// // Extract data from patient and servicesCar objects
+// // const { name, servicesCar } = JSON.parse(pat);
+// const formatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
-patName = JSON.parse(pat).name;
-servicesCar = JSON.parse(pat).servicesCar;
-servicesText = servicesCar
-  .map(service=>{
-         sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
-    nameParts = service.service.name.match(/.{1,34}\b/g);
-     nameServ = nameParts[0]+'\n';
-     price = parseFloat(sell).toLocaleString("en-US").padStart(17, ' ');
-     subtotal1 = parseFloat((sell * service.amount)).toLocaleString("en-US").padStart(3, ' ');
-     amount = service.amount.toString().padStart(0, ' ');
-    //  lines = nameParts.slice(1).map(line => line.padStart(30 + line.length / 2, ' ').padEnd(30, ' '));
-     nameWithLines = [nameServ, nameServ].join('\n');
-    return `${nameServ}${price}  ${amount}  ${subtotal1}`;
-}).join('\n');
+// patName = JSON.parse(pat).name;
+// servicesCar = JSON.parse(pat).servicesCar;
+// servicesText = servicesCar
+//   .map(service=>{
+//          sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
+//     nameParts = service.service.name.match(/.{1,34}\b/g);
+//      nameServ = nameParts[0]+'\n';
+//      price = parseFloat(sell).toLocaleString("en-US").padStart(17, ' ');
+//      subtotal1 = parseFloat((sell * service.amount)).toLocaleString("en-US").padStart(3, ' ');
+//      amount = service.amount.toString().padStart(0, ' ');
+//     //  lines = nameParts.slice(1).map(line => line.padStart(30 + line.length / 2, ' ').padEnd(30, ' '));
+//      nameWithLines = [nameServ, nameServ].join('\n');
+//     return `${nameServ}${price}  ${amount}  ${subtotal1}`;
+// }).join('\n');
 
-// Column names
-header = `Nombre      | $ | X |   ST   `;
-divider = '-'.repeat(28);
+// // Column names
+// header = `Nombre      | $ | X |   ST   `;
+// divider = '-'.repeat(28);
 
-// Combine header, services text and divider
-ticketText = `${header}\n${divider}\n${servicesText}\n${divider}`;
+// // Combine header, services text and divider
+// ticketText = `${header}\n${divider}\n${servicesText}\n${divider}`;
   
-const subtotal = servicesCar.reduce((total, service) =>{ 
-  sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
-  return total + (sell2 * service.amount)}, 0);
-total = subtotal.toLocaleString("en-US");
-const encoder = new TextEncoder();
+// const subtotal = servicesCar.reduce((total, service) =>{ 
+//   sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
+//   return total + (sell2 * service.amount)}, 0);
+// total = subtotal.toLocaleString("en-US");
+// const encoder = new TextEncoder();
 
-dateNow = getMexicoCityTime()
- hour = dateNow.getUTCHours(); // Get the hour component of the datetime
- minutes = dateNow.getUTCMinutes(); // Get the minutes component of the datetime
-  amOrPm = hour >= 12 ? 'PM' : 'AM'; // Determine whether the time is in the AM or PM
- formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert the hour to 12-hour format
- formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add a leading zero to minutes if necessary
- formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
+// dateNow = getMexicoCityTime()
+//  hour = dateNow.getUTCHours(); // Get the hour component of the datetime
+//  minutes = dateNow.getUTCMinutes(); // Get the minutes component of the datetime
+//   amOrPm = hour >= 12 ? 'PM' : 'AM'; // Determine whether the time is in the AM or PM
+//  formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert the hour to 12-hour format
+//  formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add a leading zero to minutes if necessary
+//  formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
 
-// Add patient name and services to the ticket body
-printData2 = new Uint8Array([
-  0x1B, 0x61, 0x00, // Align text to left
-  0x1B, 0x21, 0x00, // Set the font size to normal
-  0x0A, // Print a line feed
-  ...encoder.encode('      '+dateNow.toLocaleDateString()+' '+formattedTime), 
-  0x0A, // Print a line feed
-  0x0A, // Print a line feed
-  ...encoder.encode(patName),// Print patient name
-  0x0A, // Print a line feed
-  0x0A, // Print a line feed
-  ...encoder.encode(ticketText),
-  // `${servicesText}`, // Print services text
-  0x0A, // Print a line feed
-  0x1B, 0x61, 0x01, // Align text to center
-  0x1B, 0x21, 0x30, // Set font type to B (bold)
-  0x0A, // Print a line feed
-  ...encoder.encode('TOTAL: $'), 
-  ...encoder.encode(total), // Print subtotal
-  0x0A, // Print a line feed
-  0x0A, // Print a line feed
-  ...encoder.encode('Urgencias 24/7'), 
-  0x0A, // Print a line feed
-  0x0A, // Print a line feed
-  0x1D, 0x56, 0x41, 0x10
+// // Add patient name and services to the ticket body
+// printData2 = new Uint8Array([
+//   0x1B, 0x61, 0x00, // Align text to left
+//   0x1B, 0x21, 0x00, // Set the font size to normal
+//   0x0A, // Print a line feed
+//   ...encoder.encode('      '+dateNow.toLocaleDateString()+' '+formattedTime), 
+//   0x0A, // Print a line feed
+//   0x0A, // Print a line feed
+//   ...encoder.encode(patName),// Print patient name
+//   0x0A, // Print a line feed
+//   0x0A, // Print a line feed
+//   ...encoder.encode(ticketText),
+//   // `${servicesText}`, // Print services text
+//   0x0A, // Print a line feed
+//   0x1B, 0x61, 0x01, // Align text to center
+//   0x1B, 0x21, 0x30, // Set font type to B (bold)
+//   0x0A, // Print a line feed
+//   ...encoder.encode('TOTAL: $'), 
+//   ...encoder.encode(total), // Print subtotal
+//   0x0A, // Print a line feed
+//   0x0A, // Print a line feed
+//   ...encoder.encode('Urgencias 24/7'), 
+//   0x0A, // Print a line feed
+//   0x0A, // Print a line feed
+//   0x1D, 0x56, 0x41, 0x10
 
-]);
+// ]);
 
-var printData = new Uint8Array([...printData1,...printData2]);
+// var printData = new Uint8Array([...printData1,...printData2]);
 
 
-window.addEventListener('DOMContentLoaded', async () => {
-  try {
-    // Request permission to access the printer
-    const device = await navigator.usb.requestDevice({ filters: [{ vendorId, productId }] });
+// window.addEventListener('DOMContentLoaded', async () => {
+//   try {
+//     // Request permission to access the printer
+//     const device = await navigator.usb.requestDevice({ filters: [{ vendorId, productId }] });
 
-    // Open the printer interface
-    await device.open();
-    await device.selectConfiguration(1);
-    await device.claimInterface(0);
+//     // Open the printer interface
+//     await device.open();
+//     await device.selectConfiguration(1);
+//     await device.claimInterface(0);
 
-    // Store permission in cookie or local storage
-    localStorage.setItem('printerPermission', 'granted');
+//     // Store permission in cookie or local storage
+//     localStorage.setItem('printerPermission', 'granted');
 
-    // Close the connection to the printer
-    await device.releaseInterface(0);
-    await device.close();
-  } catch (error) {
-    console.error(error);
-  }
-});
-// Define a function to print the text message
-window.addEventListener('DOMContentLoaded', async () => {
-  try {
-    // Request permission to access the printer
-    const device = await navigator.usb.requestDevice({ filters: [{ vendorId, productId }] });
+//     // Close the connection to the printer
+//     await device.releaseInterface(0);
+//     await device.close();
+//   } catch (error) {
+//     console.error(error);
+//   }
+// });
+// // Define a function to print the text message
+// window.addEventListener('DOMContentLoaded', async () => {
+//   try {
+//     // Request permission to access the printer
+//     const device = await navigator.usb.requestDevice({ filters: [{ vendorId, productId }] });
 
-    // Open the printer interface
-    await device.open();
-    await device.selectConfiguration(1);
-    await device.claimInterface(0);
+//     // Open the printer interface
+//     await device.open();
+//     await device.selectConfiguration(1);
+//     await device.claimInterface(0);
 
-    // Store permission in cookie or local storage
-    localStorage.setItem('printerPermission', 'granted');
+//     // Store permission in cookie or local storage
+//     localStorage.setItem('printerPermission', 'granted');
 
-    // Close the connection to the printer
-    await device.releaseInterface(0);
-    await device.close();
-  } catch (error) {
-    console.error(error);
-  }
-});
-// Define a function to print the text message
-async function printTicket() {
-  try {
-    // Check if permission has already been granted
-    const devices = await navigator.usb.getDevices();
-    const device = devices.find(d => d.vendorId === vendorId && d.productId === productId);
-    if (device) {
-      // The user has already granted permission to access the printer, proceed with printing
-      await device.open();
-      await device.selectConfiguration(1);
-      await device.claimInterface(0);
-      await device.transferOut(2, printData);
-      await device.releaseInterface(0);
-      await device.close();
-    } else {
-      // Request permission to access the printer
-      const device = await navigator.usb.requestDevice({ filters: [{ vendorId, productId }] });
+//     // Close the connection to the printer
+//     await device.releaseInterface(0);
+//     await device.close();
+//   } catch (error) {
+//     console.error(error);
+//   }
+// });
+// // Define a function to print the text message
+// async function printTicket() {
+//   try {
+//     // Check if permission has already been granted
+//     const devices = await navigator.usb.getDevices();
+//     const device = devices.find(d => d.vendorId === vendorId && d.productId === productId);
+//     if (device) {
+//       // The user has already granted permission to access the printer, proceed with printing
+//       await device.open();
+//       await device.selectConfiguration(1);
+//       await device.claimInterface(0);
+//       await device.transferOut(2, printData);
+//       await device.releaseInterface(0);
+//       await device.close();
+//     } else {
+//       // Request permission to access the printer
+//       const device = await navigator.usb.requestDevice({ filters: [{ vendorId, productId }] });
 
-      // Open the printer interface
-      await device.open();
-      await device.selectConfiguration(1);
-      await device.claimInterface(0);
+//       // Open the printer interface
+//       await device.open();
+//       await device.selectConfiguration(1);
+//       await device.claimInterface(0);
 
-      // Store permission in cookie or local storage
-      localStorage.setItem('printerPermission', 'granted');
+//       // Store permission in cookie or local storage
+//       localStorage.setItem('printerPermission', 'granted');
 
-      // Send the print data to the printer
-      await device.transferOut(2, printData);
-      await device.releaseInterface(0);
-      await device.close();
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
+//       // Send the print data to the printer
+//       await device.transferOut(2, printData);
+//       await device.releaseInterface(0);
+//       await device.close();
+//     }
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
 
 //Aqui termina la parte del ticket ]]]]]]]]]]]
 

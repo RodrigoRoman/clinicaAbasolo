@@ -1,7 +1,7 @@
 
 <% layout('layouts/boilerplate')%>
-<script type="text/javascript" src="https://printjs.crabbly.com/print.js"></script>
-	<link rel="stylesheet" type="text/css" href="https://printjs.crabbly.com/print.css" />
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script>
   const patient_id = <%-str_id%>;  
@@ -210,6 +210,7 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
         </form>
         <%}else{%>
           <button class="btn btn-outline-info ml-1" onclick="printTicket();"><i class="fas fa-print"></i>Ticket</button>
+          
       <%}}%>
     </div>
   </div>
