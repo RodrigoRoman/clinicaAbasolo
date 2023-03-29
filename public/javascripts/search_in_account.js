@@ -54,7 +54,7 @@ servicesCar = JSON.parse(pat).servicesCar;
 servicesText = servicesCar
   .map(service=>{
     console.log(service.service.name);
-         sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
+        //  sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
     nameParts = service.service.name;
      nameServ = nameParts;
     //  price =sell;
@@ -63,7 +63,7 @@ servicesText = servicesCar
     // //  lines = nameParts.slice(1).map(line => line.padStart(30 + line.length / 2, ' ').padEnd(30, ' '));
     //  nameWithLines = [nameServ, nameServ];
     return `${nameServ}`;
-}).join(' ');
+});
 
 // Column names
 header = `Nombre       $  X   ST   `;
@@ -126,7 +126,7 @@ var printData = new Uint8Array([...printData1,...printData2]);
       optionalServices: [serviceUuid]
     });
 
-    // Connect to the GATT server
+    // Connect to the GATT servers
     const server = await device.gatt.connect();
 
     // Get the service
