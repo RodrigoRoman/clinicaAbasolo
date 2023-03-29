@@ -20,13 +20,15 @@ $(document).ready(function() {
 
 
 async function printTicket() {
-  const serviceUuid = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
-  const characteristicUuid = '49535343-1e4d-4bd9-ba61-23c647249616';
+  const serviceUuid = '0000fff0-0000-1000-8000-00805f9b34fb';
+  const characteristicUuid = '0000fff1-0000-1000-8000-00805f9b34fb';
 
   try {
     // Request Bluetooth device
     const device = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
+      filters: [
+        { name: 'Goojprt' }
+      ],
       optionalServices: [serviceUuid]
     });
 
