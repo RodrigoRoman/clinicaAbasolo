@@ -123,7 +123,8 @@ const styleSrcUrls = [
     "https://fonts.googleapis.com/",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/",
     "https://use.fontawesome.com/",
-    "https://unpkg.com/"
+    "https://unpkg.com/",
+    "https://unpkg.com/escpos-bluetooth"
 ];
 const fontSrcUrls = [];
 app.use(

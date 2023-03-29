@@ -20,14 +20,14 @@ $(document).ready(function() {
 
 
 async function printTicket() {
-  const serviceUuid = '0000fff0-0000-1000-8000-00805f9b34fb';
-  const characteristicUuid = '0000fff1-0000-1000-8000-00805f9b34fb';
-
+  const serviceUuid = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
+  const characteristicUuid = '49535343-1e4d-4bd9-ba61-23c647249616';
+  
   try {
     // Request Bluetooth device
     const device = await navigator.bluetooth.requestDevice({
       filters: [
-        { name: 'Goojprt' }
+        { name: 'Printer001' }
       ],
       optionalServices: [serviceUuid]
     });
@@ -41,13 +41,9 @@ async function printTicket() {
     // Get the characteristic
     const characteristic = await service.getCharacteristic(characteristicUuid);
 
-    // Generate ESC/POS commands for the ticket
-    const printer = new EscPosBluetooth(device);
-    printer.text('Hello World!\n');
-    printer.cut();
-
-    // Send the ESC/POS commands to the printer
-    await characteristic.writeValue(printer.buffer);
+    // Send the print command
+    const encoder = new TextEncoder();
+    await characteristic.writeValue(encoder.encode('Hello World!\n'));
 
     // Disconnect from the GATT server
     await server.disconnect();
