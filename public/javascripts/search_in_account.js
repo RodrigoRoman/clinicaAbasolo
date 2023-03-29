@@ -66,10 +66,10 @@ servicesText = servicesCar
 
 // Column names
 header = `Nombre      | $ | X |   ST   `;
-divider = '-'.repeat(28);
+// divider = '-'.repeat(28);
 
 // Combine header, services text and divider
-ticketText = `${header}\n${divider}\n${servicesText}\n${divider}`;
+ticketText = `${header}\n\n${servicesText}\n`;
   
 const subtotal = servicesCar.reduce((total, service) =>{ 
   sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
@@ -110,7 +110,6 @@ printData2 = new Uint8Array([
   0x0A, // Print a line feed
   0x0A, // Print a line feed
   0x1D, 0x56, 0x41, 0x10
-
 ]);
 
 var printData = new Uint8Array([...printData1,...printData2]);
