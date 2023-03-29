@@ -65,7 +65,7 @@ servicesText = servicesCar
 }).join('\n');
 
 // Column names
-header = `Nombre      | $ | X |   ST   `;
+header = `Nombre       $  X   ST   `;
 divider = '-'.repeat(28);
 
 // Combine header, services text and divider
@@ -96,7 +96,7 @@ printData2 = new Uint8Array([
   ...encoder.encode(patName),// Print patient name
   0x0A, // Print a line feed
   0x0A, // Print a line feed
-  // ...encoder.encode(ticketText),
+  ...encoder.encode(ticketText),
   // `${servicesText}`, // Print services text
   0x0A, // Print a line feed
   0x1B, 0x61, 0x01, // Align text to center
