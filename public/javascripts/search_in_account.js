@@ -134,7 +134,21 @@ printData2 = new Uint8Array([
     // Send the print command
     const encoder = new TextEncoder();
     await characteristic.writeValue(printData1);
-    await characteristic.writeValue(printData2);
+    const CHUNK_SIZE = 50; // define the size of each chunk
+const chunks = []; // array to hold the chunks
+
+// split the printData2 array into chunks of CHUNK_SIZE bytes
+for (let i = 0; i < printData2.length; i += CHUNK_SIZE) {
+  chunks.push(printData2.slice(i, i + CHUNK_SIZE));
+}
+
+// send each chunk with a delay between them
+for (let i = 0; i < chunks.length; i++) {
+  // setTimeout(async () => {
+    await characteristic.writeValue(chunks[i]);
+  // }, i * 1000); // add a delay of 1 second between each chunk (adjust the delay time as needed)
+}
+    // await characteristic.writeValue(printData2);
 
 
     // Disconnect from the GATT server
