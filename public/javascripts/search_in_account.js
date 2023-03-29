@@ -51,34 +51,24 @@ const formatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 
 
 patName = JSON.parse(pat).name;
 servicesCar = JSON.parse(pat).servicesCar;
-// servicesText = servicesCar
-//   .map(service=>{
-//     console.log(service.service.name);
-//         //  sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
-//     nameParts = service.service.name;
-//      nameServ = nameParts;
-//     //  price =sell;
-//     //  subtotal1 = parseFloat((sell * service.amount)).toString();
-//     //  amount = service.amount.toString();
-//     // //  lines = nameParts.slice(1).map(line => line.padStart(30 + line.length / 2, ' ').padEnd(30, ' '));
-//     //  nameWithLines = [nameServ, nameServ];
-//     return `${nameServ}`;
-// });
- servicesText = '';
+const servicesText = await Promise.all(servicesCar.map(async service => {
+  const sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
+  const nameParts = service.service.name.match(/.{1,34}\b/g);
+  const nameServ = `${nameParts[0]}\n`;
+  const price = parseFloat(sell).toLocaleString("en-US").padStart(17, ' ');
+  const subtotal1 = parseFloat((sell * service.amount)).toLocaleString("en-US").padStart(3, ' ');
+  const amount = service.amount.toString().padStart(0, ' ');
+  const nameWithLines = [nameServ, nameServ].join('\n');
+  return `${nameServ}${price}  ${amount}  ${subtotal1}`;
+}));
 
-for(let i = 0; i < servicesCar.length; i++){
-  const service = servicesCar[i];
-  servicesText+= service.service.name;
-}
-
+const servicesTextJoined = servicesText.join('\n');
 // Column names
-header = `Nombre       $  X   ST   `;
+header = `Nombre      | $ | X |   ST   `;
 divider = '-'.repeat(28);
 
 // Combine header, services text and divider
-// ticketText = `${header}\n${divider}\n${servicesText}\n${divider}`;
-ticketText = `${header}${servicesText}`;
-
+ticketText = `${header}${servicesText}\n${divider}`;
   
 const subtotal = servicesCar.reduce((total, service) =>{ 
   sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
@@ -119,10 +109,10 @@ printData2 = new Uint8Array([
   0x0A, // Print a line feed
   0x0A, // Print a line feed
   0x1D, 0x56, 0x41, 0x10
+
 ]);
 
 var printData = new Uint8Array([...printData1,...printData2]);
-  
   try {
     // Request Bluetooth device
     const device = await navigator.bluetooth.requestDevice({
