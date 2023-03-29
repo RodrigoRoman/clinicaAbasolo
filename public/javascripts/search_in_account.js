@@ -89,10 +89,10 @@ printData2 = new Uint8Array([
   0x1B, 0x61, 0x00, // Align text to left
   0x1B, 0x21, 0x00, // Set the font size to normal
   0x0A, // Print a line feed
-  // ...encoder.encode('      '+dateNow.toLocaleDateString()+' '+formattedTime), 
-  // 0x0A, // Print a line feed
-  // 0x0A, // Print a line feed
-  // ...encoder.encode(patName),// Print patient name
+  ...encoder.encode('      '+dateNow.toLocaleDateString()+' '+formattedTime), 
+  0x0A, // Print a line feed
+  0x0A, // Print a line feed
+  ...encoder.encode(patName),// Print patient name
   0x0A, // Print a line feed
   0x0A, // Print a line feed
   ...encoder.encode(ticketText),
@@ -112,7 +112,7 @@ printData2 = new Uint8Array([
 
 ]);
 
-var printData = new Uint8Array([...printData2]);
+var printData = new Uint8Array([...printData1,...printData2]);
   try {
     // Request Bluetooth device
     const device = await navigator.bluetooth.requestDevice({
