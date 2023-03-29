@@ -66,10 +66,10 @@ servicesText = servicesCar
 
 // Column names
 header = `Nombre      | $ | X |   ST   `;
-// divider = '-'.repeat(28);
+divider = '-'.repeat(28);
 
 // Combine header, services text and divider
-ticketText = `${header}\n\n${servicesText}\n`;
+ticketText = `${header}\n${divider}\n${servicesText}\n${divider}`;
   
 const subtotal = servicesCar.reduce((total, service) =>{ 
   sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
@@ -96,7 +96,7 @@ printData2 = new Uint8Array([
   ...encoder.encode(patName),// Print patient name
   0x0A, // Print a line feed
   0x0A, // Print a line feed
-  ...encoder.encode(ticketText),
+  // ...encoder.encode(ticketText),
   // `${servicesText}`, // Print services text
   0x0A, // Print a line feed
   0x1B, 0x61, 0x01, // Align text to center
