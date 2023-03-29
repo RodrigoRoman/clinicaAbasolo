@@ -51,19 +51,25 @@ const formatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 
 
 patName = JSON.parse(pat).name;
 servicesCar = JSON.parse(pat).servicesCar;
-servicesText = servicesCar
-  .map(service=>{
-    console.log(service.service.name);
-        //  sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
-    nameParts = service.service.name;
-     nameServ = nameParts;
-    //  price =sell;
-    //  subtotal1 = parseFloat((sell * service.amount)).toString();
-    //  amount = service.amount.toString();
-    // //  lines = nameParts.slice(1).map(line => line.padStart(30 + line.length / 2, ' ').padEnd(30, ' '));
-    //  nameWithLines = [nameServ, nameServ];
-    return `${nameServ}`;
-});
+// servicesText = servicesCar
+//   .map(service=>{
+//     console.log(service.service.name);
+//         //  sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
+//     nameParts = service.service.name;
+//      nameServ = nameParts;
+//     //  price =sell;
+//     //  subtotal1 = parseFloat((sell * service.amount)).toString();
+//     //  amount = service.amount.toString();
+//     // //  lines = nameParts.slice(1).map(line => line.padStart(30 + line.length / 2, ' ').padEnd(30, ' '));
+//     //  nameWithLines = [nameServ, nameServ];
+//     return `${nameServ}`;
+// });
+ servicesText = '';
+
+for(let i = 0; i < servicesCar.length; i++){
+  const service = servicesCar[i];
+  servicesText+= service.service.name;
+}
 
 // Column names
 header = `Nombre       $  X   ST   `;
