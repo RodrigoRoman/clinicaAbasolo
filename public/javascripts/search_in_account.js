@@ -69,7 +69,7 @@ header = `Nombre       $  X   ST   `;
 divider = '-'.repeat(28);
 
 // Combine header, services text and divider
-ticketText = `${header}\n${divider}\n\n${divider}`;
+ticketText = `${header}\n`;
   
 const subtotal = servicesCar.reduce((total, service) =>{ 
   sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
