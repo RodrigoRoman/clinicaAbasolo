@@ -20,8 +20,100 @@ $(document).ready(function() {
 
 
 async function printTicket() {
-  const serviceUuid = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
-  const characteristicUuid = '49535343-1e4d-4bd9-ba61-23c647249616';
+   serviceUuid = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
+   characteristicUuid = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
+
+
+ printData1 = new Uint8Array([
+  0x1B, 0x40, // Initialize the printer
+  0x1B, 0x21, 0x20, // Set the font size to double height
+  0x1B, 0x61, 0x01, // Align text to center
+  0x43, 0x4C, 0x49, 0x4E, 0x49, 0x43, 0x41, 0x20, 0x41, 0x42, 0x41, 0x53, 0x4F, 0x4C, 0x4F, // CLINICA ABASOLO
+  0x0A, // Print a line feed
+  0x0A, // Print a line feed
+  0x1B, 0x61, 0x01, // Align text to center
+  0x1B, 0x21, 0x00, // Set font size to normal
+  0x43, 0x2E, 0x20, 0x41, 0x62, 0x61, 0x73, 0x6F, 0x6C, 0x6F, 0x20, 0x32, 0x37, 0x2C, // Address line 1: C. Abasolo 27,
+  0x0A, // Print a line feed
+  0x5A, 0x6F, 0x6E, 0x61, 0x20, 0x43, 0x65, 0x6E, 0x74, 0x72, 0x6F, 0x2C, 0x20, 0x33, 0x38, 0x38, 0x30, 0x30, // Address line 2: Zona Centro, 38800
+  0x0A, // Print a line feed
+  0x4D, 0x6F, 0x72, 0x6F, 0x6C, 0x65, 0x6F, 0x6E, 0x2C, 0x20, 0x47, 0x74, 0x6F, 0x2E, // Address line 3: Moroleon, Gto.
+  0x0A, // Print a line feed
+  0x0A, // Print a line feed
+  0x0A, // Print a line feed
+  0x54, 0x65, 0x6C, 0x65, 0x66, 0x6F, 0x6E, 0x6F, 0x3A, 0x20, 0x34, 0x34, 0x35, 0x20, 0x34, 0x35, 0x37, 0x20, 0x34, 0x34, 0x31, 0x37, 0x0A, // "Telefono: 445 457 4417"
+  
+]);
+
+// Extract data from patient and servicesCar objects
+// const { name, servicesCar } = JSON.parse(pat);
+const formatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+patName = JSON.parse(pat).name;
+servicesCar = JSON.parse(pat).servicesCar;
+servicesText = servicesCar
+  .map(service=>{
+         sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
+    nameParts = service.service.name.match(/.{1,34}\b/g);
+     nameServ = nameParts[0]+'\n';
+     price = parseFloat(sell).toLocaleString("en-US").padStart(17, ' ');
+     subtotal1 = parseFloat((sell * service.amount)).toLocaleString("en-US").padStart(3, ' ');
+     amount = service.amount.toString().padStart(0, ' ');
+    //  lines = nameParts.slice(1).map(line => line.padStart(30 + line.length / 2, ' ').padEnd(30, ' '));
+     nameWithLines = [nameServ, nameServ].join('\n');
+    return `${nameServ}${price}  ${amount}  ${subtotal1}`;
+}).join('\n');
+
+// Column names
+header = `Nombre      | $ | X |   ST   `;
+divider = '-'.repeat(28);
+
+// Combine header, services text and divider
+ticketText = `${header}\n${divider}\n${servicesText}\n${divider}`;
+  
+const subtotal = servicesCar.reduce((total, service) =>{ 
+  sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
+  return total + (sell2 * service.amount)}, 0);
+total = subtotal.toLocaleString("en-US");
+const encoder = new TextEncoder();
+
+dateNow = getMexicoCityTime()
+ hour = dateNow.getUTCHours(); // Get the hour component of the datetime
+ minutes = dateNow.getUTCMinutes(); // Get the minutes component of the datetime
+  amOrPm = hour >= 12 ? 'PM' : 'AM'; // Determine whether the time is in the AM or PM
+ formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert the hour to 12-hour format
+ formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add a leading zero to minutes if necessary
+ formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
+
+// Add patient name and services to the ticket body
+printData2 = new Uint8Array([
+  0x1B, 0x61, 0x00, // Align text to left
+  0x1B, 0x21, 0x00, // Set the font size to normal
+  0x0A, // Print a line feed
+  ...encoder.encode('      '+dateNow.toLocaleDateString()+' '+formattedTime), 
+  0x0A, // Print a line feed
+  0x0A, // Print a line feed
+  ...encoder.encode(patName),// Print patient name
+  0x0A, // Print a line feed
+  0x0A, // Print a line feed
+  ...encoder.encode(ticketText),
+  // `${servicesText}`, // Print services text
+  0x0A, // Print a line feed
+  0x1B, 0x61, 0x01, // Align text to center
+  0x1B, 0x21, 0x30, // Set font type to B (bold)
+  0x0A, // Print a line feed
+  ...encoder.encode('TOTAL: $'), 
+  ...encoder.encode(total), // Print subtotal
+  0x0A, // Print a line feed
+  0x0A, // Print a line feed
+  ...encoder.encode('Urgencias 24/7'), 
+  0x0A, // Print a line feed
+  0x0A, // Print a line feed
+  0x1D, 0x56, 0x41, 0x10
+
+]);
+
+var printData = new Uint8Array([...printData1,...printData2]);
   
   try {
     // Request Bluetooth device
@@ -43,7 +135,7 @@ async function printTicket() {
 
     // Send the print command
     const encoder = new TextEncoder();
-    await characteristic.writeValue(encoder.encode('Hello World!\n'));
+    await characteristic.writeValue(printData);
 
     // Disconnect from the GATT server
     await server.disconnect();
