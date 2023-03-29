@@ -53,9 +53,10 @@ patName = JSON.parse(pat).name;
 servicesCar = JSON.parse(pat).servicesCar;
 servicesText = servicesCar
   .map(service=>{
+    console.log(service.service.name);
          sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
-    nameParts = service.service.name.match(/.{1,34}\b/g);
-     nameServ = nameParts[0];
+    nameParts = service.service.name;
+     nameServ = nameParts;
      price = parseFloat(sell).toString();
      subtotal1 = parseFloat((sell * service.amount)).toString();
      amount = service.amount.toString();
