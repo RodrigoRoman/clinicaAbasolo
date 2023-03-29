@@ -133,7 +133,9 @@ var printData = new Uint8Array([...printData1,...printData2]);
 
     // Send the print command
     const encoder = new TextEncoder();
-    await characteristic.writeValue(printData);
+    await characteristic.writeValue(printData1);
+    await characteristic.writeValue(printData2);
+
 
     // Disconnect from the GATT server
     await server.disconnect();
