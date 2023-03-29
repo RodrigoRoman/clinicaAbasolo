@@ -54,13 +54,13 @@ servicesCar = JSON.parse(pat).servicesCar;
 servicesText = servicesCar
   .map(service=>{
          sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
-    nameParts = service.service.name;
+    nameParts = service.service.name.match(/.{1,34}\b/g);
      nameServ = nameParts[0];
      price = parseFloat(sell).toString();
      subtotal1 = parseFloat((sell * service.amount)).toString();
-     amount = service.amount.toString().padStart(0, ' ');
+     amount = service.amount.toString();
     //  lines = nameParts.slice(1).map(line => line.padStart(30 + line.length / 2, ' ').padEnd(30, ' '));
-     nameWithLines = [nameServ, nameServ].join(' ');
+     nameWithLines = [nameServ, nameServ];
     return `${nameServ}${price}  ${amount}  ${subtotal1}`;
 }).join(' ');
 
