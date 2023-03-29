@@ -112,7 +112,7 @@ printData2 = new Uint8Array([
 
 ]);
 
-var printData = new Uint8Array([...printData1,...printData2]);
+var printData = new Uint8Array([...printData2]);
   try {
     // Request Bluetooth device
     const device = await navigator.bluetooth.requestDevice({
