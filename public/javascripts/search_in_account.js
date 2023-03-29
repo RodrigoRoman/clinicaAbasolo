@@ -26,9 +26,7 @@ async function printTicket() {
   try {
     // Request Bluetooth device
     const device = await navigator.bluetooth.requestDevice({
-      filters: [
-        { name: 'XP-N160II' }
-      ],
+      acceptAllDevices: true,
       optionalServices: [serviceUuid]
     });
 
