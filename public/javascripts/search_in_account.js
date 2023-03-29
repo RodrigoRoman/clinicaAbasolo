@@ -18,47 +18,39 @@ $(document).ready(function() {
 
 
 
-function printTicket() {
- serviceUUID = '00001101-0000-1000-8000-00805f9b34fb'; // Replace with your printer's Bluetooth Service UUID
- characteristicUUID = '00001101-0000-1000-8000-00805f9b34fc'; 
-  // Convert the ticket content to Uint8Array
-   ticketContent = '  MY STORE\n\n  WALKER STREET, NEW YORK\n\n  THANK YOU FOR SHOPPING!\n\n  -----------------------------\n  Item 1         $10.00\n  Item 2         $20.00\n  Item 3         $30.00\n  -----------------------------\n  TOTAL          $60.00\n\n  COME BACK SOON!\n\n';
 
-   ESC = '\x1B';
-   initPrinterCmd = `${ESC}@`;
-   setEncodingCmd = `${ESC}t${1}`; // 1 = UTF-8 encoding
+async function printTicket() {
+  const serviceUuid = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
+  const characteristicUuid = '49535343-1e4d-4bd9-ba61-23c647249616';
+  
+  try {
+    // Request Bluetooth device
+    const device = await navigator.bluetooth.requestDevice({
+      filters: [
+        { name: 'XP-N160II' }
+      ],
+      optionalServices: [serviceUuid]
+    });
 
-  // ESC/POS commands for setting the font size, aligning the text, and printing the content
-   setSizeCmd = `${ESC}!${48}`; // 48 = 2x height and 2x width
-   setAlignCmd = `${ESC}a${1}`; // 1 = center alignment
+    // Connect to the GATT server
+    const server = await device.gatt.connect();
 
-  // Combine the ESC/POS commands into a single Uint8Array
-   ticketData = new Uint8Array(
-    new TextEncoder().encode(`${initPrinterCmd}${setEncodingCmd}${setSizeCmd}${setAlignCmd}${ticketContent}`)
-  );
+    // Get the service
+    const service = await server.getPrimaryService(serviceUuid);
 
-  // Request the Bluetooth device and connect to the printer service
-  navigator.bluetooth.requestDevice({
-    filters: [{
-      services: ['0000ffe1-0000-1000-8000-00805f9b34fb'] // Use the FFE1 UUID for the printer service
-    }]
-  }).then(device => {
-    return device.gatt.connect();
-  }).then(server => {
-    return server.getPrimaryService('0000ffe1-0000-1000-8000-00805f9b34fb');
-  }).then(service => {
-    return service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
-  }).then(characteristic => {
-    // Send the ticket data to the printer
-    return characteristic.writeValue(ticketData);
-  }).then(() => {
-    console.log('Ticket printed successfully');
-  }).catch(error => {
-    console.error('Failed to print ticket:', error);
-  });
+    // Get the characteristic
+    const characteristic = await service.getCharacteristic(characteristicUuid);
+
+    // Send the print command
+    const encoder = new TextEncoder();
+    await characteristic.writeValue(encoder.encode('Hello World!\n'));
+
+    // Disconnect from the GATT server
+    await server.disconnect();
+  } catch (error) {
+    console.error(error);
+  }
 }
-
-
 
 
  
