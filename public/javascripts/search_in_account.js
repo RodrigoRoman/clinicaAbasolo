@@ -69,7 +69,9 @@ header = `Nombre       $  X   ST   `;
 divider = '-'.repeat(28);
 
 // Combine header, services text and divider
-ticketText = `${header}\n`;
+// ticketText = `${header}\n${divider}\n${servicesText}\n${divider}`;
+ticketText = `${header}${servicesText}`;
+
   
 const subtotal = servicesCar.reduce((total, service) =>{ 
   sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
@@ -212,7 +214,7 @@ var printData = new Uint8Array([...printData1,...printData2]);
 // divider = '-'.repeat(28);
 
 // // Combine header, services text and divider
-// ticketText = `${header}\n${divider}\n${servicesText}\n${divider}`;
+// ticketText = `${header}${servicesText}\n${divider}`;
   
 // const subtotal = servicesCar.reduce((total, service) =>{ 
 //   sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
