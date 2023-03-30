@@ -22,6 +22,7 @@ $(document).ready(function() {
 async function printTicket() {
    serviceUuid = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
    characteristicUuid = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
+    deviceKey = 'lastUsedDevice'; // Key for storing the device address
 
 
  printData1 = new Uint8Array([
@@ -54,21 +55,26 @@ servicesCar = JSON.parse(pat).servicesCar;
 const servicesText = await Promise.all(servicesCar.map(async service => {
   const sell = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
   const nameParts = service.service.name.match(/.{1,45}\b/g);
-  const nameServ = `${nameParts[0]}\n`;
+  const nameServ = nameParts[0]+`\n`;
+  console.log(nameServ);
   const price = parseFloat(sell).toLocaleString("en-US").padStart(25, ' ');
-  const subtotal1 = parseFloat((sell * service.amount)).toLocaleString("en-US").padStart(3, ' ');
+  const subtotal1 = parseFloat((sell * service.amount)).toLocaleString("en-US").padStart(5, ' ');
+  console.log('subtotal')
+  // .toLocaleString("en-US").padStart(5, ' ');
   const amount = service.amount.toString().padStart(0, ' ');
+  console.log(`${nameServ} ${price}       ${amount}     ${subtotal1}\n`);
+
   const nameWithLines = [nameServ, nameServ].join('\n');
-  return `${nameServ}${price}  ${amount}  ${subtotal1}\n`;
+  return `${nameServ} ${price}       ${amount}     ${subtotal1}\n`;
 }));
 
 const servicesTextJoined = servicesText.join('\n');
 // Column names
-header = `Nombre             |   $   |   X   |   ST  \n`;
+header = `Nombre               $         X         ST    \n`;
 divider = '-'.repeat(45);
 
 // Combine header, services text and divider
-ticketText = `${header}${servicesText}\n${divider}\n`;
+ticketText = `${header}${divider}\n${servicesTextJoined}\n${divider}\n`;
   
 const subtotal = servicesCar.reduce((total, service) =>{ 
   sell2 = service.service.type === 'Supply' ? service.service.sell_price : service.service.price;
@@ -114,25 +120,40 @@ printData2 = new Uint8Array([
 
 // var printData = new Uint8Array([...printData1,...printData2]);
   try {
-    // Request Bluetooth device
-    const device = await navigator.bluetooth.requestDevice({
-      filters: [
-        { name: 'Printer001' }
-      ],
-      optionalServices: [serviceUuid]
-    });
 
-    // Connect to the GATT servers
+    let device;
+
+    // Check if there is a saved device in localStorage
+    const storedDevice = localStorage.getItem('lastUsedDeviceID5');
+    if (storedDevice) {
+      console.log('there is a stored device');
+      console.log(storedDevice[0]);
+      console.log('alone')
+      console.log(storedDevice)
+      //  device = storedDevice[0]
+      device = navigator.bluetooth.getDevice(storedDevice)
+  .then(device => {
+    console.log(`Found device: ${device.name}`);
+  })
+  .catch(error => {
+    console.error(`Error getting device: ${error}`);
+  });
+      // device = await navigator.bluetooth.getDevice(storedDevice);
+      console.log('the device stores');
+      console.log(device)
+    } else {
+      // Request Bluetooth device
+      device = await navigator.bluetooth.requestDevice({
+        filters: [{ name: 'Printer001' }],
+        optionalServices: [serviceUuid],
+      });
+    }
+
     const server = await device.gatt.connect();
-
-    // Get the service
     const service = await server.getPrimaryService(serviceUuid);
-
-    // Get the characteristic
     const characteristic = await service.getCharacteristic(characteristicUuid);
-
-    // Send the print command
     const encoder = new TextEncoder();
+
     await characteristic.writeValue(printData1);
     const CHUNK_SIZE = 50; // define the size of each chunk
 const chunks = []; // array to hold the chunks
@@ -148,34 +169,20 @@ for (let i = 0; i < chunks.length; i++) {
     await characteristic.writeValue(chunks[i]);
   // }, i * 1000); // add a delay of 1 second between each chunk (adjust the delay time as needed)
 }
-    // await characteristic.writeValue(printData2);
+  console.log('device to be stored');
+  console.log(device)
+    localStorage.setItem('lastUsedDeviceID5', device.id);
 
-
-    // Disconnect from the GATT server
     await server.disconnect();
+
   } catch (error) {
     console.error(error);
-  }
+  }  
 }
 
 
  
 
-  // socket.addEventListener('open', function (event) {
-  //   console.log('WebSocket connection established');
-  // });
-  
-  // socket.addEventListener('message', function (event) {
-  //   console.log('Message from server:', event.data);
-  // });
-  
-  // socket.addEventListener('close', function (event) {
-  //   console.log('WebSocket connection closed');
-  // });
-  
-  
-
-// }
 
 // [[[[[[[[[[[[[[ A partir de aqui empieza la impresion del ticket:
 // const vendorId =0x1a86; // USB vendor ID for EC Line printers
