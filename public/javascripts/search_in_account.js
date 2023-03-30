@@ -120,34 +120,12 @@ printData2 = new Uint8Array([
 
 // var printData = new Uint8Array([...printData1,...printData2]);
   try {
-
-    let device;
-
-    // Check if there is a saved device in localStorage
-    const storedDevice = localStorage.getItem('lastUsedDeviceID5');
-    if (storedDevice) {
-      console.log('there is a stored device');
-      console.log(storedDevice[0]);
-      console.log('alone')
-      console.log(storedDevice)
-      //  device = storedDevice[0]
-      device = navigator.bluetooth.getDevice(storedDevice)
-  .then(device => {
-    console.log(`Found device: ${device.name}`);
-  })
-  .catch(error => {
-    console.error(`Error getting device: ${error}`);
-  });
-      // device = await navigator.bluetooth.getDevice(storedDevice);
-      console.log('the device stores');
-      console.log(device)
-    } else {
       // Request Bluetooth device
       device = await navigator.bluetooth.requestDevice({
         filters: [{ name: 'Printer001' }],
         optionalServices: [serviceUuid],
       });
-    }
+    
 
     const server = await device.gatt.connect();
     const service = await server.getPrimaryService(serviceUuid);
@@ -171,7 +149,6 @@ for (let i = 0; i < chunks.length; i++) {
 }
   console.log('device to be stored');
   console.log(device)
-    localStorage.setItem('lastUsedDeviceID5', device.id);
 
     await server.disconnect();
 
