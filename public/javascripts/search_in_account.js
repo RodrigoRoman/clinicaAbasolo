@@ -16,8 +16,17 @@ $(document).ready(function() {
   $("#beginDate").val(makeYMD(new Date(JSON.parse(beginD))));
 });
 
-
-
+var printer;
+function stringBluetooth(deviceData) {
+  console.log('transform from json')
+  console.log(deviceData)
+  stringBlue = {}
+  stringBlue['id'] = deviceData.id;
+  stringBlue['name'] = deviceData.name;
+  stringBlue['gatt'] = deviceData.gatt;
+  stringBlue['ongattserverdisconnected'] = deviceData.ongattserverdisconnected;
+  return stringBlue
+}
 
 async function printTicket() {
    serviceUuid = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
@@ -120,12 +129,15 @@ printData2 = new Uint8Array([
 
 // var printData = new Uint8Array([...printData1,...printData2]);
   try {
-      // Request Bluetooth device
-      device = await navigator.bluetooth.requestDevice({
-        filters: [{ name: 'Printer001' }],
-        optionalServices: [serviceUuid],
-      });
-    
+      if(printer){
+        device = printer
+      }else{
+        device = await navigator.bluetooth.requestDevice({
+          filters: [{ name: 'Printer001' ,deviceId:'OsURHI+3wBk8YoxCAZGClg=='}],
+          optionalServices: [serviceUuid],
+        });
+        printer = device;
+      }    
 
     const server = await device.gatt.connect();
     const service = await server.getPrimaryService(serviceUuid);
@@ -483,6 +495,7 @@ function populateTable(event) {
 <option id="quirofano" value="Quirofano">Quirofano</option>
 <option id="farmacia1" value="Farmacia1">Farmacia1</option>
 <option id="farmacia2" value="Farmacia2">Farmacia2</option>
+<option id="bodega" value="Bodega">Bodega</option>
     </select>
       </td>
       `;
@@ -533,6 +546,8 @@ function populateTableModal(event) {
 <option id="quirofano" value="Quirofano">Quirofano</option>
 <option id="farmacia1" value="Farmacia1">Farmacia1</option>
 <option id="farmacia2" value="Farmacia2">Farmacia2</option>
+<option id="bodega" value="Bodega">Bodega</option>
+
     </select>
              </td>
                           `;
