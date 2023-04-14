@@ -180,7 +180,7 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
     </table>
     <%}
     %>
-    <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin" || (currDate.getHours()<6 || currDate.getHours()>19)){%>
+    <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin" || (currentUser.role == "caja")||(currentUser.role == "medico")){%>
       <div class="container ">
         <%total = +(total).toFixed(3)%>
         <h2 class = "float-right font-italic border border-secondary rounded"><span class = "mx-2 my-2">Total: $<%=numberCommas(total)%></span></h2>
@@ -188,11 +188,6 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
     <%}%>
     <div class="container">
       <%
-            console.log('beg');
-            console.log(begin);
-            console.log('een');
-            console.log(end);
-
       const b = begin.toISOString().substring(0,10);
       const e = end.toISOString().substring(0,10);
       %>
@@ -206,6 +201,7 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
         </form>
         <%}if(patient.payed == false){%>
         <form class="d-inline" action="/patients/<%=patient._id%>/pay?_method=PUT" method="POST">
+          <input class="form-control" type="text" id="totalCharged" name="totalCharged" value="<%=total%>" required style="display:none;">
           <button class="btn btn-outline-danger ml-1">Cobrada <i class="fas fa-dollar-sign"></i></button>
         </form>
         <%}else{%>

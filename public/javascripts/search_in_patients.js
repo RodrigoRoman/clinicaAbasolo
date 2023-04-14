@@ -39,7 +39,6 @@ function makeHour(dateString) {
   }
 // Fill table with data
 function foundPatients(event) {
-    
     // let currentRequest = null;
     // event.preventDefault();
     const dat = {'search':$("#search_val").val(),'sorted':$(".custom-select").val(),'begin':$("#beginDate").val(),'end':$("#endDate").val(),page:$(event).attr("alt")};
@@ -61,8 +60,9 @@ function foundPatients(event) {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         patientsContent+=`<div class="patients row scrollDiv mt-4">`
         $.each(response.patients.sort((a, b) => (a.discharged) ? 1 : -1), function(){
+            if(((this.author.role != 'caja')|| (response.currentUser.role== 'caja'))&& ((this.author.role != 'medico')&&((response.currentUser.role!= 'medico')||(this.currentUser.role!= 'caja')))){
             patientsContent+= '<div class="col-md-6">'
-            let borderColor = (this.discharged)?"#7f8a88":this.author.color;
+            let borderColor = (this.discharged)?"#7f8a88":this.author.color; 
             patientsContent+=`
             <div class="card index_card_p mb-4 border border-`+borderColor+`"style="border-color:`+borderColor+`!important;">
                 <div class="row">
@@ -87,14 +87,14 @@ function foundPatients(event) {
                                 }
                                 patientsContent+=`<ul class="list-group list-group-flush mb-4">`
                                 
-                                if (this.payed) {
+                                if (this.payed && (response.currentUser.role == 'directAdmin')) {
                                     if (!this.discharged) {
-                                      patientsContent += `<li class="list-group-item border border-danger">Cobrada por: ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
+                                      patientsContent += `<li class="list-group-item border border-danger">Total:$${this.totalReceived}. Cobrada por: ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
                                       ${makeHour(this.chargedDate)} 
                                      
                                        </li>`;
                                     } else {
-                                    patientsContent += `<li class="list-group-item border ">Cobrada por: ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
+                                    patientsContent += `<li class="list-group-item border ">Total:$${this.totalReceived}. ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
                                     ${makeHour(this.chargedDate)} 
                                          </li>`;
                                     }
@@ -129,6 +129,7 @@ function foundPatients(event) {
                     </div>
                 </div>
             </div>`
+                            }
             
                  });
                  patientsContent+=`</div>`

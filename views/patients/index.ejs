@@ -40,8 +40,17 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
             <!-- <div class="row justify-content-around mb-4"> -->
                     <div></div>
                     <%if(currentUser.role == 'medico'){ %>
-                      <div class="mr- ml-5">
-                          <a class="btn btn-info " href="/patients/newConsultation">
+                      <div class="mr- ml-5 pb-3">
+                        <form action="/patients/newConsultation?_method=POST" method="POST" novalidate class="validated-form">
+
+                        <div class="col-9 mx-auto pb-3">
+                          <div class="form-group">
+                            <label for="input-field" class="text-muted font-weight-bold mb-2">Nombre del paciente:</label>
+                            <input type="text" class="form-control" id="patientName" name="patientName" value =''>
+                         </div>
+                        </div>
+                        
+                          <button class="btn btn-info">
                               <div class="col">
                                   <div class="row d-flex text-center flex-row justify-content-between"> 
                                       <lottie-player src="/lotties/register.json" background="transparent"  speed="1"  style="width: 200px; height: 100px;" loop  autoplay></lottie-player>
@@ -52,11 +61,12 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                                   <!-- <div class="col d-flex text-center flex-column justify-content-between">
                                   </div> -->
                               </div>
-                          </a> 
+                            </button> 
+                          </form>
                       </div>
                     <%}else{
                       if(currentUser.role == 'caja'){ %>
-                        <div class="mr- ml-5">
+                        <div class="mr- ml-5 pt-3 pb-3">
                             <a class="btn btn-info " href="/patients/newPharmacySale">
                                 <div class="col">
                                     <div class="row d-flex text-center flex-row justify-content-between"> 
@@ -72,7 +82,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                         </div>
                       <%}else{%>
 
-                      <div class="mr- ml-5">
+                      <div class="mr- ml-5 pb-3">
                           <a class="btn btn-info " href="/patients/new">
                               <div class="col">
                                   <div class="row d-flex text-center flex-row justify-content-between"> 
@@ -88,7 +98,8 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                       </div>
                     <%}
                   }%>
-                    <select class="btn btn-outline-success custom-select custom-select-lg mb-3" >
+
+                    <select class="btn btn-outline-success custom-select custom-select-lg pt-3 mb-3" >
                         <option selected>Ordenar por:</option>
                         <option id= "byName" value="name">Nombre</option>
                         <option id= "byDoctor" value="doctor">Medico Tratante</option>
@@ -115,7 +126,9 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
     </div>
     
     <div class="patients row scrollDiv mt-4">
-    <%for (let patient of patients){%>
+    <%for (let patient of patients){
+      if(((patient.author.role != 'caja')|| (currentUser.role== 'caja'))&& ((patient.author.role != 'medico')&&((currentUser.role!= 'medico')||(currentUser.role!= 'caja')))){%>
+
         <div class="col-md-6">
             <%
               let borderColor = (patient.discharged)?"#7f8a88":patient.author.color%>
@@ -149,9 +162,9 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                                       console.log('paciente')
                                       console.log(patient)
                                     %>
-                                    <li class="list-group-item  border border-danger">Cobrada por: <%= patient.receivedBy.username%>  <%= patient.chargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.chargedDate)%></li>
+                                    <li class="list-group-item  border border-danger">Total: $<%=patient.totalReceived%>. Cobrada por: <%= patient.receivedBy.username%> el  <%= patient.chargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.chargedDate)%></li>
                                     <%}else{%>
-                                      <li class="list-group-item ">Cobrada por: <%= patient.receivedBy.name%><%= patient.chargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.chargedDate)%></li>
+                                      <li class="list-group-item ">Total: $<%=patient.totalReceived%>. Cobrada por: <%= patient.receivedBy.name%><%= patient.chargedDate.toLocaleDateString('es-US', options)+" a las "+makeHour(patient.chargedDate)%></li>
 
                                       <%}}%>
                                     <li class="list-group-item">Telefono: <%= patient.phone%> </li>
@@ -210,7 +223,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
                 </div>
             </div>
         </div>
-    <% }%>
+    <%} }%>
     </div>
 </div>
 <div class="container">

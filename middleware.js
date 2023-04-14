@@ -112,6 +112,16 @@ module.exports.isDinamicDirectAdmin = async (req, res, next) => {
     next();
 }
 
+module.exports.isDirectAdminOrCaja = async (req, res, next) => {
+    console.log('THE ROLE');
+    console.log(req.user.role);
+    if (("caja")!=(req.user.role) && ("directAdmin")!=(req.user.role)) {
+        req.flash('error', 'No tiene permiso de hacer eso');
+        return res.redirect("/");
+    }
+    next();
+}
+
 
 module.exports.isPatAuthor = async (req, res, next) => {
     const { id } = req.params;

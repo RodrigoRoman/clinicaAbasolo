@@ -68,7 +68,8 @@ module.exports.searchAllPatients = async (req, res) => {
         res.locals.error = 'Ningun servicio corresponde a la busqueda';
         res.json({})
     }
-    res.json({'patients':patients,'begin':begin,'end':end,"page":page, 'pages': Math.ceil(numPatients / resPerPage),
+    console.log(res.locals.currentUser);
+    res.json({'patients':patients,'currentUser':res.locals.currentUser,'begin':begin,'end':end,"page":page, 'pages': Math.ceil(numPatients / resPerPage),
     'numOfResults': numPatients,'search':req.query.search,'sorted':sorted})
 }
 
@@ -101,7 +102,7 @@ hour = nDate.getUTCHours(); // Get the hour component of the datetime
  formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
  formattedMonth = nDate.getUTCMonth() <10?`0${nDate.getUTCMonth()}`:nDate.getUTCMonth();
  formattedDay = nDate.getUTCDate() <10?`0${nDate.getUTCDate()}`:nDate.getUTCDate();
-    patient.name = 'Consulta: '+req.user.username+' '+formattedDay+'/'+formattedMonth+'/'+nDate.getUTCFullYear()+" - "+formattedTime;
+    patient.name = 'Paciente: '+req.body.patientName+'. Consulta: '+req.user.username+' '+formattedDay+'/'+formattedMonth+'/'+nDate.getUTCFullYear()+" - "+formattedTime;
     patient.cuarto = 'Consultorio';
     patient.treatingDoctor = req.user.username;
     patient.diagnosis = 'Consulta'
@@ -167,6 +168,7 @@ module.exports.updatePayedPatient = async (req, res) => {
     patient.payed = true;
     patient.chargedDate = getMexicoCityTime();
     patient.receivedBy = req.user;
+    patient.totalReceived = req.body.totalCharged;
     await patient.save();
     req.flash('success', 'Cuenta cobrada!');
     res.redirect(`/patients/${patient.id}`)

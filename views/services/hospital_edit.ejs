@@ -7,6 +7,7 @@
                 <label class="form-label" for="name">Nombre</label>
                 <input class="form-control" type="text" id="name" name="service[name]" value = "<%=service.name%>" required>
             </div>
+            <%if(currentUser.role == 'dinamicAdmin'){%>
             <div class="mb-3">
                 <label class="form-label" for="class">Clasificacion</label>
                 <input class="form-control" type="text" id="class" name="service[class]" value = "<%=service.class%>" required>
@@ -30,8 +31,32 @@
             </div>
             <div class="mb-3">
                 <label class="form-label" for="claveSat">Clave del Sat</label>
-                <input class="form-control" type="number" id="claveSat" name="service[claveSat]" value = <%=service.claveSat%> required>
+                <input class="form-control" type="number" id="claveSat" name="service[claveSat]" value = "<%=service.claveSat%>" required>
             </div>
+            <%}else{%>
+                <div class="mb-3">
+                <input class="form-control" type="text" id="class" name="service[class]" value = "<%=service.class%>" required style="display:none;">
+            </div>
+            <div class="mb-3">
+                <select name  = "service[unit]" class="btn btn-outline-secondary btn-sm custom-select custom-select-sm mt-1" style="display:none;" >
+                    <%
+                    var options = ["Procedimiento","Uso", "Hora", "Dia"];
+                    options.forEach((op)=>
+                    {
+                        if(( service.unit == op )){%>
+                            <option value="<%=op%>" selected><%=op %></option>
+                        <%}else{%>
+                            <option value="<%=op%>"><%=op %></option>
+                        <%}
+                    }
+                    )
+                    %>
+                </select> 
+            </div>
+            <div class="mb-3">
+                <input class="form-control" type="number" id="claveSat" name="service[claveSat]" value = "<%=service.claveSat%>" required style="display:none;">
+            </div>
+                <%}%>
             <div class="mb-3">
                 <label class="form-label" for="buy">Precio del servicio</label>
                 <div class="input-group">
@@ -40,6 +65,7 @@
                         aria-describedby="price-label" name="service[price]" value= <%=service.price%> required>
                 </div> 
             </div>
+            <%if(currentUser.role == 'directAdmin'){%>
             <div class="mb-3">
                 <label class="form-label" for="doctor">Nombre del profesional de la salud</label>
                 <input class="form-control" type="text" id="doctor" name="service[doctor]" value= "<%=service.doctor%>" required>
@@ -85,6 +111,33 @@
                 <label for="image-<%=i%>">Borrar</label>
                 <% })%>
             </div>
+            <%}else{%>
+                <div class="mb-3">
+                <input class="form-control" type="text" id="doctor" name="service[doctor]" value= "<%=service.doctor%>" required style="display:none;">
+            </div>
+            <div class="mb-3">
+                <textarea class="form-control" type="text" id="description" name="service[description]"
+                    required style="display:none;"><%=service.description%></textarea>
+            </div>
+            <div class="mb-3">
+                <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="customRadioInline1" name="service[hospitalEntry]"value = <%=service.hospitalEntry%> class="custom-control-input"
+                <%if(service.hospitalEntry == "true"){%>
+                    <%="checked"%>
+                <%}%> 
+                >
+                <label class="custom-control-label" for="customRadioInline1">Ingreso a hospital</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="customRadioInline2" name="service[hospitalEntry]" value = "false" class="custom-control-input"
+                <%if(service.hospitalEntry == "false"){%>
+                    <%="checked"%>
+                <%}%> 
+                >
+                <label class="custom-control-label" for="customRadioInline2">Honorarios</label>
+                </div>
+            </div>
+                <%}%>
             <div class="mb-3">
                 <button class="btn btn-success">Actualizar</button>
             </div>

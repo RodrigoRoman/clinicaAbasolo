@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const services = require('../controllers/services');
 const catchAsync = require('../utils/catchAsync');
-const { isLoggedIn, isServAuthor,isDinamicDirectAdmin, validateService, validateSupply, validateHospital} = require('../middleware');
+const { isLoggedIn, isServAuthor,isDinamicDirectAdmin,isDirectAdminOrCaja, validateService, validateSupply, validateHospital} = require('../middleware');
 const multer = require('multer');
 const { storage } = require('../cloudinary');
 const upload = multer({ storage });
@@ -19,12 +19,12 @@ router.get('/searchServices/:page?',isLoggedIn,isDinamicDirectAdmin,catchAsync(s
 
 
 router.route('/supply/:page?')
-    .get(catchAsync(services.index_supplies))
+    .get(isDinamicDirectAdmin,catchAsync(services.index_supplies))
     .post(isLoggedIn,isDinamicDirectAdmin, upload.array('image'), validateSupply, catchAsync(services.createSupply))
   
 
 router.route('/hospital/:page?')
-    .get(catchAsync(services.index_hospital))
+    .get(isDinamicDirectAdmin,catchAsync(services.index_hospital))
     .post(isLoggedIn, isDinamicDirectAdmin,upload.array('image'), validateHospital, catchAsync(services.createHospital))
 
 router.get('/new', isLoggedIn,isDinamicDirectAdmin, services.renderNewForm)
@@ -42,13 +42,13 @@ router.route('/:id')
 
 router.route('/:id/supply')
     .get(isLoggedIn,isDinamicDirectAdmin, upload.array('image'), catchAsync(services.renderNewFrom))
-    .put(isLoggedIn,isDinamicDirectAdmin, upload.array('image'), validateSupply, catchAsync(services.updateService))
+    .put(isLoggedIn,isDirectAdminOrCaja, upload.array('image'), validateSupply, catchAsync(services.updateService))
 
 router.route('/:id/hospital')
-    .put(isLoggedIn,isDinamicDirectAdmin, upload.array('image'), validateHospital, catchAsync(services.updateService))
+    .put(isLoggedIn,isDirectAdminOrCaja, upload.array('image'), validateHospital, catchAsync(services.updateService))
 
 
-router.get('/:id/edit',isLoggedIn,isDinamicDirectAdmin, catchAsync(services.renderEditForm))
+router.get('/:id/edit',isLoggedIn,isDirectAdminOrCaja, catchAsync(services.renderEditForm))
 
 
 module.exports = router;

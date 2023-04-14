@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const patients = require('../controllers/patients');
 const catchAsync = require('../utils/catchAsync');
-const { isLoggedIn, isServAuthor,isDinamicDirectAdmin, validateService, validateSupply, validateHospital,validatePatient} = require('../middleware');
+const { isLoggedIn, isServAuthor,isDinamicDirectAdmin,isDirectAdminOrCaja, validateService, validateSupply, validateHospital,validatePatient} = require('../middleware');
 const multer = require('multer');
 
 const Patient = require('../models/patient');
@@ -18,7 +18,7 @@ router.get('/searchPatients',isLoggedIn,catchAsync(patients.searchAllPatients))
 
 router.get('/new', isLoggedIn, patients.renderNewForm)
 
-router.get('/newConsultation', isLoggedIn, patients.createPatientConsultation)
+router.post('/newConsultation', isLoggedIn, patients.createPatientConsultation)
 router.get('/newPharmacySale',isLoggedIn, patients.createPharmacySale)
 
 //SHOW ROUTE FOR PRODUCTS
@@ -35,7 +35,7 @@ router.route('/:id')
 router.route('/:id/pay')
     .put(isLoggedIn,catchAsync(patients.updatePayedPatient))
 
-router.get('/:id/edit', isLoggedIn,isDinamicDirectAdmin, catchAsync(patients.renderEditForm))
+router.get('/:id/edit', isLoggedIn,isDirectAdminOrCaja, catchAsync(patients.renderEditForm))
 
 //retrieve product data for patient account
 router.get('/:id/search3',isLoggedIn,catchAsync(patients.search_3))

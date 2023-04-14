@@ -26,6 +26,7 @@ const PatientSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    totalReceived:{type:Number, default:0.0},
     servicesCar: [ {
             type: Schema.Types.ObjectId,
             ref: "Transaction"
