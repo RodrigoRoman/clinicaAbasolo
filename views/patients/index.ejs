@@ -127,7 +127,7 @@ function convertUTCDateToLocalDate(date) {
     
     <div class="patients row scrollDiv mt-4">
     <%for (let patient of patients){
-      if(((patient.author.role != 'caja')|| ((currentUser.role== 'caja')||(currentUser.role== 'directAdmin')))&& ((patient.author.role != 'medico')||((currentUser.role!= 'medico')||(currentUser.role!= 'caja')||(currentUser.role== 'directAdmin')))){%>
+      if(((patient.author.role != 'caja')|| ((currentUser.role== 'caja')||(currentUser.role== 'directAdmin')))&& ((patient.author.role != 'medico')||((currentUser.role== 'medico')||(currentUser.role== 'caja')||(currentUser.role== 'directAdmin')))){%>
 
         <div class="col-md-6">
             <%

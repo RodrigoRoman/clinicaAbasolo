@@ -60,7 +60,7 @@ function foundPatients(event) {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         patientsContent+=`<div class="patients row scrollDiv mt-4">`
         $.each( function(){
-                if(((this.author.role != 'caja')|| ((response.currentUser.role== 'caja')||(response.currentUser.role== 'directAdmin')))&& ((this.author.role != 'medico')||((response.currentUser.role!= 'medico')||(response.currentUser.role!= 'caja')||(response.currentUser.role== 'directAdmin')))){
+                if(((this.author.role != 'caja')|| ((response.currentUser.role== 'caja')||(response.currentUser.role== 'directAdmin')))&& ((this.author.role != 'medico')||((response.currentUser.role== 'medico')||(response.currentUser.role== 'caja')||(response.currentUser.role== 'directAdmin')))){
 
             patientsContent+= '<div class="col-md-6">'
             let borderColor = (this.discharged)?"#7f8a88":this.author.color; 
