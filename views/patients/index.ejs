@@ -19,7 +19,7 @@ function convertUTCDateToLocalDate(date) {
     return new Date(date.getTime() - diff); // needs to substract
  }
 
-patients.sort((a, b) => (a.discharged) ? 1 : -1)
+// patients.sort((a, b) => (a.discharged) ? 1 : -1)
 %>
 <div class="container">   
     <div class="container">
@@ -127,7 +127,7 @@ patients.sort((a, b) => (a.discharged) ? 1 : -1)
     
     <div class="patients row scrollDiv mt-4">
     <%for (let patient of patients){
-      if(((patient.author.role != 'caja')|| (currentUser.role== 'caja'))&& ((patient.author.role != 'medico')&&((currentUser.role!= 'medico')||(currentUser.role!= 'caja')))){%>
+      if(((patient.author.role != 'caja')|| ((currentUser.role== 'caja')||(currentUser.role== 'directAdmin')))&& ((patient.author.role != 'medico')||((currentUser.role!= 'medico')||(currentUser.role!= 'caja')||(currentUser.role== 'directAdmin')))){%>
 
         <div class="col-md-6">
             <%
