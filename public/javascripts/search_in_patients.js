@@ -19,7 +19,10 @@ function truncate(str, n){
     return (str.length > n) ? str.substr(0, n-1) + '...' : str;
   };
 
-function makeYMD(date){
+function makeYMD(dat){
+    const date = new Date(dat);
+    console.log('date!')
+    console.log('get utc')
 const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
 y : date.getUTCFullYear()};
 return  newDate.y+ "-" + ((newDate.m.toString().length>1)?newDate.m:"0"+newDate.m)+ "-" + ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d);
@@ -59,8 +62,10 @@ function foundPatients(event) {
 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         patientsContent+=`<div class="patients row scrollDiv mt-4">`
-        $.each( function(){
-                if(((this.author.role != 'caja')|| ((response.currentUser.role== 'caja')||(response.currentUser.role== 'directAdmin')))&& ((this.author.role != 'medico')||((response.currentUser.role== 'medico')||(response.currentUser.role== 'caja')||(response.currentUser.role== 'directAdmin')))){
+        $.each(response.patients.sort((a, b) => (a.discharged) ? 1 : -1), function(){
+            if(((this.author.role != 'caja')|| ((response.currentUser.role== 'caja')||(response.currentUser.role== 'directAdmin')))&& ((this.author.role != 'medico')||((response.currentUser.role== 'medico')||(response.currentUser.role== 'caja')||(response.currentUser.role== 'directAdmin')))){
+
+                // if(((this.author.role != 'caja')|| ((response.currentUser.role== 'caja')||(response.currentUser.role== 'directAdmin')))&& ((this.author.role != 'medico')||((response.currentUser.role!= 'medico')||(response.currentUser.role!= 'caja')||(response.currentUser.role== 'directAdmin')))){
 
             patientsContent+= '<div class="col-md-6">'
             let borderColor = (this.discharged)?"#7f8a88":this.author.color; 

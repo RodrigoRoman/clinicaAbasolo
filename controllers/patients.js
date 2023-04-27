@@ -38,6 +38,7 @@ module.exports.index = async (req, res) => {
 module.exports.searchAllPatients = async (req, res) => {
     let {search,sorted,begin,end,page} = req.query;
     page = parseInt(page)||1;
+    console.log('in here!')
     let resPerPage = 30;
     search = new RegExp(escapeRegExp(search), 'gi');
     let dbQueries =  [
@@ -48,21 +49,57 @@ module.exports.searchAllPatients = async (req, res) => {
         ];
     begin = new Date(begin+"T00:00:01.000Z")
     end = new Date(end+"T23:59:01.000Z")
-    let patients = await Patient.find({$or:dbQueries,admissionDate:{$gte:begin,$lte:end}}).limit(resPerPage*3).sort({discharged: 1, admissionDate: -1}).populate("author").populate("receivedBy");
-    let numPatients = patients.length;
+    let patients = [];
+    console.log('passs!')
+    const skip = resPerPage * (page - 1);
+
+
+    //  = await Patient.find({$or:dbQueries,admissionDate:{$gte:begin,$lte:end}}).limit(resPerPage*3).sort({discharged: 1, admissionDate: -1}).populate("author").populate("receivedBy");
+
+
+let numPatients = await Patient.countDocuments({ $or: dbQueries, admissionDate: { $gte: begin, $lte: end } });
+console.log('num patients');
+console.log(numPatients);
+
     begin = req.query.begin;
     end = req.query.end;
     if(sorted == "name"||sorted == "Ordenar por:"){
+        console.log('first!');
+       patients = await Patient.find({ $or: dbQueries, admissionDate: { $gte: begin, $lte: end } })
+       .sort({ discharged: 1, admissionDate: -1 })
+       .skip(skip)
+       .limit(resPerPage)
+       .populate("author")
+       .populate("receivedBy");
+     
+     console.log("Number of patients: ", patients.length);
+    //  console.log("Patients: ", patients);
+
+  console.log('num of docs');
+  console.log(patients.length)
+        
         //sort in alphabetical order
-        patients = patients.slice(((resPerPage * page) - resPerPage),((resPerPage * page) - resPerPage)+resPerPage).sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:'base'}));
+        // patients = patients.slice(((resPerPage * page) - resPerPage),((resPerPage * page) - resPerPage)+resPerPage).sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:'base'}));
     };
     if(sorted == "doctor"){
         //sort in alphabetical order
-        patients = patients.slice(((resPerPage * page) - resPerPage),((resPerPage * page) - resPerPage)+resPerPage).sort((a,b)=>a.doctor.localeCompare(b.name,"es",{sensitivity:'base'}));
+        patients = await Patient.find({ $or: dbQueries, admissionDate: { $gte: begin, $lte: end } })
+       .sort({ discharged: 1, admissionDate: -1 })
+       .skip(skip)
+       .limit(resPerPage)
+       .populate("author")
+       .populate("receivedBy");
+        // patients = patients.slice(((resPerPage * page) - resPerPage),((resPerPage * page) - resPerPage)+resPerPage).sort((a,b)=>a.doctor.localeCompare(b.name,"es",{sensitivity:'base'}));
     };
     if(sorted == "diagnosis"){
         //sort in alphabetical order
-        patients = patients.slice(((resPerPage * page) - resPerPage),((resPerPage * page) - resPerPage)+resPerPage).sort((a,b)=>a.class.localeCompare(b.diagnosis,"es",{sensitivity:'base'}));
+        patients = await Patient.find({ $or: dbQueries, admissionDate: { $gte: begin, $lte: end } })
+       .sort({ discharged: 1, admissionDate: -1 })
+       .skip(skip)
+       .limit(resPerPage)
+       .populate("author")
+       .populate("receivedBy");
+        // patients = patients.slice(((resPerPage * page) - resPerPage),((resPerPage * page) - resPerPage)+resPerPage).sort((a,b)=>a.class.localeCompare(b.diagnosis,"es",{sensitivity:'base'}));
     };
     if (!patients) {
         res.locals.error = 'Ningun servicio corresponde a la busqueda';
