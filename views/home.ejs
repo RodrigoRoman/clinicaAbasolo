@@ -35,7 +35,7 @@
         
         <main class="px-3">
             <p><i>"<%=phrases.sample()%>"</i></p>
-
+           <% if(currentUser) {%>
             <div class="container my-5">
                 <div class="row">
                     <div class="col-sm-4">
@@ -80,6 +80,7 @@
                     
                 </div>
             </div>
+            <%}%>
           
                  <div>
             <% if(!currentUser) { %>
