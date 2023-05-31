@@ -70,16 +70,20 @@ let newPatient = patientNoHonorary.concat(honoraries);
                             <th scope="col"><h6>Nombre</h6></th> 
                             <th scope="col"><h6>Cantidad</h6></th>  
                             <th scope="col"><h6>Precio Unitario</h6></th>
+                            <th scope="col"><h6>Descuento</h6></th>  
                             <th scope="col"><h6>Subtotal</h6></th>
                         </tr>  
                     </thead>
                     <tbody>
                     <%let prev_class= "", subtotal_class = 0, sub_amount = 0,total = 0; 
-                    newPatient.forEach(function(item,index){%>
+                    newPatient.forEach(function(item,index){
+                        
+                        %>
                             <tr class = 'subRed'>  
                                 <th><%=item.class%></th> 
                                 <th></th> 
                                 <th></th>  
+                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th> 
@@ -89,17 +93,22 @@ let newPatient = patientNoHonorary.concat(honoraries);
                         let price = 0;
                         (item.amount).forEach(function(amnt,i){
                             let price = item.price[i]
-                            let item_subtotal = +(price * amnt).toFixed(3);%>
+                            let discount = item.discount[i]
+                            let item_subtotal = (amnt*(price-(price*(discount*0.01)))).toFixed(2)
+
+                            // let item_subtotal = +(price * amnt).toFixed(3);
+                            %>
                         <tr class = 'reduced'>  
                             <td></td>
                             <td><%=item.serviceName[i]%></td> 
                             <td><%=Math.round(amnt)%></td>  
                             <td>$<%=numberCommas(price)%></td>
+                            <td><%=discount%>%</td>
                             <td>$<%=numberCommas(item_subtotal)%></td>  
                         </tr> 
                         <%
-                        sub_amount += amnt;subtotal_class += item_subtotal;
-                        total += item_subtotal;
+                        sub_amount += amnt;subtotal_class += parseFloat(item_subtotal);
+                        total += parseFloat(item_subtotal);
                         subtotal_class = +(subtotal_class).toFixed(3)
                     })%>
                         <tr class = "subRed border">  
@@ -107,6 +116,7 @@ let newPatient = patientNoHonorary.concat(honoraries);
                             <th scope="row">Subtotal</th>  
                             <th scope="row"><%=Math.round(sub_amount)%></th>  
                             <th scope="row"></th>  
+                            <th></th>
                             <th scope="row">$<%=numberCommas(subtotal_class)%></th> 
                         </tr>
                 <%})%>

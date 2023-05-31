@@ -8,6 +8,7 @@ const DischargedSchema = new Schema({
     name: { type: String},
     processDate: { type: Date},
     service_type: { type: String},
+    discount: {type: Number,default: 0},
     hospitalEntry:{type: String,required:true},
     buyPrice: { type: Number},
     unitPrice: { type: Number, required: true, get: p => `${p}.00` }

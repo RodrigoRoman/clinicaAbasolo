@@ -1,5 +1,7 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose'),     
+ MoneyBox = require('./money_parts'),
+ Schema = mongoose.Schema;
+
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const ImageSchema = new Schema({
@@ -24,10 +26,20 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    stockLocation:{
+        type: String,
+        default:'Central'
+    },
+    serviceType:{
+        type: String,
+        default:'Consulta'
+    },
     color: {
         type: String,
         default: '#00DD00' // default color value (black)
-    }
+    },
+    moneyBox: { type: Schema.Types.ObjectId, ref: 'MoneyBox' },
+
 });
 
 

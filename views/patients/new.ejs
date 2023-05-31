@@ -23,42 +23,6 @@ function getMexicoCityTime() {
     return mexicoCityTime;
   }
 
-
-
-// function convertUTCDateToLocalDate(date) {
-
-// var strDate =  date.toLocaleString('en-US', {timeZone: 'America/Mexico_City'});
-// console.log('the date to be transformed')
-// console.log(new Date(Date.parse(strDate)).toISOString().substring(0, 16))
-
-// var parts = strDate.split(' ');
-// var year = parts[2];
-// var month = months[parts[0].toLowerCase()];
-// var day = parts[1].replace(/\,/g,"");
-
-// var timeParts = parts[3].split(':');
-// var hours = timeParts[0];
-// var minutes = timeParts[1];
-// var seconds = timeParts[2];
-
-// if (parts[4]==="PM") {
-//     hours = parseInt(hours) + 12;
-// }
-
-// var d = new Date(year, month, day, hours, minutes, seconds);
-
-// var localOffset = date.toLocaleString('en-US', {timeZone: 'America/Mexico_City'}) * 60000;
-
-// var localOffset = date.getTimezoneOffset() * 60000;
-
-// var localTime = date.getTime();
-
-// date = localTime - localOffset;
-
-//date = new Date(dat);
-// return new Date(Date.parse(strDate));
-// }
-// console.log(new Date(convertUTCDateToLocalDate(new Date())));
 %>
 <div class="row">
     <h1 class="text-center">Crear perfil de paciente</h1>
@@ -107,10 +71,20 @@ function getMexicoCityTime() {
                 <label class="form-label" for="doctor">Médico Tratante</label>
                 <input class="form-control" type="text" id="doctor" name="patient[treatingDoctor]" value = "">
             </div>
+            <div class="d-flex justify-content-center align-items-center mb-4 mt-4">
+                <select class="btn btn-outline-secondary btn-lg custom-select ml-2" name="patient[serviceType]" style="max-width: 300px">
+                  <option <%=(currentUser.serviceType =="Farmacia")?'selected':''%> id="farmacia" value="Farmacia">Farmacia</option>
+                  <option <%=(currentUser.serviceType =="Consulta")?'selected':''%>id="consulta" value="Consulta">Consulta</option>
+                  <option <%=(currentUser.serviceType =="Hospitalizacion")?'selected':''%>id="hospitalizacion" value="Hospitalizacion">Hospitalizacion</option>
+                  <option <%=(currentUser.serviceType == "Emergencia")?'selected':''%>id="emergencia" value="Emergencia">Emergencia</option>
+                  <option <%=(currentUser.serviceType =="Cirugia")?'selected':''%>id="cirugia" value="Cirugia">Cirugia</option>
+                  <option <%=(currentUser.serviceType =="Unidad de Cuidados Intensivos (UCI)")?'selected':''%>id="uci" value="Unidad de Cuidados Intensivos (UCI)">Unidad de Cuidados Intensivos (UCI)</option>
+                  <option <%=(currentUser.serviceType =="Laboratorios Clinicos")?'selected':''%>id="labClinic" value="Laboratorios Clinicos">Laboratorio Clinicos</option>
+                </select>
+            </div>
             <div class="mb-3">
                 <button class="btn btn-success">Agregar paciente</button>
             </div>
         </form>
-        <a href="/patients">Pacientes</a>
     </div>
 </div>

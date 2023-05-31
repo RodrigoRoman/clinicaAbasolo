@@ -15,18 +15,21 @@ ImageSchema.virtual('thumbnail').get(function () {
 
 const ServiceSchema = new Schema({
     name:{ type: String, required: true },
-    class: { type: String },
+    class: { type: String,defalut:''},
     images: [ImageSchema],
-    unit: { type: String },
-    claveSat: { type: Number, required: true},
-    description: {type: String, required: true},
+    unit: {type: String,defalut:'pieza'},
+    claveSat: { type: Number,defalut:''},
+    description: {type: String,defalut:''},
     hospitalEntry: {type: String,required:true},
     deleted:{type: Boolean,default:false},
+    barcode:{type: String,default:''},
     author: {
       type: Schema.Types.ObjectId,
       ref: 'User'
   }
-  }, { discriminatorKey: 'type' });
+  }, 
+  { discriminatorKey: 'type' }
+  );
 
 // definition of discriminators (subclasses of the main schema)
 const SupplySchema = new Schema({
@@ -34,7 +37,7 @@ const SupplySchema = new Schema({
     principle: { type: String,required:true },
     buy_price: { type: Number, required: true, get: p => `${p}` },
     sell_price: { type: Number, required: true, get: p => `${p}` },
-    expiration:  { type: Date, required: true},
+    expiration: { type: Date, default: Date.now},
     supplier : { type: String, required: true},
     optimum : {type: Number, required: true},
     outside : {type: Number, required: true},

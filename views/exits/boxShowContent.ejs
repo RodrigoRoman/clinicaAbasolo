@@ -1,0 +1,308 @@
+<% layout('layouts/boilerplate')%>
+<%
+function numberCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+function makeHour(date){
+    const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+    y : date.getUTCFullYear(),h:date.getUTCHours(), min:(((""+date.getUTCMinutes()).length>1)?date.getUTCMinutes():"0"+date.getUTCMinutes())};
+    return  (newDate.h+":"+newDate.min);
+  }
+function convertUTCDateToLocalDate(date) {
+
+invdate = new Date(`${date.toLocaleString('en-US', { timeZone: 'America/Mexico_City' })} GMT`)
+
+// and the diff is 5 hours
+var diff = date.getTime() - invdate.getTime();
+
+return new Date(date.getTime() - diff); // needs to substract
+
+}
+function makeYMD(date){
+    const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+    y : date.getUTCFullYear()};
+    return  newDate.y+ "-" + newDate.m+ "-" + ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d);
+    }
+    const nDate = new Date(convertUTCDateToLocalDate(new Date))
+    %>
+    <script>
+        // Pass the 'box' variable to the JavaScript file
+        var box = <%- JSON.stringify(box) %>;
+        var historyTransactions = <%- JSON.stringify(historyTransactions) %>;
+        var historyExits = <%- JSON.stringify(historyExits) %>;
+
+    </script>
+
+<div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
+
+<div class="pop-up-container ">
+    <h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px"><%=box.name%></h5> </div>
+</div>
+
+<div class="container mb-4">
+    <div class="row offset-sm-2 justify-content-md-center">
+        <div class="col col-10">
+          <div class="input-group input-group" id="search_group">
+            <input class="input-group-text" id="search_val" type="text" name="search" value="<%=search%>" placeholder="Buscar" aria-label="Search">
+          </div>
+        </div>
+        <div class="col col-2 ml-auto">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary btn-success" type="button" id="search-button"><i class="fas fa-search" style="color: white;"></i></button>
+          </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex main justify-content-center align-items-center mb-4 mt-4">
+    <div class="">
+        <label for="transactionSort" class = 'ml-4 mb-1'>Agrupar transacciones:</label>
+        <br>
+        <select id="transactionSort" class="btn btn-outline-secondary btn-lg custom-select " style="max-width: 300px">
+            <option value="serviceData.name">Nombre del servicio</option>
+            <option value="serviceData.class">Categoria del servicio</option>
+            <option value="patientData.name">Nombre del paciente</option>
+            <option value="patientData.serviceType">Tipo de servicio</option>
+            <option value="_id">Transacciones individuales</option>
+        </select>
+    </div>
+    <div class="ml-4 ">
+        <label for="exitSort" class = 'ml-2 mb-1'>Agrupar salidas</label>
+        <br>
+        <select id="exitSort" class="btn btn-outline-secondary btn-lg custom-select" style="max-width: 300px">
+            <option value="name">Nombre</option>
+            <option value="category">Clase</option>
+            <option value="_id">Salidas individuales</option>
+        </select>
+    </div>
+    <div class="ml-4 mt-4">
+        <button class="btn btn-outline-secondary" id ="genPDf"><i class="fas fa-file-pdf" ></i></button>
+    </div>
+
+</div>
+
+<div class="container scrollDiv " id ="contentTables">
+    
+        <div class="table-container">
+            <div class="pop-up-container">
+                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #90EE90; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Ingresos actuales</p> 
+            </div>
+            <table class="table  table-success">
+                <thead class="thead-primary">
+                    <tr>
+                        <th>Nombre        </th>
+                        <th>Agregado por</th>
+                        <th>Fecha-Hora</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Descuento</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% totalCurrentIncome = 0.0;
+                        box.transactionsActive.forEach(transaction => { %>
+                        <tr>
+                            <td><%= transaction.service.name%></td>
+                            <td><%= transaction.addedBy.username %></td>
+                            <td><%= transaction.consumtionDate.toISOString().substr(0,10)%> a las <%=makeHour(transaction.consumtionDate)%></td>
+                            <td><%= transaction.amount %></td>
+                            <%if(transaction.service.service_type == 'supply'){%>
+                                <td>$<%=  transaction.service.sell_price %></td>
+                                <td>%<%=  transaction.discount %></td>
+                                <td>$<%=  (transaction.amount*(transaction.service.sell_price-(transaction.service.sell_price*transaction.discount *0.01))).toFixed(2) %></td>
+                                
+                            <%
+                            totalCurrentIncome+=transaction.amount*(transaction.service.sell_price-(transaction.service.sell_price*transaction.discount *0.01))
+
+                        }else{%>
+                                <td>$<%=  transaction.service.price %></td>
+                                <td>%<%=  transaction.discount %></td>
+                                <td>$<%= numberCommas(transaction.amount*(transaction.service.price-(transaction.service.price*transaction.discount *0.01)).toFixed(2) ) %></td>
+                            <%
+                            totalCurrentIncome+=transaction.amount*(transaction.service.price-(transaction.service.price*transaction.discount *0.01))
+                        }%>
+                        </tr>
+                    <%
+                 }); %>
+                 <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><b>Total:</b></td>
+                    <td><b>$<%=numberCommas(totalCurrentIncome.toFixed(2))%></b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+
+        <div class="table-container">
+            <div class="pop-up-container">
+                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #FF7F7F; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Egresos actuales</p> 
+            </div>
+            <table class="table table-danger">
+                <thead>
+                    <tr>
+                        <th>Nombre      </th>
+                        <th>Categoria   </th>
+                        <th>Agregado por</th>
+                        <th>Fecha-Hora</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% 
+                    currentTotalExit = 0;
+                    box.exitsActive.forEach(exit => { %>
+                        <tr>
+                            <td><%= exit.name %></td>
+                            <td><%= exit.category %></td>
+                            <td><%= exit.author.username%></td>
+                            <td><%= exit.clearDate.toISOString().substr(0,10)%> a las <%=makeHour(exit.clearDate)%></td>
+                            <td>$<%= exit.moneyAmount%></td>
+                        </tr>
+                    <% 
+                    currentTotalExit+=parseFloat(exit.moneyAmount)
+                }); %>
+                    <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><b>Total:</b></td>
+                    <td><b>$<%=numberCommas(currentTotalExit.toFixed(2))%></b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        
+
+        <div class="table-container">
+            <div class="pop-up-container">
+                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #90EE90; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de ingresos</p> 
+            </div>
+
+            <table class="table table-light">
+                <thead class="theady">
+                    <tr>
+                        <th>Nombre        </th>
+                        <th>Agregado por</th>
+                        <th>Fecha-Hora</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Descuento</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% 
+                    historyTransactionsTotal = 0
+                    historyTransactions.forEach(transaction => {
+                        console.log('transaction')
+                        console.log(transaction)
+                        %>
+                        <tr>
+                            <td><%= transaction.service.name %></td>
+                            <td><%= transaction.user.username %></td>
+                            <td><%= transaction.consumtionDate.toISOString().substr(0,10)%> a las <%=makeHour(transaction.consumtionDate)%></td>
+                            <td><%= transaction.amount %></td>
+                            <%if(transaction.service.service_type == 'supply'){%>
+                                <td>$<%=  transaction.service.sell_price %></td>
+                                <td>%<%=  transaction.discount %></td>
+                                <td>$<%=  (transaction.total).toFixed(2)  %></td>
+                            <%}else{%>
+                                <td>$<%=  transaction.service.price %></td>
+                                <td>%<%=  transaction.discount %></td>
+                                <td>$<%=  numberCommas((transaction.total).toFixed(2))  %></td>
+                            <%}%>
+                        </tr>
+                    <% 
+                    historyTransactionsTotal+=transaction.total
+                }); %>
+                    <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><b>Total:</b></td>
+                    <td><b>$<%=numberCommas(historyTransactionsTotal.toFixed(2))%></b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pop-up-container">
+            <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #FF7F7F; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de Egresos</p> 
+        </div>
+        <div class="table-container">
+            <table class="table table-dark ">
+                <thead>
+                    <tr>
+                        <th>Nombre      </th>
+                        <th>Categoria   </th>
+                        <th>Agregado por</th>
+                        <th>Fecha-Hora</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% 
+                    historyExitsTotal = 0
+                    historyExits.forEach(exit => { %>
+                        <tr>
+                            <td><%= exit.name %></td>
+                            <td><%= exit.category %></td>
+                            <td><%= exit.user.username%></td>
+                            <td><%= exit.clearDate.toISOString().substr(0,10)%> a las <%=makeHour(exit.clearDate)%></td>
+                            <td>$<%= numberCommas(exit.total)%></td>
+                        </tr>
+                    <% 
+                    historyExitsTotal+=exit.total
+                }); %>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+
+                    <td><b>Total:</b></td>
+                    <td><b>$<%=numberCommas(historyExitsTotal.toFixed(2))%></b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+</div>
+
+<div class="container justify-content-md-center mb-4">
+    <div class="row ">
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-3 mt-4">
+            <label for="beginDate">Fecha y hora de inicio</label>
+            <input type="datetime-local" value = '<%=new Date(beginDate).toISOString().slice(0, 16);%>'id="beginDate" class="form-control" >
+        </div>
+        <div class="col-md-3 mt-4" >
+            <label for="endDate">Fecha y hora final</label>
+            <input type="datetime-local" value = '<%=new Date(endDate).toISOString().slice(0, 16);%>' id="endDate" class="form-control">
+        </div>
+        <div class="col-md-1">
+            <button id="printHistory" class="btn btn-info mt-4" >Imprimir historial<i class="fas fa-print"></i>
+            </button>
+        </div>
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-1">
+            <button id="printBtn" class="btn btn-primary mt-4">Imprimir corte <br><i class="fas fa-print"></i>
+            </button>
+        </div>
+        <div class="col-md-1">
+            <button id="cutBtn" class="btn btn-danger mt-4" onclick="makeCut('<%= box._id %>')">
+                Realizar <br> Corte <br>
+              <i class="fas fa-money-bill-wave"></i>
+            </button>
+          </div>
+    </div>
+</div>
+<script src="/javascripts/box_show_content.js" ></script>

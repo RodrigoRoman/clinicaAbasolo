@@ -18,11 +18,11 @@
             </div>
             <div class="mb-3">
                 <label class="form-label" for="unit">Unidad (hora, pieza, litro)</label>
-                <input class="form-control" type="text" id="unit" name="service[unit]" required>
+                <input class="form-control" type="text" id="unit" name="service[unit]" >
             </div>
             <div class="mb-3">
                 <label class="form-label" for="claveSat">Clave del Sat</label>
-                <input class="form-control" type="number" id="claveSat" name="service[claveSat]" required>
+                <input class="form-control" type="number" id="claveSat" name="service[claveSat]" >
             </div>
             <div class="mb-3">
                 <label class="form-label" for="buy">Precio de compra</label>
@@ -41,10 +41,6 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label" for="date">Caducidad</label>
-                <input class="form-control" type="date" id="date" name="service[expiration]" required>
-            </div>
-            <div class="mb-3">
                 <label class="form-label" for="supplier">Proveedor</label>
                 <input class="form-control" type="text" id="supplier" name="service[supplier]" required>
             </div>
@@ -54,27 +50,32 @@
             </div>
             <div class="mb-3">
                 <label class="form-label" for="optimum">Cantidad Optima</label>
-                <input class="form-control" type="number" id="optimum" name="service[optimum]" required>
+                <input class="form-control" type="number" id="optimum" name="service[optimum]">
             </div>
             <div class="mb-3">
                 <label class="form-label" for="outside">Cantidad Fuera de Bodega</label>
                 <input class="form-control" type="number" id="outside" name="service[outside]" required>
             </div>
             <div class="mb-3">
+                <label class="form-label" for="outside">Codigo de Barras</label>
+                <input class="form-control" type="number" id="outside" name="service[barcode]">
+            </div>
+            <div class="mb-3">
                 <label class="form-label" for="description">Especificaciones</label>
                 <textarea class="form-control" type="text" id="description" name="service[description]"
-                    required></textarea>
+                    ></textarea>
             </div>
             <div class="mb-3">
                 <div class="custom-control custom-radio custom-control-inline">
-                <input type="radio" id="customRadioInline1" name="service[hospitalEntry]"value = "true" class="custom-control-input">
-                <label class="custom-control-label" for="customRadioInline1">Ingreso a hospital</label>
+                    <input type="radio" id="customRadioInline1" name="service[hospitalEntry]" value="true" class="custom-control-input" checked>
+                    <label class="custom-control-label" for="customRadioInline1">Ingreso a hospital</label>
                 </div>
                 <div class="custom-control custom-radio custom-control-inline">
-                <input type="radio" id="customRadioInline2" name="service[hospitalEntry]" value = "false" class="custom-control-input">
-                <label class="custom-control-label" for="customRadioInline2">Honorarios</label>
+                    <input type="radio" id="customRadioInline2" name="service[hospitalEntry]" value="false" class="custom-control-input">
+                    <label class="custom-control-label" for="customRadioInline2">Honorarios</label>
                 </div>
             </div>
+            
             <div class="mb-3">
                 <div class="form-file custom-file">
                     <input type="file" class="form-file-input" id="image" name="image" multiple>
@@ -91,3 +92,26 @@
         <a href="/services/supply">Insumos médicos</a>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const barcodeInput = document.getElementById('barcode');
+
+    barcodeInput.addEventListener('input', function(event) {
+        const barcodeData = event.target.value;
+        console.log('Barcode data:', barcodeData);
+
+        // You can process the barcode data here
+        processBarcodeData(barcodeData);
+        
+        // Clear the input field after processing the barcode data
+        event.target.value = '';
+    });
+
+    function processBarcodeData(data) {
+        // Implement your barcode processing logic here
+        alert('Scanned barcode: ' + data);
+    }
+});
+</script>
+

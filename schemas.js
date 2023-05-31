@@ -25,14 +25,15 @@ const Joi = BaseJoi.extend(extension)
 module.exports.supplySchema = Joi.object({
     service: Joi.object({
         name: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
-        unit: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
+        unit: Joi.string().allow('').regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').escapeHTML(),
         class: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
         principle: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
-        claveSat: Joi.number().required(),
-        description: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
+        claveSat: Joi.number().allow(''),
+        barcode: Joi.string().allow('').regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').escapeHTML(),
+        description: Joi.string().allow('').regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').escapeHTML(),
         buy_price: Joi.number().precision(2).required(),
         sell_price: Joi.number().precision(2).required(),
-        expiration: Joi.date().required(),
+        expiration: Joi.date().allow(''),
         supplier: Joi.string().required().escapeHTML(),
         optimum: Joi.number().required().min(1),
         outside: Joi.number().required(),
@@ -47,7 +48,7 @@ module.exports.hospitalSchema = Joi.object({
         name: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
         class: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
         unit: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
-        claveSat: Joi.number().required(),
+        claveSat: Joi.number().allow(''),
         description: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
         price: Joi.number().precision(2).required(),
         doctor: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
@@ -61,6 +62,7 @@ module.exports.patientSchema = Joi.object({
         name: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
         phone: Joi.number().allow(''),
         cuarto: Joi.string().required(),
+        serviceType: Joi.string().required(),
         edad: Joi.string().allow('').regex(/^[a-zA-Z0-9.,?()-+_%*@\u0300-\u036f?/%ñ ]*$/, 'Un caracter ingresado no es valido').escapeHTML(),
         admissionDate: Joi.date(),
         email: Joi.string().allow('').regex(/^[a-zA-Z0-9.,?()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').email({tlds: { allow: false } }).escapeHTML(),
@@ -74,10 +76,20 @@ module.exports.patientSchema = Joi.object({
 module.exports.exitSchema = Joi.object({
     exit: Joi.object({
         name: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
-        clearDate: Joi.date().required(),
+        category: Joi.string().required().escapeHTML(),
+        clearDate: Joi.date().allow(''),
         moneyAmount: Joi.number().required()
     }).required()
 });
+
+module.exports.boxSchema = Joi.object({
+    box: Joi.object({
+        name: Joi.string().regex(/^[a-zA-Z0-9.,()-+_%*@\u0300-\u036f/%ñ ]*$/, 'Un caracter ingresado no es valido').required().escapeHTML(),
+        color: Joi.string().required(),
+        hierarchy: Joi.string().allow('')
+
+    }).required()
+})
 
 module.exports.paymentSchema = Joi.object({
     payment: Joi.object({

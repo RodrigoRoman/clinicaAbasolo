@@ -2,9 +2,12 @@ const mongoose = require('mongoose');
 const {Service,Supply,Hospital} = require('../models/service');
 const Disch = require('../models/discharged_data');
 const Transaction = require('../models/transaction');
+const Point = require('../models/refillPoint');
 const Patient = require('../models/patient');
+const MoneyBox = require('../models/money_parts');
 const { cloudinary } = require("../cloudinary");
 const mongoosePaginate = require("mongoose-paginate-v2");
+const User = require('../models/user');
 const puppeteer = require('puppeteer'); 
 // const service = require('../models/services');
 
@@ -58,9 +61,6 @@ module.exports.searchAllPatients = async (req, res) => {
 
 
 let numPatients = await Patient.countDocuments({ $or: dbQueries, admissionDate: { $gte: begin, $lte: end } });
-console.log('num patients');
-console.log(numPatients);
-
     begin = req.query.begin;
     end = req.query.end;
     if(sorted == "name"||sorted == "Ordenar por:"){
@@ -71,13 +71,6 @@ console.log(numPatients);
        .limit(resPerPage)
        .populate("author")
        .populate("receivedBy");
-     
-     console.log("Number of patients: ", patients.length);
-    //  console.log("Patients: ", patients);
-
-  console.log('num of docs');
-  console.log(patients.length)
-        
         //sort in alphabetical order
         // patients = patients.slice(((resPerPage * page) - resPerPage),((resPerPage * page) - resPerPage)+resPerPage).sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:'base'}));
     };
@@ -112,13 +105,18 @@ console.log(numPatients);
 
 
 module.exports.renderNewForm = (req, res) => {
-    res.render("patients/new");
+    res.render("patients/new",{'currentUser':res.locals.currentUser,'serviceType':res.locals.currentUser.serviceType});
 }
 
 module.exports.createPatient = async (req, res, next) => {
     const patient = new Patient(req.body.patient);
     const nDate = getMexicoCityTime();
     patient.author = req.user._id;
+    let currUser = await User.findById(req.user._id)
+    console.log('the user')
+    console.log(req.body.patient.serviceType)
+    currUser.serviceType = req.body.patient.serviceType;
+    await currUser.save();
     patient.admissionDate = nDate;
     await patient.save();
     req.flash('success', 'Paciente creado!');
@@ -143,6 +141,7 @@ hour = nDate.getUTCHours(); // Get the hour component of the datetime
     patient.cuarto = 'Consultorio';
     patient.treatingDoctor = req.user.username;
     patient.diagnosis = 'Consulta'
+    patient.serviceType = 'Consulta'
     patient.admissionDate = nDate;
     await patient.save();
     req.flash('success', 'Nueva consulta');
@@ -154,18 +153,19 @@ module.exports.createPharmacySale= async (req, res, next) => {
     const nDate = getMexicoCityTime();
     patient.author = req.user._id;
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-hour = nDate.getUTCHours(); // Get the hour component of the datetime
- minutes = nDate.getUTCMinutes(); // Get the minutes component of the datetime
-  amOrPm = hour >= 12 ? 'PM' : 'AM'; // Determine whether the time is in the AM or PM
- formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert the hour to 12-hour format
- formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; 
- formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
- formattedMonth = nDate.getUTCMonth() <10?`0${nDate.getUTCMonth()}`:nDate.getUTCMonth();
- formattedDay = nDate.getUTCDate() <10?`0${nDate.getUTCDate()}`:nDate.getUTCDate();
+    hour = nDate.getUTCHours(); // Get the hour component of the datetime
+    minutes = nDate.getUTCMinutes(); // Get the minutes component of the datetime
+    amOrPm = hour >= 12 ? 'PM' : 'AM'; // Determine whether the time is in the AM or PM
+    formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert the hour to 12-hour format
+    formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; 
+    formattedTime = `${formattedHour}:${formattedMinutes} ${amOrPm}`; 
+    formattedMonth = nDate.getUTCMonth() <10?`0${nDate.getUTCMonth()}`:nDate.getUTCMonth();
+    formattedDay = nDate.getUTCDate() <10?`0${nDate.getUTCDate()}`:nDate.getUTCDate();
     patient.name = 'Venta de Farmacia:  '+req.user.username+' '+formattedDay+'/'+formattedMonth+'/'+nDate.getUTCFullYear()+" - "+formattedTime;
     patient.cuarto = 'Farmacia';
     patient.treatingDoctor = ' ';
-    patient.diagnosis = 'Farmacia'
+    patient.diagnosis = 'Farmacia';
+    patient.serviceType = 'Consulta'
     patient.admissionDate = nDate;
     await patient.save();
     req.flash('success', 'Venta de farmacia creada');
@@ -208,7 +208,7 @@ module.exports.updatePayedPatient = async (req, res) => {
     patient.totalReceived = req.body.totalCharged;
     await patient.save();
     req.flash('success', 'Cuenta cobrada!');
-    res.redirect(`/patients/${patient.id}`)
+    res.redirect(`/patients/${patient.id}?redirected=true`)
 }
 
 module.exports.dischargePatient = async (req, res) => {
@@ -225,6 +225,8 @@ module.exports.dischargePatient = async (req, res) => {
     patient.dischargedDate = nDate;
     //create discharged data
     for(let trans of patient.servicesCar){
+        console.log('the trans when discharged')
+        console.log(trans)
         let dischargedData = {
             patient:trans.patient,
             class: trans.service.class,
@@ -232,12 +234,15 @@ module.exports.dischargePatient = async (req, res) => {
             name: trans.service.name,
             service_type: trans.service.service_type,
             processDate: nDate,
+            discount:trans.discount,
             hospitalEntry:trans.service.hospitalEntry,
             unitPrice: trans.service.sell_price||trans.service.price,
             buyPrice: trans.service.buy_price||0
 
         }
         let dischargedField = new Disch(dischargedData);
+        console.log('discharged data')
+        console.log(dischargedField)
         trans.discharged_data = dischargedField;
         await trans.save();
         await dischargedField.save();
@@ -259,6 +264,9 @@ module.exports.deletePatient = async (req, res) => {
 module.exports.showPatient = async (req, res) => {
     let {begin,bH,end,eH} = req.query;
     let pat = await Patient.findById(req.params.id);
+    let boxes = await MoneyBox.find({});
+    console.log('the box')
+    console.log(boxes)
     //variable for local time 
     const nDate = getMexicoCityTime();
     if(!begin){
@@ -301,7 +309,9 @@ module.exports.showPatient = async (req, res) => {
         req.flash('error', 'No se encontro paciente!');
         return res.redirect('/patients');
     }
-    res.render(`patients/show`, { patient, str_id,begin,end,eH,bH});
+    let redirected = req.query.redirected || false;
+
+    res.render(`patients/show`, { patient, str_id,begin,end,eH,bH,boxes,'flag':redirected});
 }
 
 
@@ -340,13 +350,14 @@ module.exports.showDischargedPatient= async (req, res) => {
             $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$fromDischarged", 0 ] }, "$$ROOT" ] } }
         },
         {$group: {
-            _id:"$name",
+            _id: { name:"$name", discount: "$discount" }, // Group by name and discount
             patientName:{$last:"$patientName"},
             class:{$last:"$class"},
             name: {$last:"$name"},
             treatingDoctor:{$last:"$treatingDoctor"},
             diagnosis : {$last:"$diagnosis"},
             admissionDate : {$last:"$admissionDate"},
+            discount: { $last: "$discount"}, // Add discount
             price: {$last:"$unitPrice"},
             amount: { $sum:"$amount"}}},
         {$group: {
@@ -357,6 +368,7 @@ module.exports.showDischargedPatient= async (req, res) => {
             treatingDoctor:{$last:"$treatingDoctor"},
             diagnosis : {$last:"$diagnosis"},
             admissionDate : {$last:"$admissionDate"},
+            discount: { $push: "$discount"}, // Add discount
             price: {$push:"$price"},
             amount: { $push:"$amount"}}},
         {$addFields:{totalPrice : { $sum: "$price" }}},
@@ -407,8 +419,8 @@ module.exports.patientAccount = async (req, res) => {
         {
             $lookup: {
                from: "services",
-               localField: "service",    // field in the Trasaction collection
-               foreignField: "_id",  // field in the Service collection
+               localField: "service",
+               foreignField: "_id",
                as: "fromService"
             }
          },
@@ -417,7 +429,7 @@ module.exports.patientAccount = async (req, res) => {
          },
          { $project: { fromService: 0 } },
          {$group: {
-            _id:"$name",
+            _id: { name:"$name", discount: "$discount" }, // Group by name and discount
             patientName:{$last:"$patientName"},
             class:{$last:"$class"},
             name: {$last:"$name"},
@@ -431,21 +443,22 @@ module.exports.patientAccount = async (req, res) => {
             expiration: { $push:"$expiration"},
             sell_price: { $last:"$sell_price"},
             buy_price: { $last: "$buy_price"},
+            discount: { $last: "$discount"}, // Add discount
             amount: { $sum:"$amount"}}},
          {
             $lookup: {
                from: "services",
-               localField: "service",    // field in the Trasaction collection
-               foreignField: "_id",  // field in the Service collection
+               localField: "service",
+               foreignField: "_id",
                as: "fromService"
             }
          },
-         {
-            $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$fromService", 0 ] }, "$$ROOT" ] } }
+    {
+      $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$fromService", 0 ] }, "$$ROOT" ] } }
          },
          { $project: { fromService: 0 } },
         {$group: {
-            _id:"$class",
+            _id:"$class", // Group by name and discount
             patientName:{$last:"$patientName"},
             class:{$last:"$class"},
             serviceName: {$push:"$name"},
@@ -456,6 +469,8 @@ module.exports.patientAccount = async (req, res) => {
             admissionDate : {$last:"$admissionDate"},
             price: {$push:"$price"},
             cost: {$push:0},
+            discount: { $last: "$discount"}, // Add discount
+
             expiration: { $push:"$expiration"},
             sell_price: { $push:"$sell_price"},
             buy_price: { $push: "$buy_price"},
@@ -640,15 +655,36 @@ module.exports.searchAll = async (req, res) => {
 
 module.exports.addToCart = async (req, res) => {
     const patient = await Patient.findById(req.params.id);
-    const service = await Service.findById(req.body.service);
+    const moneyBox = await MoneyBox.findById(req.body.moneyBoxId).populate({
+        path: 'dependantMoneyBoxes',
+        populate: {
+            path: 'dependantMoneyBoxes',
+            populate: {
+                path: 'dependantMoneyBoxes' // and so on...
+            }
+        }
+    });
+    console.log('money box');
+    console.log(req.body.moneyBoxId)
+    console.log('money add to cart');
+    console.log(moneyBox)
+    var service;
+    if(req.body.mode == 'pistol'){
+         service = await Service.findOne({barcode:req.body.service});
+         console.log('service found')
+         console.log(service)
+    }else{
+        service = await Service.findById(req.body.service);
+    }
     const timeUnits =  ["Hora", "Dia"];
     //variable for local time 
     const nDate = getMexicoCityTime();
     let termDate = nDate;
     let amnt = 0;
     if(!timeUnits.includes(service.unit)){
-        amnt = req.body.addAmount;
+        amnt = parseInt(req.body.addAmount);
     }
+    
     const transaction = new Transaction({
         patient: patient,
         service:service,
@@ -656,24 +692,54 @@ module.exports.addToCart = async (req, res) => {
         consumtionDate:nDate,
         addedBy:req.user,
         location:req.body.location,
-        terminalDate:termDate
+        terminalDate:termDate,
     });
+
+    console.log('transaction')
+    console.log(transaction)
+    let timePoint;
     if(service.service_type == "supply"){
         if((service.stock - req.body.addAmount) < 0 ){
             return res.send({ msg: "False",serviceName:`${service.name}`});
         }else{
             service.stock = service.stock-req.body.addAmount;
+            timePoint = await Point.findOne({name:"datePoint"});
+            timePoint.servicesCar.push(transaction);
         }
+    }else{
+        timePoint = await Point.findOne({name:"datePoint"});
+        timePoint.servicesCar.push(transaction);
     }
     patient.servicesCar.push(transaction);
+    try{
+    if(moneyBox.dependantMoneyBoxes.length > 0){
+    for (const dependentBox of moneyBox.dependantMoneyBoxes) {
+        dependentBox.transactionsActive.push(transaction)
+        await dependentBox.save()
+        for (const rootDependantBox of dependentBox.dependantMoneyBoxes) {
+            rootDependantBox.transactionsActive.push(transaction)
+            await rootDependantBox.save()
+        }
+    }
+    }
+    moneyBox.transactionsActive.push(transaction);
+    
     await transaction.save();
+    await timePoint.save();
+    await moneyBox.save()
     await patient.save();
     //Remove supply from the inventory
     await service.save();
     return res.send({ msg: "True",serviceName:`${service.name}`,patientName:`${patient.name}`});
+}catch(e){
+    console.log('error')
+    console.log(e)
+}
 }
 
 module.exports.deleteServiceFromAccount = async (req, res) => {
+    console.log('called delete from account')
+    try{
     const service = await Service.findById(req.body.serviceID);
     const begin = new Date(req.body.begin+"T00:00:01.000Z");
     const end = new Date(req.body.end+"T23:59:01.000Z");
@@ -683,14 +749,51 @@ module.exports.deleteServiceFromAccount = async (req, res) => {
           path: 'service',
         },
       });
+    const moneyBox = await MoneyBox.findByIdAndUpdate(req.body.moneyBoxId,{$pull:{transactionsActive:{_id:req.body.trans_id}}})
     let trans =  await Transaction.findByIdAndDelete(req.body.trans_id);
-    if(service.service_type=="supply"){service.stock += parseInt(req.body.amount)};
+    let timePoint;
+    if(service.service_type=="supply"){
+        service.stock += parseInt(req.body.amount)
+        
+    }
+    timePoint = await Point.findOneAndUpdate({name:"datePoint"},{$pull:{servicesCar:{_id:req.body.trans_id}}}).populate({
+        path: 'servicesCar',
+        populate: {
+          path: 'service',
+        },
+      });
+    await moneyBox.save();
     await service.save()
     await patient.save();
+    await timePoint.save()
+    req.flash('success', 'Producto borrado!');
     return res.send({msg:"True"});
+}catch(e){
+    console.log('error')
+    console.log(e)
+}
 }
 
+
+module.exports.editDiscountFromAccount = async (req, res) => {
+    try{
+    const patient = await Patient.findById(req.params.id);
+    const transaction = await Transaction.findByIdAndUpdate(
+      req.body.trans_id,
+      { discount: req.body.discount }, // Update the discount field with the new value
+    );
+    await transaction.save()
+    await patient.save();
+    return res.send({ msg: "True",serviceName:`sini`,patientName:`${patient.name}`});
+    }catch(e){
+        console.log('error')
+        console.log(e)
+    }
+};
+
+
 module.exports.updateServiceFromAccount = async (req, res) => {
+    try{
     const service = await Service.findById(req.body.serviceID);
     const nDate = getMexicoCityTime()
     const patient = await Patient.findByIdAndUpdate(req.params.id,{$pull:{servicesCar:{_id:req.body.trans_id}}}).populate({
@@ -699,12 +802,15 @@ module.exports.updateServiceFromAccount = async (req, res) => {
           path: 'service',
         },
       });
+    const moneyBox = await MoneyBox.findByIdAndUpdate(req.body.moneyBoxId,{$pull:{transactionsActive:{_id:req.body.trans_id}}})
     const req_amount = req.body.amount;
     let transact = await Transaction.findById(req.body.trans_id);
     let location = transact.location;
     const difference = transact.amount - req_amount;
     if(difference<0){
         if(service.service_type == "supply"){
+            
+
             if((service.stock - Math.abs(difference)) < 0 ){
                 return res.send({ msg: "False",serviceName:`${service.name}`});
             }else{
@@ -714,15 +820,30 @@ module.exports.updateServiceFromAccount = async (req, res) => {
     }else{
         service.stock = service.stock + Math.abs(difference);
     }
-    await Transaction.deleteMany({_id:req.body.trans_id});
     const new_trans = new Transaction({patient: patient,service:service,amount:req_amount,location:location,consumtionDate:nDate,addedBy:req.user});
+    if(service.service_type == "supply"){
+        let timePoint = await Point.findOneAndUpdate({name:"datePoint"},{$pull:{servicesCar:{_id:req.body.trans_id}}}).populate({
+            path: 'servicesCar',
+            populate: {
+              path: 'service',
+            },
+          });
+          timePoint.servicesCar.push(new_trans);
+          await timePoint.save();
+    }
+    await Transaction.deleteMany({_id:req.body.trans_id});
     patient.servicesCar.push(new_trans);
+    moneyBox.transactionsActive.push(new_trans);
     await new_trans.save();
     //Remove supply from the inventory
     await service.save();
     await patient.save();
     //update transactions (delete all transactions with that service and create a new one with new amount)
     return res.send({ msg: "True",serviceName:`${service.name}`,patientName:`${patient.name}`});
+    }catch(e){
+        console.log('error')
+        console.log(e)
+    }
 }
 
 
@@ -757,35 +878,3 @@ module.exports.updateTimeService = async (req, res) => {
     //update transactions (delete all transactions with that service and create a new one with new amount)
     return res.send({ msg: "True",serviceName:`${service.name}`,patientName:`${patient.name}`});
 }
-
-// module.exports.updateTimeService = async (req, res) => {
-//     const service = await Service.findById(req.body.serviceID);
-//     const patient = await Patient.findById(req.params.id);
-//     const nDate = getMexicoCityTime()
-//     console.log()
-//     // let transact = await Transaction.findById(req.body.trans_id);
-//     let toggle = req.body.toggle == "true";
-//     let start = new Date(convertUTCDateToLocalDate(new Date(req.body.start))),
-//         end = (toggle)?nDate:new Date(convertUTCDateToLocalDate(new Date(req.body.until)));
-//     //calculate the unit time in miliseconds
-//     let miliUnit = (service.unit == "Dia")?(86400*1000):(3600*1000);
-//     //divide the difference between start and end batween the miliseconds unit
-//     let new_amount = (end.getTime() - start.getTime())/miliUnit;
-//     new_amount = Math.round(new_amount * 100) / 100;
-//     await Transaction.deleteMany({_id:req.body.trans_id});
-//     const transaction = new Transaction({
-//         patient: patient,
-//         service:service,
-//         amount:new_amount,
-//         consumtionDate:start,
-//         addedBy:req.user,
-//         terminalDate:end,
-//         toggle:toggle
-//     });
-//     patient.servicesCar.push(transaction);
-//     await transaction.save()
-//     //Remove supply from the inventory
-//     await patient.save();
-//     //update transactions (delete all transactions with that service and create a new one with new amount)
-//     return res.send({ msg: "True",serviceName:`${service.name}`,patientName:`${patient.name}`});
-// }

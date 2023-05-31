@@ -1,4 +1,4 @@
-const {supplySchema,hospitalSchema,serviceSchema, patientSchema,exitSchema,paymentSchema} = require('./schemas.js');
+const {supplySchema,hospitalSchema,serviceSchema, boxSchema,patientSchema,exitSchema,paymentSchema} = require('./schemas.js');
 const ExpressError = require('./utils/ExpressError');
 const {Service,Supply,Hospital} = require('./models/service');
 const Transaction = require('./models/transaction');
@@ -65,6 +65,16 @@ module.exports.validatePatient= (req, res, next) => {
 
 module.exports.validateExit= (req, res, next) => {
     const { error } = exitSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
+module.exports.validateBox= (req, res, next) => {
+    const { error } = boxSchema.validate(req.body);
     if (error) {
         const msg = error.details.map(el => el.message).join(',')
         throw new ExpressError(msg, 400)

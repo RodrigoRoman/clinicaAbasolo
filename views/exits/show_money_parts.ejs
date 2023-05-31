@@ -1,0 +1,91 @@
+<% layout('layouts/boilerplate')%>
+<script>
+    // Pass the 'box' variable to the JavaScript file
+    var box = <%- JSON.stringify(box) %>;
+
+</script>
+<div class="row">
+    <div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
+        <div class="pop-up-container " ><h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px"><%= box.name %></h5> </div>
+    </div>
+    <small class="text-center mb-4" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 14px">Gerarquia: <%= box.hierarchy %></small>
+        <% if (box.dependantMoneyBoxes && box.dependantMoneyBoxes.length > 0) {%>
+            <% box.dependantMoneyBoxes.forEach(function renderMoneyBox(subMoneyBox) {%>
+                <button class="float-right btn btn-outline-danger ml-4 btn-sm" onclick="removeFromBox('<%= subMoneyBox._id %>')"><i class="fas fa-trash"></i></button>
+                <div class="list-group-item ml-4">
+
+                    <div class="d-flex w-100 justify-content-between">
+                        <div class="pop-up-container mb-2">
+                            <h5 class="mt-2 mb-2 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px"><%= subMoneyBox.name %></h5>
+                        </div>
+
+                        <small class="text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 14px">Gerarquia: <%= subMoneyBox.hierarchy %></small>
+                    </div>
+
+                     <% if (subMoneyBox.dependantMoneyBoxes && subMoneyBox.dependantMoneyBoxes.length > 0) {
+                         %>
+                         <% subMoneyBox.dependantMoneyBoxes.forEach(subSubMoneyBox => renderMoneyBox(subSubMoneyBox)) %>
+                     <% } %>
+                </div>
+            <% }) %>
+        <% } %>
+
+    <div class="d-flex justify-content-center align-items-center mb-4 mt-4">
+        <select id="select-box" class="custom-select ml-2" name="add another one" multiple="multiple" style="max-width: 300px">
+            <% for (let box of boxes) { %>
+                <option selected id="<%= box._id %>" value="<%= box._id %>" data-hierarchy="<%= box.hierarchy %>"><%= box.name %></option>
+            <% } %>
+        </select>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#select-box').multiselect({buttonClass: 'btn btn-outline-primary',
+        buttonContainer: '<div class="btn-group" />',
+        buttonWidth: '300px',
+        nonSelectedText: 'Seleccionar Apartados',
+        nSelectedText: 'Apartados seleccionadas',
+        allSelectedText: 'Todos seleccionados',
+        templates: {
+            button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span> <b class="caret"></b></button>',
+            ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+            filter: '<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
+            li: '<li><a tabindex="0"><label></label></a></li>',
+            divider: '<li class="multiselect-item divider"></li>',
+            liGroup: '<li><label class="multiselect-group"></label></li>'
+        }});
+
+        
+    
+    });
+    function removeFromBox(removeBoxId){
+            console.log('remove from box')
+            let currentRequest = null;
+            const data = {
+                'removeParentId':removeBoxId,
+            };
+            console.log('data to be sent')
+            console.log(data)
+
+            let tables = '';
+            console.log('the box')
+            console.log(box)
+            $.ajax({
+            url: `/exits/removeBoxFrom/${box._id}`,
+            method: 'PUT',
+            data: data,
+            dataType: 'JSON',
+            processData: true,
+            beforeSend : function()    {          
+                if(currentRequest != null) {
+                    currentRequest.abort();
+                }
+            },
+            cache: false
+            }).done(function( response ){
+                window.location.reload();
+
+            })
+        };
+</script>

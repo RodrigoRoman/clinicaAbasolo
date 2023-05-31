@@ -7,10 +7,16 @@ invdate = new Date(`${date.toLocaleString('en-US', { timeZone: 'America/Mexico_C
 // and the diff is 5 hours
 var diff = date.getTime() - invdate.getTime();
 
-// so 12:00 in Toronto is 17:00 UTC
 return new Date(date.getTime() - diff); // needs to substract
 
 }
+
+function makeHour(date){
+    const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+    y : date.getUTCFullYear(),h:date.getUTCHours(), min:(((""+date.getUTCMinutes()).length>1)?date.getUTCMinutes():"0"+date.getUTCMinutes())};
+    return  (newDate.h+":"+newDate.min);
+  }
+  
 function makeYMD(date){
     const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
     y : date.getUTCFullYear()};
@@ -18,9 +24,29 @@ function makeYMD(date){
     }
     const nDate = new Date(convertUTCDateToLocalDate(new Date))
     %>
-<div class="container">
+        <div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
+
+<div class="pop-up-container ">
+    <h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px">Pagos realizados</h5> </div>
+</div>
+
+<div class="container mb-4">
+    <div class="row offset-sm-2 justify-content-md-center">
+        <div class="col col-10">
+          <div class="input-group input-group" id="search_group">
+            <input class="input-group-text" id="search_val" type="text" name="search" value="<%=search%>" placeholder="Buscar" aria-label="Search">
+          </div>
+        </div>
+        <div class="col col-2 ml-auto">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary btn-success" type="button" id="search-button"><i class="fas fa-search" style="color: white;"></i></button>
+          </div>
+        </div>
+    </div>
+</div>
+
+<div class="container scrollDiv">
     
-    <h1 class= "display-3 font-weight-bold text-center">Pagos Activos</h1>
     <div class="container">
         <div class="row  mb-4">
             <div class = "container align-self-start ml-5">
@@ -29,59 +55,31 @@ function makeYMD(date){
         </div>
     </div>
     
-    <div class="patients row mt-4">
-    <%for (let payment of payments){%>
-        <div class="col-md-6">
+    <div class="exits row mt-4">
+    <%for (let payment of exits){%>
+        <div class="col-md-4">
             <div class="card index_card_p mb-4 border border-success>">
                 <div class="row">
                     <div class="container">
                         <div class="col-md-16">
                             <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                             console.log(payment)
-                            let paid_terms = 0; let unpaid_terms = 0;
-                            let paid_amount = 0; let unpaid_amount = 0;
-                            for(let i of payment.exits){
-                                if((nDate).getTime()<= i.dueDate){
-                                    paid_terms+=1;
-                                    paid_amount+=i.moneyAmount
-                                }else{
-                                    unpaid_terms+=1;
-                                    unpaid_amount+=parseFloat(i.moneyAmount);
-                                }
-                            }
                             %>
                             <div class="card-body">
                                 <h3 class="card-title text-center"><%= payment.name %> </h3>
-                                <%if(payment.exits>1){%>
-                                <div class="clearfix split-items">
-                                    <h4 class="list-group-item left-side card-title text-muted">Primer pago: <%=payment.exits[0].clearDate.toISOString().substr(0,10)%> </h4>
-                                   
-                                    <h4 class="list-group-item right-side card-title text-muted">Ultimo pago: <%=payment.exits[payment.exits.length - 1].clearDate.toISOString().substr(0,10)%> </h4>
-                                    
-                                </div>
-                                <ul class="list-group list-group-flush mb-4">
-                                    <li class="list-group-item text-center">Plazos</li>
-                                    <div class="clearfix split-items">
-                                        <li class="list-group-item left-side">Plazos pagados: <%=paid_terms%></li>
-                                        <li class="list-group-item right-side ">Suma pagada: $<%=paid_amount%></li>
-                                    </div>
-                                    
-                                </ul>
-                                <ul class="list-group list-group-flush mb-4">
-                                <div class="clearfix split-items">
-                                    <li class="list-group-item left-side">Plazos restantes: <%=unpaid_terms%></li>
-                                    <li class="list-group-item right-side ">Suma por pagar: $<%=unpaid_amount%></li>
-                                </div> 
-                                </ul>
-                                <%}else{%>
                                     <div class="clearfix">
-                                        <h4 class="text-center card-title text-muted">Fecha de pago: <%=payment.exits[0].clearDate.toISOString().substr(0,10)%> </h4>
+                                        <h4 class="text-center card-title text-muted">Fecha y hora de pago: <%=payment.clearDate.toISOString().substr(0,10)%> a las <%=makeHour(payment.clearDate)%></h4>
                                     </div>
+                                    <li class="list-group-item text-center">Total: $<%= payment.moneyAmount%> </li>
+                                    <li class="list-group-item text-center">Categoria: <%= payment.category%> </li>
+                                    <%if(payment.author){%>
+                                    <li class="list-group-item text-center">Agregado por: <%= payment.author.username%> </li>
                                     <%}%>
-                                    <li class="list-group-item text-center">Total: $<%= paid_amount+unpaid_amount%> </li>
+                                    <%if(currentUser.role == 'directAdmin'){%>
                                     <form class="d-inline" action="/exits/<%=payment._id%>?_method=DELETE" method="POST">
-                                        <button class="float-right btn btn-outline-danger mx-1 my-1 btn-sm">Borrar</button>
+                                        <button class="float-right btn btn-outline-danger mx-1 my-1 btn-sm"><i class="fas fa-trash"></i></button>
                                     </form>
+                                    <%}%>
                             </div>
                         </div>
                     </div>
@@ -90,4 +88,22 @@ function makeYMD(date){
         </div>
     <% }%>
     </div>
+    <div class = "container">
+        <div class="row my-3 pagination customClass" >
+            <div class="btn-group float-right" role="group" aria-label="First group">
+                <%if(page >1){%>
+                    <a onclick="foundExits(this)" alt="<%=page-1%>"  class="btn btn-light " role="button" aria-pressed="true"><i class="fas fa-arrow-circle-left"></i></a>
+                <%}%>
+                <%for(let step = 1; step < pages+1; step++) {
+                    let act = (step == page)?"active":"";%>
+                    <a onclick="foundExits(this)" alt="<%=step%>" class="btn btn-light <%=act%>" role="button" aria-pressed="true"><%=step%></a>
+                <%}%>
+                <%if(page+1 <= pages){%>
+                    <a onclick="foundExits(this)" alt="<%=page+1%>"  class="btn btn-light " role="button" aria-pressed="true"><i class="fas fa-arrow-circle-right"></i></a>
+                <%}%>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="/javascripts/exits.js" ></script>
+

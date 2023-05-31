@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 const patients = require('../controllers/patients');
 const catchAsync = require('../utils/catchAsync');
-const { isLoggedIn, isServAuthor,isDinamicDirectAdmin,isDirectAdminOrCaja, validateService, validateSupply, validateHospital,validatePatient} = require('../middleware');
+const { isLoggedIn,editDiscountFromAccount, isServAuthor,isDinamicDirectAdmin,isDirectAdminOrCaja, validateService, validateSupply, validateHospital,validatePatient} = require('../middleware');
 const multer = require('multer');
-
 const Patient = require('../models/patient');
 
 
@@ -20,6 +19,9 @@ router.get('/new', isLoggedIn, patients.renderNewForm)
 
 router.post('/newConsultation', isLoggedIn, patients.createPatientConsultation)
 router.get('/newPharmacySale',isLoggedIn, patients.createPharmacySale)
+
+router.put('/:id/updateDiscount', patients.editDiscountFromAccount)
+
 
 //SHOW ROUTE FOR PRODUCTS
 

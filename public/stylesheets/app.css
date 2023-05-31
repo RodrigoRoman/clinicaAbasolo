@@ -1,4 +1,48 @@
 
+.table-light {
+  background-color: #f8f9fa; /* Set a lighter background color */
+  /* Additional styles for the light table */
+}
+
+.table-dark {
+  background-color: #343a40; /* Set a darker background color */
+  color: #fff; /* Set a lighter text color for better contrast */
+  /* Additional styles for the dark table */
+}
+
+.table-container {
+  max-height: 400px; /* Set the maximum height for the table container */
+  overflow-y: auto; /* Enable vertical scrolling when the content exceeds the container height */
+}
+
+.table-container table thead {
+  position: sticky; /* Make the table header sticky */
+  top: 0; /* Position it at the top */
+  background-color: #f8f9fa; /* Optional: Set a background color for the sticky header */
+  z-index: 1; /* Ensure the header appears above the table body */
+}
+
+.qr-flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.qr-code-container {
+  flex-basis: calc(100% / 20); 
+  box-sizing: border-box;
+  padding: 1px;
+}
+
+.fifteen-cols {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.fifteen-cols > div {
+  flex: 0 0 calc(100% / 15);
+  max-width: calc(100% / 15);
+}
 
 /* remove padding */
 .pad{
@@ -77,14 +121,28 @@ div.row.customClass [class*="col-md"] {
   width: 20%;
 }
 
+
+
+.sticky1 thead, .sticky1 tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.sticky2 thead, .sticky2 tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
 .sticky1 table { min-width: 90%; }
 
 /*The next 3 sections make the magic happen*/
-.sticky1 thead, tbody tr {
+/* .sticky1 thead, tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
-}
+} */
 
 .sticky1 tbody {
     display: block;
@@ -127,17 +185,25 @@ div.row.customClass [class*="col-md"] {
   width: 20%;
 }
 
+.sticky1 th:nth-child(8), .sticky1 td:nth-child(8) {
+  width: 20%;
+}
+.sticky1 th:nth-child(9), .sticky1 td:nth-child(9) {
+  width: 20%;
+}
+
+
 
 
 
 .sticky2 table { min-width: 600px; }
 
 /*The next 3 sections make the magic happen*/
-.sticky2 thead, tbody tr {
+/* .sticky2 thead, tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
-}
+} */
 
 .sticky2 tbody {
     display: block;
@@ -176,6 +242,10 @@ width: 12%;
 .sticky2 th:nth-child(6),td:nth-child(6) {
   width: 17%;
 }
+.sticky2 th:nth-child(6),td:nth-child(6) {
+  width: 10%;
+}
+
 
   /* index card */
 .border {
@@ -200,7 +270,7 @@ width: 12%;
   width:100%;
 }
 #search_val{
-  width:100%;
+  width:80%;
 }
 
 
@@ -347,6 +417,14 @@ input[type="number"] {
     transform: translate(-50%, -50%) rotate(90deg);
   }
 
+  .number-input button.plus2:after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  .number-input button.plusEX:after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+
 .number-input button:hover {background-color: #c8ccc8}
 
 .number-input button:active {
@@ -357,7 +435,7 @@ input[type="number"] {
   
   .number-input input[type=number] {
     font-family: sans-serif;
-    max-width: 2rem;
+    max-width: 3rem;
     max-height: 2rem;
     padding: .1rem;
     border: none;

@@ -14,6 +14,7 @@ const PatientSchema = new Schema({
     rfc: { type: String },
     diagnosis: { type: String},
     treatingDoctor: { type: String },
+    serviceType: { type: String,default:'Hospitalizacion'},
     admissionDate: { type: Date, default: Date.now},
     chargedDate: { type: Date, default: Date.now},
     discharged: { type: Boolean, default: false},

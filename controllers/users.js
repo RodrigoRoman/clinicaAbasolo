@@ -1,5 +1,7 @@
 const User = require('../models/user');
 const randomColor = require('randomcolor');
+const MoneyBox = require('../models/money_parts');
+
 
 
 module.exports.renderRegister = (req, res) => {
@@ -32,6 +34,24 @@ module.exports.register = async (req, res, next) => {
         req.flash('error', e.message);
         res.redirect('register');
     }
+}
+
+module.exports.updateStockLocation =  async (req, res, next) => {
+    console.log(currentUser.id)
+    updatedStockLocation = req.body.stockLocation;
+    console.log('update stock location');
+    console.log(updatedStockLocation)
+    user = await User.findByIdAndUpdate(currentUser.id, { stockLocation: updatedStockLocation });
+    res.send({ msg: "True"});
+}
+
+module.exports.updateMoneyBox =  async (req, res, next) => {
+    console.log('update Money Box!!!!')
+    updatedMoneyBox = await MoneyBox.findById(req.body.moneyBoxId);
+    console.log('caja de dinero actualizada');
+    console.log(updatedMoneyBox);
+    user = await User.findByIdAndUpdate(currentUser.id, { moneyBox: updatedMoneyBox });
+    res.send({ msg: "True"});
 }
 
 module.exports.renderLogin = (req, res) => {

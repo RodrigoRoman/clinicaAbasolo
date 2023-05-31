@@ -173,6 +173,7 @@ function convertUTCDateToLocalDate(date) {
                                     <%if(patient.edad){%>
                                         <li class="list-group-item">Edad: <%= patient.edad%> </li>
                                     <%}%>
+                                    <div class="pop-up-container my-3"> <li class="list-group-item display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 10px" ><%= patient.serviceType%> </li></div>  
                                     <li class="list-group-item">Agregado por:  <%= patient.author.username%></li>
                                     <li class="list-group-item">Medico tratante:  <%= patient.treatingDoctor%></li>
                                     <li class="list-group-item text-muted">Diagnostico: <%= patient.diagnosis%></li>

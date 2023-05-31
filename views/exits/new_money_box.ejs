@@ -1,0 +1,64 @@
+<% layout('layouts/boilerplate')%>
+
+<div class="row">
+    <div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
+        <div class="pop-up-container "><h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px">Crear Apartado</h5> </div>
+        </div>
+    <div class="col-md-6 offset-md-3">
+        <form action="/exits/box" method="POST" novalidate class="validated-form">
+            <div class="mb-3">
+                <label class="form-label" for="name">Nombre del apartado</label>
+                <input class="form-control" type="text" id="name" name="box[name]" required>
+            </div>
+            <div class = 'mb-3'>
+                <label for="hierarchies" class="mr-2">Gerarquia</label>
+                <div class="d-flex justify-content-center align-items-center mb-4 mt-4">
+                <select id="hierarchies" class="btn btn-outline-secondary btn-lg custom-select ml-2" name="box[hierarchy]" style="max-width: 300px">
+                    <option <% if (hierarchyParam == 1) { %>selected<% } %> id="top" value="1">1</option>
+                    <option <% if (hierarchyParam == 2) { %>selected<% } %> id="mid" value="2">2</option>
+                    <option <% if (hierarchyParam == 3) { %>selected<% } %> id="low" value="3">3</option>
+                </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="select-box" class="mr-2">Apartados dependientes:</label>
+
+                <div class="d-flex justify-content-center align-items-center mb-4 mt-4">
+                    <select id="select-box" class="custom-select ml-2" name="box[boxes][]" multiple="multiple" style="max-width: 300px">
+                        <% for (let box of boxes) { %>
+                            <option selected id="<%= box._id %>" value="<%= box._id %>" data-hierarchy="<%= box.hierarchy %>"><%= box.name %></option>
+                        <% } %>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <button type = "submit" class="btn btn-success">Crear apartado</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#select-box').multiselect({buttonClass: 'btn btn-outline-primary',
+        buttonContainer: '<div class="btn-group" />',
+        buttonWidth: '300px',
+        nonSelectedText: 'Seleccionar Apartados',
+        nSelectedText: 'Apartados seleccionadas',
+        allSelectedText: 'Todos seleccionados',
+        templates: {
+            button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span> <b class="caret"></b></button>',
+            ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+            filter: '<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
+            li: '<li><a tabindex="0"><label></label></a></li>',
+            divider: '<li class="multiselect-item divider"></li>',
+            liGroup: '<li><label class="multiselect-group"></label></li>'
+        }});
+        $('#hierarchies').change(function() {
+            let selectedHierarchy = $(this).val();
+            window.location.href = '/exits/newBox?hierarchy=' + selectedHierarchy;
+        });
+    
+    });
+</script>

@@ -107,6 +107,7 @@ function foundPatients(event) {
                                   }
                                       patientsContent+=`
                                     <li class="list-group-item">Telefono: `+this.phone+`</li>
+                                    <div class="pop-up-container my-3"> <li class="list-group-item display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 10px" >${this.serviceType} </li></div>  
                                     <li class="list-group-item">RFC: `+this.rfc+`</li>
                                     <li class="list-group-item">Dirección: `+this.address+`</li>
                                     <li class="list-group-item">Agregado por:  `+this.author.username+`</li>

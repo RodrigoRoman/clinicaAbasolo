@@ -14,6 +14,8 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 const Refill = require("./models/refillPoint");
+const MoneyBox = require("./models/money_parts");
+
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/users');
@@ -25,6 +27,9 @@ const MongoDBStore = require("connect-mongo")(session);
 
 
 const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/clinicaSanR';
+
+// const dbUrl = 'mongodb://localhost:27017/clinicaSanR';
+
 
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
@@ -61,7 +66,13 @@ app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' })); // for parsing application/json
+app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
+
+// app.use(bodyParser.json({ limit: '50mb' }));
+// app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
+
+
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(mongoSanitize({
@@ -89,7 +100,7 @@ const sessionConfig = {
         httpOnly: true,
         // secure: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-        maxAge: 1000 * 60 * 60 * 24 * 7
+        maxAge: 1000 * 60 * 60 * 24
     }
 }
 
@@ -112,7 +123,8 @@ const scriptSrcUrls = [
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome",
     "https://pure-brushlands-42473.herokuapp.com",
     "https://unpkg.com/",
-    "ws://192.168.1.114/"
+    "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"
+
 
 ];
 const styleSrcUrls = [
@@ -124,7 +136,12 @@ const styleSrcUrls = [
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/",
     "https://use.fontawesome.com/",
     "https://unpkg.com/",
-    "https://unpkg.com/escpos-bluetooth"
+    "https://unpkg.com/escpos-bluetooth",
+    'https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js',
+    'https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js',
+    "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css"
+
 ];
 const fontSrcUrls = [];
 app.use(
@@ -162,6 +179,40 @@ Refill.countDocuments(function (err, count) {
         });
     }
 });
+
+MoneyBox.countDocuments(function (err, count) {
+    if (!err && count === 0) {
+        // No money box found, create a new one
+        let moneyBox = new MoneyBox({
+            name: 'Caja Principal',
+        });
+
+        moneyBox.save(function (err, saved) {
+            if (err) {
+                console.error("Failed to create default MoneyBox:", err);
+                return;
+            }
+
+            console.log("Default MoneyBox created");
+
+            // After creation of MoneyBox, set it as the default value for all Users
+            User.updateMany({}, { $set: { moneyBox: saved._id } }, (err, res) => {
+                if (err) {
+                    console.error("Failed to set default MoneyBox for all users:", err);
+                    return;
+                }
+                
+                console.log("Default MoneyBox set for all users");
+            });
+        });
+    } else {
+        console.log("Default MoneyBox already exists");
+    }
+});
+
+
+
+
 
 
 app.use(passport.initialize());

@@ -14,5 +14,8 @@ router.route('/login')
     .post(passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), users.login)
 
 router.get('/logout', users.logout)
+router.put('/stockLocationUpdate', users.updateStockLocation)
+router.put('/moneyBoxUpdate',users.updateMoneyBox)
+
 
 module.exports = router;

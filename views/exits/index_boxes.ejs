@@ -1,0 +1,65 @@
+<% layout('layouts/boilerplate')%>
+<%
+function convertUTCDateToLocalDate(date) {
+
+invdate = new Date(`${date.toLocaleString('en-US', { timeZone: 'America/Mexico_City' })} GMT`)
+
+// and the diff is 5 hours
+var diff = date.getTime() - invdate.getTime();
+
+return new Date(date.getTime() - diff); // needs to substract
+
+}
+function makeYMD(date){
+    const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript months are 0-11
+    y : date.getUTCFullYear()};
+    return  newDate.y+ "-" + newDate.m+ "-" + ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d);
+    }
+    const nDate = new Date(convertUTCDateToLocalDate(new Date))
+    %>
+        <div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
+
+<div class="pop-up-container ">
+    <h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px">Apartados de dinero</h5> </div>
+</div>
+
+<div class="container scrollDiv">
+    
+    <div class="container">
+        <div class="row  mb-4">
+            <div class = "container align-self-start ml-5">
+                <a class="btn btn-info " href="/exits/newBox">Crear apartado</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="exits row mt-4">
+    <%for (let box of boxes){%>
+        <div class="col-md-4">
+            <div class="card index_card_p mb-4 border border-success>">
+                <div class="row">
+                    <div class="container">
+                        <div class="col-md-16">
+                            <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                            console.log(box)
+                            %>
+                            <div class="card-body">
+                                <h3 class="card-title text-center"><%= box.name %> </h3>
+                                <div class="d-flex justify-content-center align-items-center mb-4 mt-4">
+                                    <button class ="btn btn-outline-info btn-sm" onclick="window.location.href='/exits/box/<%=box._id%>'"><i class="fas fa-edit"></i></button>
+                                    <form class="d-inline" action="/exits/moneyBox/<%=box._id%>?_method=DELETE" method="POST">
+                                        <button class="float-right btn btn-outline-danger mx-1 my-1 btn-sm"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                            <button class ="btn btn-outline-primary btn-lg" onclick="window.location.href='/exits/boxShow/<%=box._id%>'"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }%>
+    </div>
+    
+</div>
+

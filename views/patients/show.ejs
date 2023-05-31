@@ -2,6 +2,7 @@
 <% layout('layouts/boilerplate')%>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script>
   const patient_id = <%-str_id%>;  
@@ -13,12 +14,32 @@
 <div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
   <div class="pop-up-container "><h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px"><%=patient.name%></h5> </div>
   </div>
+  <div class="d-flex justify-content-center align-items-center mb-4 mt-4">
+    <select class="btn btn-outline-secondary btn-lg custom-select ml-2" id='department' name="department" style="max-width: 300px">
+      <option <%= currentUser.stockLocation == 'Vale' ? 'selected' : '' %> id="vale" value="Vale">Vale</option>
+        <option <%= currentUser.stockLocation == 'Central' ? 'selected' : '' %> id="central" value="Central">Central de enfermeria</option>
+        <option <%= currentUser.stockLocation == 'Urgencias' ? 'selected' : '' %> id="urgencias" value="Urgencias">Urgencias</option>
+        <option <%= currentUser.stockLocation == 'Quirofano' ? 'selected' : '' %> id="quirofano" value="Quirofano">Quirofano</option>
+        <option <%= currentUser.stockLocation == 'Farmacia1' ? 'selected' : '' %> id="farmacia1" value="Farmacia1">Farmacia1</option>
+        <option <%= currentUser.stockLocation == 'Farmacia2' ? 'selected' : '' %> id="farmacia2" value="Farmacia2">Farmacia2</option>
+        <option <%= currentUser.stockLocation == 'Bodega' ? 'selected' : '' %> id="bodega" value="Bodega">Bodega</option>
+    </select>
+    <select id="moneyBox" class="btn btn-outline-secondary btn-lg custom-select ml-2" name="moneyBox" style="max-width: 300px">
+      <% for (let box of boxes) {
+        console.log('the box')
+        console.log(box)
+        %>
+          
+          <option <%= currentUser.moneyBox._id.equals(box._id) ? 'selected' : '' %>  id="<%= box._id %>" value="<%= box._id %>" data-hierarchy="<%= box.hierarchy %>"><%= box.name %></option>
+      <% } %>
+    </select>
+</div>
 <div class = "container">
   <div class = "btn-group mr-2" id = "search_group">
     <input class="input-group-text mr-2" id = "search_val" type="text" name="search" placeholder="Search" aria-label="Search">
-    <input type="date" id="expirDate" name="expiration">
-    <button class="btn btn-outline-success" id = "search" type="submit" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-search"></i></button>
+    <button class="btn btn-outline-success" id = "search" type="submit" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-search"></i></button> 
   </div>
+  
   <!-- //search preview table -->
   <div id = "searchList">
     <table class = "table" id = "searchTable">
@@ -43,16 +64,21 @@ let timeUnits = ["Hora","Dia"];
 let total = 0;
       // Make a new object with amount to the same level as price, name and the other fields of servie
       if(patient.servicesCar){
-       let serviceCar = (patient.servicesCar).map((el) =>{if((el.consumtionDate>=begin) && (el.consumtionDate<=end)){return Object.assign(Object.assign({},el.service._doc),{trans_id:el._id,terminalDate:el.terminalDate,amount:el.amount,toggle:el.toggle,consumtionDate:el.consumtionDate,author:el.addedBy.username})}});
+       let serviceCar = (patient.servicesCar).map((el) =>{
+         if((el.consumtionDate>=begin) && (el.consumtionDate<=end)){return Object.assign(Object.assign({},el.service._doc),{trans_id:el._id,terminalDate:el.terminalDate,amount:el.amount,toggle:el.toggle,consumtionDate:el.consumtionDate,author:el.addedBy.username,discount:el.discount})}});
       serviceCar = serviceCar.filter(el => el!= undefined);
       patientCar = serviceCar.sort((a, b) => b.consumtionDate - a.consumtionDate);
     }
 let nonTimeElements = patientCar.filter(el=>!(timeUnits.includes(el.unit)));
 let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
+
 %> 
+
 
 <div class="row justify-content-center" id = "account-table">
   <div class="col-12 overflow-auto ">
+    
+
     <table id="accountrStatus" class="table table-responsive-sm sticky1">
       <thead>
         <tr>
@@ -70,6 +96,8 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
           </th>
           <th><small class = "text-muted">Agregado por</small>
           </th>
+          <th><small class = "text-muted">Descuento</small>
+          </th>
           <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"){%>
             <th>Subtotal
             </th>
@@ -81,7 +109,8 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
       </thead>
 
       <tbody >
-        <%for(let item of nonTimeElements){console.log(item.amount)%>
+        
+        <%for(let item of nonTimeElements){%>
           <tr>
             <td class= "item-name" alt = "<%=item._id%>"><%=item.name%></td>
             <td ><small class = "text-muted" id="transID" alt = "<%=item.trans_id%>"><%=item.class%></small></td>
@@ -92,8 +121,11 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
             <%}%>
             
             <td class = "item-price"><%=makeDMYHour(new Date(item.consumtionDate))%></td>
-            <%let subtotal = +(item.amount*price).toFixed(3);%>
+            <%
+               let subtotal = +(item.amount*(price-(price*(item.discount*0.01)))).toFixed(2);%>
+
             <td ><small class = "text-muted"><%=item.author%></small></td>
+            <td><div class="number-input"><button class="minus2"></button><input class="quantity updateDiscount" min="0" name="quantity" value="<%=item.discount%>" type="number"><button class="plus2"></button></div>% <button class="btn btn-sm btn-discount-inactive btn-secondary discount-button" onclick="toggleDiscount(this)"><i class="fas fa-cog submitDiscount"></i></button></td>
             <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"||currentUser.role == "caja"){%>
               <td>$ <%=numberCommas(subtotal)%> 
                 <%total+=subtotal%>
@@ -160,7 +192,9 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
             <td><input type="datetime-local" id="until"
               name="meeting-time" value = "<%=item.terminalDate.toISOString().substring(0, 16)%>" alt= "<%=item.toggle%>"></td>
             <td>X <span class = "item-amount" id="transID" alt = "<%=item.trans_id%>"><%=item.amount%></span></td>
-            <%let subtotal = +(item.amount*price).toFixed(3);%>
+            <%
+            let subtotal = +(item.amount*price).toFixed(2);
+            %>
             <td>$ <%=numberCommas(subtotal)%><%total+=subtotal%>
             </td>
             <td>
@@ -182,7 +216,7 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
     %>
     <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin" || (currentUser.role == "caja")||(currentUser.role == "medico")){%>
       <div class="container ">
-        <%total = +(total).toFixed(3)%>
+        <%total = +(total).toFixed(2)%>
         <h2 class = "float-right font-italic border border-secondary rounded"><span class = "mx-2 my-2">Total: $<%=numberCommas(total)%></span></h2>
       </div>
     <%}%>
@@ -204,15 +238,14 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
           <input class="form-control" type="text" id="totalCharged" name="totalCharged" value="<%=total%>" required style="display:none;">
           <button class="btn btn-outline-danger ml-1">Cobrada <i class="fas fa-dollar-sign"></i></button>
         </form>
-        <%}else{%>
+        <%}else{
+          if (flag) {%>
           <button class="btn btn-outline-info ml-1" onclick="printTicket();"><i class="fas fa-print"></i>Ticket</button>
-          
-      <%}}%>
+      <%}
+    }}%>
     </div>
   </div>
 </div>
-
-
 
 
 <!-- Modal for complete display of services by search query -->
@@ -274,6 +307,6 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
 
   
    
-<script src="/javascripts/search_in_account.js" ></script>
+<script src="/javascripts/search_in_account.js" defer></script>
 
 

@@ -20,11 +20,11 @@
             </div>
             <div class="mb-3">
                 <label class="form-label" for="class">Unidad (hora, pieza, litro, etc)</label>
-                <input class="form-control" type="text" id="class" name="service[unit]" value = "<%=service.unit%>" required>
+                <input class="form-control" type="text" id="class" name="service[unit]" value = "<%=service.unit%>" >
             </div>
             <div class="mb-3">
                 <label class="form-label" for="claveSat">Clave del Sat</label>
-                <input class="form-control" type="number" id="claveSat" name="service[claveSat]" value = <%=service.claveSat%> required>
+                <input class="form-control" type="number" id="claveSat" name="service[claveSat]" value = <%=service.claveSat%> >
             </div>
             <%}else{%>
                 <div class="mb-3">
@@ -34,10 +34,10 @@
                     <input class="form-control" type="text" id="principle" name="service[principle]" value = "<%=service.principle%>" required style="display:none;" >
                 </div>
                 <div class="mb-3">
-                    <input class="form-control" type="text" id="class" name="service[unit]" value = "<%=service.unit%>" required style="display:none;">
+                    <input class="form-control" type="text" id="class" name="service[unit]" value = "<%=service.unit%>"  style="display:none;">
                 </div>
                 <div class="mb-3">
-                    <input class="form-control" type="number" id="claveSat" name="service[claveSat]" value = <%=service.claveSat%> required style="display:none;">
+                    <input class="form-control" type="number" id="claveSat" name="service[claveSat]" value = <%=service.claveSat%>  style="display:none;">
                 </div>
             <%}%>
             <div class="mb-3">
@@ -48,7 +48,6 @@
                         aria-describedby="price-label" name="service[buy_price]" value = <%=service.buy_price%> required>
                 </div>           
             </div>
-            
             <div class="mb-3">
                 <label class="form-label" for="sell">Precio de venta</label>
                 <div class="input-group">
@@ -58,13 +57,6 @@
                 </div>
             </div>
             <%if(currentUser.role == 'directAdmin'){%>
-
-            <div class="mb-3">
-                <label class="form-label" for="date">Expiration date</label>
-                <%const date_format = service.expiration.toISOString().split('T')[0]%>
-                <%console.log(date_format)%>
-                <input class="form-control" type="date" id="date" name="service[expiration]" value = "<%=date_format%>" required>
-            </div>
             <div class="mb-3">
                 <label class="form-label" for="supplier">Proveedor</label>
                 <input class="form-control" type="text" id="supplier" name="service[supplier]" value = "<%=service.supplier%>" required>
@@ -82,9 +74,13 @@
                 <input class="form-control" type="number" id="optimum" name="service[optimum]" value = <%=service.optimum%> required>
             </div>
             <div class="mb-3">
+                <label class="form-label" for="outside">Codigo de Barras</label>
+                <input class="form-control" type="number" id="outside" name="service[barcode]" value = <%=service.barcode%>>
+            </div>
+            <div class="mb-3">
                 <label class="form-label" for="description">Especificaciones</label>
                 <textarea class="form-control" type="text" id="description" name="service[description]"
-                required><%=service.description%></textarea>
+                ><%=service.description%></textarea>
             </div>
             <div class="mb-3">
                 <div class="custom-control custom-radio custom-control-inline">
@@ -168,6 +164,5 @@
                 <button class="btn btn-success">Actualizar insumo medico</button>
             </div>
         </form>
-        <a class="btn btn-success" href="/services/supply">Insumos médicos</a>
     </div>
 </div>

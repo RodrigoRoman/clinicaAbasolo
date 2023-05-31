@@ -15,16 +15,32 @@
 </div>
 
 <div class="col-xs-12" style="height:50px;"></div>
+<div class="row justify-content-between"><div class = "container  col-2">Reporte de existencias</div></div>
 
 <div class="row justify-content-between mt-4 mb-4">
     <div class = "container  col-4">
+        
         <a class="btn btn-info" href="/services/new?service_type=supplies">Crear Insumo Medico</a>
     </div>
+    <div class = "contaier col-5">
+        <button id="printExistences" type="button" class="btn btn-primary"><i class="fas fa-print"></i>
+        </button>
+        <!-- <button id="generatePDF" type="button" class="btn btn-primary"><i class="fas fa-file-pdf"></i>
+        </button> -->
+        <div id = "limitExistence" class="number-input mx-3">
+            <button class="minusEX"></button>
+            <input class="quantityEX" min="0" name="quantity" value="1" type="number">
+            <button class="plusEX"></button>
+        </div>
+        <button id="toggle-button" type="button" class="btn btn-primary">Todo</button>
+    </div>
+    <!-- <div class = "container  col-3">
+        <a class="btn btn-info" href="/services/deleteAA">Borrar perro</a>
+    </div> -->
     
     <div class="container col-2">
         <select class="btn btn-outline-success custom-select custom-select-lg mb-3" >
             <option selected value = "name">Ordenar Por:</option>
-            <option id= "byExpiration" value="expiration">Caducidad</option>
             <option id= "byStock" value="stock">Existencias</option>
             <option id= "byName" value="name">Nombre</option>
             <option id= "byClass" value="class">Clase</option>
@@ -43,6 +59,7 @@ function diff_months(dt2, dt1)
  }
  //function for selecting the border color based on existence and optimum parameters
 function defineBorder(proportion){
+    console.log('colors called')
     let border = "";
     if(proportion <= 0.33){
         border = "danger";
@@ -53,6 +70,8 @@ function defineBorder(proportion){
     }
     return border
 }
+
+
  %>
     <!-- //search preview table -->
 <div class="row supplies scrollDiv">
@@ -84,15 +103,33 @@ function defineBorder(proportion){
                 <div class = "d-inline"><h3 class="card-subtitle "><%= supply.name%> </h3><h6><%= supply.principle%></h6></div>
                 <h5 class="card-title text-muted"><%= supply.class%></h5>
             </div>
-            <%let dateColor = defineBorder(diff_months(new Date(supply.expiration) , new Date())/12) %>
+            <%let 
+            stockColor = defineBorder(supply.stock)
+            %>
+            
             <ul class="list-group list-group-flush">
-                <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };%>
-                <li class="list-group-item border border-<%=dateColor%>">Caducidad: <%=new Date(supply.expiration.toISOString().replace(/-/g, '\/').replace(/T.+/, '')).toLocaleDateString('es-ES', options)%></li>
-                <%if(supply.outside){%>
-                    <li class="list-group-item">En Bodega:<%= supply.stock - supply.outside%></li>
-                <%}%>
-                <li class="list-group-item">Existencias: <%= supply.stock%></li>
+               
+                <div class="clearfix split-items">
+                    <li class="list-group-item left-side ">Existencias:<br><span class = "border border-<%=stockColor%> rounded-circle px-3 py-2 d-inline-block "> <%= supply.stock%> </span></li>
+
+                    <%if(supply.outside){%>
+                        <li class="list-group-item right-side">En Bodega:<br>   <%= supply.stock - supply.outside%></li>
+                    <%}%>
+                </div>
+                <li class="list-group-item" id = "serviceID" alt = "<%=supply._id%>"></li>
                 <li class="list-group-item">Proveedor: <%= supply.supplier%></li>
+                <li class=" d-flex justify-content-center align-items-center">Agregar a existencias</li>
+
+                <li class="list-group-item d-flex justify-content-center align-items-center"> 
+                    <div class="number-input mx-2">
+                      <button class="minus2"></button>
+                      <input class="quantity updateDiscount" min="0" name="quantity" value="0" type="number">
+                      <button class="plus2"></button>
+                    </div>      
+                    <button class="btn btn-sm btn-discount-inactive btn-secondary discount-button  mx-2" onclick="toggleAddToStock(this)">
+                      <i class="fas fa-cog submitDiscount"></i>
+                    </button>
+                  </li>
                 <div class="clearfix split-items">
                     <li class="list-group-item left-side">Compra: $<%= supply.buy_price%> /cu</li>
                     <li class="list-group-item right-side ">Venta: $<%= supply.sell_price%> /cu</li>
