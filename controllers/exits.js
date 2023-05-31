@@ -676,64 +676,6 @@ module.exports.searchRefillTrans = async (req, res) => {
     res.json({'transactions':aggregatedTransactions,'secondarySort':secondOrderSort,'primarySort':firstOrderSort,entrega,recibe});
 }
 
-
-
-
-
-
-
-
-
-
-
-
-module.exports.refillFormPDF = async (req,res) =>{ 
-    // let {begin,end,name} = req.query;               
-    // const browser = await puppeteer.launch();       // run browser
-    let entrega = req.body.refill.entrega;
-    let recibe = req.body.refill.recibe;
-    const chromeOptions = {
-        headless: true,
-        defaultViewport: null,
-        args: [
-            "--incognito",
-            "--no-sandbox",
-            "--single-process",
-            "--no-zygote"
-        ],
-    };
-    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'], ignoreDefaultArgs: ['--disable-extensions']});
-    const page = await browser.newPage();           // open new tab yes
-    
-    // await page.goto(`https://pure-brushlands-42473.herokuapp.com/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
-    //     waitUntil: 'networkidle0'}); 
-    // await page.goto(`https://warm-forest-49475.herokuapp.com/exits/refill`,{
-    //     waitUntil: 'networkidle0'});          // go to site
-    // await page.goto(
-    //     `http://localhost:3000/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
-    //       waitUntil: 'networkidle0'});
-    await page.goto(`https://clinicaabasolo.up.railway.app/exits/refill?entrega=${entrega}&recibe=${recibe}`,{
-                waitUntil: 'networkidle0'});
-    // await page.goto(`http://localhost:3000/exits/refill?entrega=${entrega}&recibe=${recibe}`,{
-    //             waitUntil: 'networkidle0'});
-    const dom = await page.$eval('.toPDF', (element) => {
-        return element.innerHTML
-    }) // Get DOM HTML
-    await page.setContent(dom)   // HTML markup to assign to the page for generate pdf
-    await page.addStyleTag({url: "https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"});
-    await page.addStyleTag({content: `.image_print{
-        position:absolute;
-        top:50px;
-        left:20px;
-        width:250px;
-        height: 120px;
-      }`})
-    const pdf = await page.pdf({landscape: false})
-    await browser.close(); 
-    res.contentType("application/pdf");
-    res.send(pdf);
-}
-
 module.exports.createPayment = async (req, res, next) => {
     let {name, dueDate,category, moneyAmount,moneyBoxId} = req.body.payment;
     let moneyBox = await MoneyBox.findById(moneyBoxId).populate({

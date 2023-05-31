@@ -28,7 +28,6 @@ router.get('/new', isLoggedIn, isDirectAdminOrCaja, exits.renderNewForm)
 
 router.route('/refill')
     .get(exits.refillForm)
-    .post(exits.refillFormPDF)
     .put(exits.editDatePoint)
 
 router.route('/refillSearch')

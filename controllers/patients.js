@@ -708,7 +708,6 @@ module.exports.addToCart = async (req, res) => {
         }
     }else{
         timePoint = await Point.findOne({name:"datePoint"});
-        timePoint.servicesCar.push(transaction);
     }
     patient.servicesCar.push(transaction);
     try{
