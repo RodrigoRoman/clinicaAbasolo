@@ -500,7 +500,7 @@ receiptContent += `           _____________________\n\n`;
       console.log(tableId)
       console.log(document.getElementById(tableId).innerHTML);
   
-      fetch('http://localhost:3000/exits/generate-pdf-stock', {
+      fetch('https://clinicaabasolo.up.railway.app/exits/generate-pdf-stock', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
