@@ -80,8 +80,9 @@ function refillOrder() {
             property = transactions[index].property
             tablesContent += (`
             <div class="jumbotron style="overflow: auto;"">
-                <div class = "m-4 p-4">
-                                <table class="table table-borderless sticky1" id="simple_table">
+                <div class = "m-4 p-4" id="simple_table_${property}">
+                <table class="table table-borderless sticky1" >
+
                                     <thead class="thead-dark">
                                         <tr class="border-bottom border-dark">  
                                             <th scope ="col"><h3></h3></th>
@@ -137,16 +138,17 @@ function refillOrder() {
             tablesContent += (`
                                     </tbody> 
                                 </table> 
+                                </div>
                                <div class="container">
                                     <div class="row">
                                         <div class="col">
                                             <button id="${printButtonId}" type="button" class="btn btn-primary"><i class="fas fa-print"></i>
                                             </button>
+                                            <button type="button" class="btn btn-secondary" onclick="generatePDF('simple_table_${property}')"><i class="fas fa-file-pdf"></i></button>
                                             <button type="button" class="btn btn-danger" onclick="resetSelection('${property}')"><i class="fas fa-sync-alt"></i></button>
                                         </div>
                                     </div>
                                 </div>
-                    </div>
                 </div>`);
         }
         for (const index in transactions) {
@@ -453,9 +455,6 @@ receiptContent += `           _____________________\n\n`;
   
   
   
-  
-  
-  
   //RESET ACTIONS
   function resetAll(){
     console.log('resetAll')
@@ -488,7 +487,36 @@ receiptContent += `           _____________________\n\n`;
 
         }
     )};
-
-    $(document).on('click', '.closeAlert', function() {
-        $(this).parent().remove();
+    $(document).ready(function() {
+      $(document).on('click', '.closeAlert', function() {
+          $(this).parent().remove();
+      });
     });
+
+
+
+    function generatePDF(tableId) {
+      console.log('generate llamado');
+      console.log(tableId)
+      console.log(document.getElementById(tableId).innerHTML);
+  
+      fetch('http://localhost:3000/exits/generate-pdf-stock', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              content: document.getElementById(tableId).innerHTML, // Get the content of the specific table
+          }),
+      })
+      .then(response => response.blob())
+      .then(blob => {
+          // Create a blob URL and download the file
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `reporte_${nDate.toISOString()}.pdf`;
+          a.click();
+      })
+      .catch(error => console.error('Error:', error));
+  }

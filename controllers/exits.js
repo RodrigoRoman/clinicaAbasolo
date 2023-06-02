@@ -1485,3 +1485,73 @@ module.exports.generate_pdf = async (req, res) => {
     res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
     res.send(pdf);
 };
+
+
+
+
+module.exports.generate_pdf_stock = async (req, res) => {
+    console.log('about to restock')
+    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'], ignoreDefaultArgs: ['--disable-extensions']});
+    const page = await browser.newPage();
+
+    // Get the content from the request body
+    const content = req.body.content;
+
+    console.log('the content');
+    console.log(content);
+
+    //Set content
+    await page.setContent(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinica Abasolo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />    
+ </head>
+    <body>
+    <div class = 'd-flex justify-content-center align-items-center mb-4 mt-4'>
+        <div class="pop-up-container ">
+            <h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px">Stock ${getMexicoCityTime().toLocaleDateString()} </h5> </div>
+        </div>
+    </div>
+     <div class="m-2" >
+        ${content}
+        </div>
+    </body>
+    </html>
+    `);
+
+    // await page.addStyleTag({
+    //     content: `
+    //     .table-light {
+    //         background-color: #f8f9fa; /* Set a lighter background color */
+    //         /* Additional styles for the light table */
+    //       }
+          
+    //       .table-dark {
+    //         background-color: #343a40; /* Set a darker background color */
+    //         color: #fff; /* Set a lighter text color for better contrast */
+    //         /* Additional styles for the dark table */
+    //       }
+    //       .pop-up-container {
+    //         display: inline-block;
+    //         background-color: #fff;
+    //         padding: 20px;
+    //         box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+    //         border-radius: 10px;
+    //       }
+          
+    //     `
+    // });
+
+    const pdf = await page.pdf({ format: 'A4' });
+
+    await browser.close();
+
+    res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
+    res.send(pdf);
+};

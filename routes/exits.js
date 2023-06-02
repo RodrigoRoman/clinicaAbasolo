@@ -83,6 +83,10 @@ router.route('/moneyBox/:id')
 router.route('/generate-pdf-account')
     .post(isLoggedIn, isDinamicDirectAdmin,catchAsync(exits.generate_pdf))
 
+router.route('/generate-pdf-stock')
+    .post(isLoggedIn, isDinamicDirectAdmin,catchAsync(exits.generate_pdf_stock))
+    
+
 router.route('/removeBoxFrom/:id')
     .put(isLoggedIn, isDinamicDirectAdmin,catchAsync(exits.removeBoxFrom))
 

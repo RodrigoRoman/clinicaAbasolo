@@ -251,8 +251,14 @@ module.exports.renderEditForm = async (req, res) => {
 module.exports.updateService = async (req, res) => {
     const { id } = req.params;
     const found = await Service.findById({_id:id});
+    console.log('the barcode');
+    console.log(req.body)
     if(found.service_type==="supply"){
-        service = await Supply.findByIdAndUpdate(id,{ ...req.body.service});
+        service = await Supply.findByIdAndUpdate(id,{
+            ...req.body.service,
+        });
+        await service.save();
+        service.barcode =  req.body.service.barcode;
     }else{
         service = await Hospital.findByIdAndUpdate(id,{ ...req.body.service});
     }

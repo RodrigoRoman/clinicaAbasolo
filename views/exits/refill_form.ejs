@@ -98,7 +98,7 @@ for(let zone in refill_location){
             <div class="jumbotron"style="overflow: auto;">
                 <div class = "m-4 p-4">
                     <%  for (const property in refill_location) {%>
-                        <table class="table table-borderless sticky1" id="simple_table">
+                    <table class="table table-borderless sticky1" id="simple_table_<%=property%>">
                             <thead class="thead-dark">
                                 <tr class="border-bottom border-dark">  
                                     <th scope ="col"><h3></h3></th>
@@ -136,6 +136,7 @@ for(let zone in refill_location){
                                         <div class="col">
                                             <button type="button" class="btn btn-primary"><i class="fas fa-print"></i>
                                             </button>
+                                            <button type="button" class="btn btn-secondary" onclick="generatePDF('simple_table_<%=property%>')"><i class="fas fa-file-pdf"></i></button>
                                             <button type="button" class="btn btn-danger"><i class="fas fa-sync-alt"></i></button>
                                         </div>
                                     </div>
@@ -155,7 +156,7 @@ for(let zone in refill_location){
             </div>
         </div> 
         </main>
-<script src="/javascripts/refill_form.js" ></script>
+    <script src="/javascripts/refill_form.js" ></script>
 
  </body> 
 
