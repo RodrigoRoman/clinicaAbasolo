@@ -96,9 +96,9 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
           </th>
           <th><small class = "text-muted">Agregado por</small>
           </th>
+          <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"||currentUser.role == "caja"){%>
           <th><small class = "text-muted">Descuento</small>
           </th>
-          <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"){%>
             <th>Subtotal
             </th>
           <%}else{%>
@@ -122,11 +122,11 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
             
             <td class = "item-price"><%=makeDMYHour(new Date(item.consumtionDate))%></td>
             <%
-               let subtotal = +(item.amount*(price-(price*(item.discount*0.01)))).toFixed(2);%>
-
+            let subtotal = +(item.amount*(price-(price*(item.discount*0.01)))).toFixed(2);%>
             <td ><small class = "text-muted"><%=item.author%></small></td>
-            <td><div class="number-input"><button class="minus2"></button><input class="quantity updateDiscount" min="0" name="quantity" value="<%=item.discount%>" type="number"><button class="plus2"></button></div>% <button class="btn btn-sm btn-discount-inactive btn-secondary discount-button" onclick="toggleDiscount(this)"><i class="fas fa-cog submitDiscount"></i></button></td>
             <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"||currentUser.role == "caja"){%>
+
+            <td><div class="number-input"><button class="minus2"></button><input class="quantity updateDiscount" min="0" name="quantity" value="<%=item.discount%>" type="number"><button class="plus2"></button></div>% <button class="btn btn-sm btn-discount-inactive btn-secondary discount-button" onclick="toggleDiscount(this)"><i class="fas fa-cog submitDiscount"></i></button></td>
               <td>$ <%=numberCommas(subtotal)%> 
                 <%total+=subtotal%>
                 <span class = "float-right buttons">

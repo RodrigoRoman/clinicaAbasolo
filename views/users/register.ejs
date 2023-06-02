@@ -36,6 +36,16 @@
                                 Valido!
                             </div>
                         </div>
+                        <div class="d-flex justify-content-center my-4">
+                        <select id="moneyBox" class="btn btn-outline-secondary btn-lg custom-select ml-2" name="moneyBox" style="max-width: 300px">
+                            <% for (let box of boxes) {
+                              console.log('the box')
+                              console.log(box)
+                              %>
+                                <option  id="<%= box._id %>" value="<%= box._id %>" data-hierarchy="<%= box.hierarchy %>"><%= box.name %></option>
+                            <% } %>
+                          </select>
+                          </div>
                         <button class="btn btn-success btn-block">Registrarse</button>
                     </form>
 

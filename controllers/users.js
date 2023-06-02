@@ -4,25 +4,26 @@ const MoneyBox = require('../models/money_parts');
 
 
 
-module.exports.renderRegister = (req, res) => {
-    res.render('users/register');
+module.exports.renderRegister = async (req, res) => {
+    let boxes = await MoneyBox.find({});
+    res.render('users/register',{boxes});
 }
 
 module.exports.register = async (req, res, next) => {
     try {
-        const { email, username, password,keyword } = req.body;
+        const { email, username, password,keyword,moneyBox} = req.body;
         let user;
         if(keyword == "administracionAlta"){
-            user = new User({ email, username, role:"directAdmin",color:"#00FF00"});
+            user = new User({ email, username,moneyBox, role:"directAdmin",color:"#00FF00"});
         }
         if(keyword == "administracion1" || keyword == "cajaAbasolo"){
-            user = new User({ email, username, role:"caja",color:"#00DDAA"});
+            user = new User({ email, username,moneyBox, role:"caja",color:"#00DDAA"});
         }
         if(keyword == "enfermeria"){
-            user = new User({ email, username, role:"nurse",color:"#00FF00"});
+            user = new User({ email, username,moneyBox, role:"nurse",color:"#00FF00"});
         }
         if(keyword == "MedicoAbasolo"){
-            user = new User({ email, username, role:"medico",color: randomColor({luminosity:'light'})});
+            user = new User({ email, username,moneyBox, role:"medico",color: randomColor({luminosity:'light'})});
         }
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
