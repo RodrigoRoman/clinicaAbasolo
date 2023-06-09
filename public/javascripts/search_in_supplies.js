@@ -605,7 +605,7 @@ function generatePDF() {
   content = content.replace(/<li class=" d-flex justify-content-center align-items-center">[\s\S]*?<\/li>/g, '');
 
 
-  fetch('http://localhost:3000/services/generate-pdf-exists', {
+  fetch('https://clinicaabasolo.up.railway.app/services/generate-pdf-exists', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
