@@ -29,7 +29,7 @@ $(document).ready(function() {
   $('#search_val').on('keyup', function(event) {
     if (event.keyCode === 13) {
         if($(".custom-select").val() == 'stock'){
-            foundSupplies_existence(event);
+          foundSupplies(event);
     
         }else{
             foundSupplies(event);
