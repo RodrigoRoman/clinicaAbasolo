@@ -25,8 +25,8 @@
     <div class = "contaier col-5">
         <button id="printExistences" type="button" class="btn btn-primary"><i class="fas fa-print"></i>
         </button>
-        <!-- <button id="generatePDF" type="button" class="btn btn-primary"><i class="fas fa-file-pdf"></i>
-        </button> -->
+        <button id="genPDf" type="button" class="btn btn-primary"><i class="fas fa-file-pdf"></i>
+        </button>
         <div id = "limitExistence" class="number-input mx-3">
             <button class="minusEX"></button>
             <input class="quantityEX" min="0" name="quantity" value="1" type="number">
@@ -74,7 +74,7 @@ function defineBorder(proportion){
 
  %>
     <!-- //search preview table -->
-<div class="row supplies scrollDiv">
+<div class="row supplies scrollDiv" id="suppliesContent">
     <%for(let supply of supplies){%>
         <!--Create random string for carousel id use-->
         <%let id_name = "a"+Math.random().toString(36).substring(7); %>

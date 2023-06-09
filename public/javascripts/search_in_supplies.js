@@ -589,3 +589,39 @@ $(document).on("click", ".plusEX", function() {
     quantityInput.val(currentValue + 1);
   }
 })
+
+
+
+
+
+
+
+$('#genPDf').click(generatePDF)
+
+function generatePDF() {
+  var content = document.getElementById('suppliesContent').innerHTML;
+  content = content.replace(/<li class="list-group-item d-flex justify-content-center align-items-center">[\s\S]*?<\/li>/g, '');
+  content = content.replace(/<div class="d-flex justify-content-around mx-1 my-1">[\s\S]*?<\/div>/g, '');
+  content = content.replace(/<li class=" d-flex justify-content-center align-items-center">[\s\S]*?<\/li>/g, '');
+
+
+  fetch('http://localhost:3000/services/generate-pdf-exists', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      content: content, // Get the content of your div
+    }),
+  })
+  .then(response => response.blob())
+  .then(blob => {
+    // Create a blob URL and download the file
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `existencias_${nDate.toISOString()}.pdf`;
+    a.click();
+  })
+  .catch(error => console.error('Error:', error));
+}

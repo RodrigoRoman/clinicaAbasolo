@@ -68,5 +68,7 @@ router.route('/:id/hospital')
 
 router.get('/:id/edit',isLoggedIn,isDirectAdminOrCaja, catchAsync(services.renderEditForm))
 
+router.route('/generate-pdf-exists')
+    .post(isLoggedIn, isDinamicDirectAdmin,catchAsync(services.generate_pdf_exists))
 
 module.exports = router;

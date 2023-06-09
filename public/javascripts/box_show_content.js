@@ -613,6 +613,8 @@ function generatePDF() {
   })
   .then(response => response.blob())
   .then(blob => {
+
+    
     // Create a blob URL and download the file
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

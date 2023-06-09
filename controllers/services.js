@@ -27,7 +27,7 @@ module.exports.renderGenerateQr = async(req,res)=>{
 
 module.exports.index_supplies = async (req, res) => {
     // classify by name (case and symbol insensitive, up to a space)
-    const resPerPage = 40;
+    const resPerPage = 100;
     const page = parseInt(req.params.page) || 1;
     let {search,sorted} = req.query;
     console.log(search)
@@ -320,7 +320,7 @@ module.exports.searchAllSupplies = async (req, res) => {
 
     search = new RegExp(escapeRegExp(search), 'gi');
     const page = parseInt(req.query.page) || 1;
-    const resPerPage = 40;
+    const resPerPage = 100;
     let dbQueries =  [
             { name: search },
             { class: search },
@@ -484,6 +484,83 @@ module.exports.search_3 = async (req, res) => {
     }
     res.json(supplies);
 }
+
+
+
+module.exports.generate_pdf_exists = async (req, res) => {
+    console.log('about to restock')
+    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'], ignoreDefaultArgs: ['--disable-extensions']});
+    const page = await browser.newPage();
+
+    // Get the content from the request body
+    const content = req.body.content;
+
+    console.log('the content');
+    console.log(content);
+
+    //Set content
+    await page.setContent(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+    #suppliesContent * {
+        page-break-inside: avoid !important ;
+    }
+    .card {
+        page-break-inside: avoid !important;
+    }
+
+    /* Prevent page breaks within the carousel */
+    .carousel {
+        page-break-inside: avoid !important;
+    }
+
+    /* Prevent page breaks within the carousel controls */
+    .carousel-control-prev,
+    .carousel-control-next {
+        page-break-inside: avoid !important;
+    }
+
+    /* Prevent page breaks within the list group */
+    .list-group {
+        page-break-inside: avoid !important;
+    }
+
+    /* Prevent page breaks within the split items */
+    .split-items {
+        page-break-inside: avoid;
+    }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinica Abasolo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />    
+ </head>
+    <body>
+    <div class = 'd-flex justify-content-center align-items-center mb-4 mt-4'>
+        <div class="pop-up-container ">
+            <h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px">Stock ${getMexicoCityTime().toLocaleDateString()} </h5> </div>
+        </div>
+    </div>
+
+    <div class="row" id="suppliesContent" >
+        ${content}
+        </div>
+    </body>
+    </html>
+    `);
+ 
+
+    const pdf = await page.pdf({ format: 'A4' });
+
+    await browser.close();
+
+    res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
+    res.send(pdf);
+};
 
 // //search for hospital services
 // module.exports.searchAllServices = async (req, res) => {
