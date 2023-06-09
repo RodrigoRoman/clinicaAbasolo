@@ -121,6 +121,10 @@
             </div>
             <%}else{%>
                 <div class="mb-3">
+                <label class="form-label" for="barcode">Codigo de Barras</label>
+                <input class="form-control" type="text" id="barcode" name="service[barcode]" value = <%=service.barcode%>>
+            </div>
+                <div class="mb-3">
                     <%const date_format = service.expiration.toISOString().split('T')[0]%>
 
                     <input class="form-control" type="date" id="date" name="service[expiration]" value = "<%=date_format%>" required style="display:none;">

@@ -30,7 +30,8 @@ function makeYMD(date){
         var box = <%- JSON.stringify(box) %>;
         var historyTransactions = <%- JSON.stringify(historyTransactions) %>;
         var historyExits = <%- JSON.stringify(historyExits) %>;
-
+        var activeExits = <%- JSON.stringify(activeExits) %>;
+        var activeTransactions = <%- JSON.stringify(activeTransactions) %>;
     </script>
 
 <div class = ' d-flex justify-content-center align-items-center mb-4 mt-4'>
@@ -177,12 +178,14 @@ function makeYMD(date){
                 </tbody>
             </table>
         </div>
-
+        <div style="text-align: right;">
+            <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color:#0505ef;text-transform: uppercase; letter-spacing: 2px; font-size: 20px;">Balance de corte:$<%=numberCommas((totalCurrentIncome-currentTotalExit).toFixed(2))%> </p> 
+        </div>
         
 
         <div class="table-container">
             <div class="pop-up-container">
-                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #90EE90; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de ingresos</p> 
+                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de ingresos</p> 
             </div>
 
             <table class="table table-light">
@@ -201,8 +204,6 @@ function makeYMD(date){
                     <% 
                     historyTransactionsTotal = 0
                     historyTransactions.forEach(transaction => {
-                        console.log('transaction')
-                        console.log(transaction)
                         %>
                         <tr>
                             <td><%= transaction.service.name %></td>
@@ -235,7 +236,7 @@ function makeYMD(date){
             </table>
         </div>
         <div class="pop-up-container">
-            <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #FF7F7F; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de Egresos</p> 
+            <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de Egresos</p> 
         </div>
         <div class="table-container">
             <table class="table table-dark ">
@@ -273,7 +274,11 @@ function makeYMD(date){
                 </tbody>
             </table>
         </div>
+        <div style="text-align: right;">
+            <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color:#131372;text-transform: uppercase; letter-spacing: 2px; font-size: 20px;">Balance de historial:$<%=numberCommas((historyTransactionsTotal-historyExitsTotal).toFixed(2))%> </p> 
+        </div>
 </div>
+
 
 <div class="container justify-content-md-center mb-4">
     <div class="row ">

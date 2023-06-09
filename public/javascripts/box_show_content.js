@@ -77,7 +77,7 @@ console.log('TRANSACTIONS FROM PRINT TICKET FUNCTION');
     0x1B, 0x40, // Initialize the printer
     0x1B, 0x21, 0x20, // Set the font size to double height
     0x1B, 0x61, 0x01, // Align text to center
-    ...encoder.encode(`          ${box.name}`),
+    ...encoder.encode(`    ${box.name}`),
   ]);
 
   let receiptContent = '';
@@ -85,38 +85,39 @@ console.log('TRANSACTIONS FROM PRINT TICKET FUNCTION');
   // Print the transactionsActive table
   receiptContent += '              ' + 'Ingresos'+ '\n';
   receiptContent += '           _______________\n\n';
-  receiptContent += 'Nombre\n         Cantidad     Precio    - %    Total\n';
+  receiptContent += 'Nombre\n                 Cantidad       Total\n';
   receiptContent += '____________________________________________\n';
-
-  box.transactionsActive.forEach(function (item, index) {
-    const subtotal = item.amount * item.service.price;
-    let discountedTotal =0;
-    if (item.service.service_type == 'supply') {
-        let price = item.service.sell_price
-        discountedTotal =     (item.amount*(price-(price*(item.discount*0.01)))).toFixed(2)
-
-      receiptContent +=
-        `${item.service.name.padEnd(15)}\n            ${item.amount.toString().padEnd(8)} $${item.service.sell_price.toString().padEnd(8)} %${item.discount.toString().padEnd(5)} $${discountedTotal.toString().padEnd(8)}\n`;
-    } else {
-        let price = item.service.price
-        discountedTotal =     (item.amount*(price-(price*(item.discount*0.01)))).toFixed(2)
-      receiptContent +=
-        `${item.service.name.padEnd(15)}\n            ${item.amount.toString().padEnd(8)} $${item.service.price.toString().padEnd(8)} %${item.discount.toString().padEnd(5)} $${discountedTotal.toString().padEnd(8)}\n`;
-    }
+  
+  var totalTrans = 0;
+  activeTransactions.forEach(function (item, index) {
+    totalTrans +=item.total;
+    receiptContent +=
+        `${item.name.padEnd(14)}\n                       ${item.amount.toString().padEnd(8)}  $${item.total.toLocaleString("en-US").padEnd(8)}\n`;
   });
 
   // Add a line break between the two tables
   receiptContent += '\n';
+  receiptContent += '             ' + 'Total Entradas:$'+`${totalTrans.toLocaleString("en-US")}`+'\n';
+  receiptContent += '\n\n';
+
+
   receiptContent += '              ' + 'Salidas'+ '\n';
   receiptContent += '           _____________\n\n';
   // Print the exitsActive table
   receiptContent += 'Nombre\n              Categoria            Total\n';
   receiptContent += '____________________________________________\n';
-
-  box.exitsActive.forEach(function (exit) {
+  totalExts = 0
+  activeExits.forEach(function (exit) {
+    totalExts+=exit.total
     receiptContent +=
-      `${exit.name.padEnd(17)}\n            ${exit.category.padEnd(15)}  $${exit.moneyAmount.toString().padEnd(8)}\n`;
+      `${exit.name.padEnd(14)}\n               ${exit.category.padEnd(8)}  $${exit.total.toLocaleString("en-US").padEnd(8)}\n`;
   });
+  receiptContent += '\n';
+  receiptContent += '             ' + 'Total Salidas:$'+`${totalExts.toLocaleString("en-US")}`+'\n';
+  receiptContent += '\n';
+  receiptContent += '\n\n';
+  receiptContent += '             ' + 'Balance total:$'+`${totalTrans-totalExts.toLocaleString("en-US")}`+'\n';
+  receiptContent += '\n\n';
 
  
  dateNow = getMexicoCityTime()
@@ -185,9 +186,6 @@ console.log('TRANSACTIONS FROM PRINT TICKET FUNCTION');
      await characteristic.writeValue(chunks[i]);
    // }, i * 1000); // add a delay of 1 second between each chunk (adjust the delay time as needed)
  }
-   console.log('device to be stored');
-   console.log(device)
- 
      await server.disconnect();
  
    } catch (error) {
@@ -216,11 +214,7 @@ function rebuildTables() {
         'transactionSort':$('#transactionSort').val(),
         'exitSort':$('#exitSort').val(),
     };
-    console.log('data to be sent')
-    console.log(data)
-
     let tables = '';
-    
     $.ajax({
       url: `/exits/boxRebuild/${box._id}`,
       method: 'GET',
@@ -237,9 +231,9 @@ function rebuildTables() {
         box = response.box;
         historyExits = response.historyExits;
         historyTransactions= response.historyTransactions;
+        activeExits = response.activeExits;
+        activeTransactions= response.activeTransactions;
 
-        console.log('these are the boxes!')
-        console.log(box)
         tables += `
         <div class="table-container">
         <div class="pop-up-container">
@@ -249,45 +243,29 @@ function rebuildTables() {
                 <thead class="thead-primary">
                     <tr>
                         <th>Nombre        </th>
-                        <th>Agregado por</th>
+                        <th>Usuario        </th>
                         <th>Fecha-Hora</th>
                         <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Descuento</th>
                         <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>`
                 totalCurrentIncome = 0;
-                     box.transactionsActive.forEach(transaction => {
-                         console.log('transaction from history')
-                         console.log(transaction);
+                response.activeTransactions.forEach(transaction => {
                         tables += `
                         <tr>
-                            <td>${ transaction.service.name}</td>
-                            <td>${ transaction.addedBy.username }</td>
+                            <td>${ transaction.name}</td>
+                            <td>${ transaction.user.username }</td>
                             <td>${ new Date(transaction.consumtionDate).toISOString().substr(0,10)} a las ${makeHour(new Date(transaction.consumtionDate))}</td>
                             <td>${ transaction.amount}</td>`;
-                            if(transaction.service.service_type == 'supply'){
-                               tables +=` <td>$${  transaction.service.sell_price }</td>
-                                <td>%${  transaction.discount}</td>
-                                <td>$${  (transaction.amount*(transaction.service.sell_price-(transaction.service.sell_price*transaction.discount *0.01))).toFixed(2)}</td>`
-                                totalCurrentIncome+=transaction.amount*(transaction.service.sell_price-(transaction.service.sell_price*transaction.discount *0.01))
-
-                            }else{
-                                table += `
-                                <td>$${  transaction.service.price }</td>
-                                <td>%${  transaction.discount }</td>
-                                <td>$${(transaction.amount*(transaction.service.price-(transaction.service.price*transaction.discount *0.01))).toFixed(2) }</td>`
-                                totalCurrentIncome+=transaction.amount*(transaction.service.price-(transaction.service.price*transaction.discount *0.01))
-                            }
+                                tables += `
+                            <td>$${transaction.total}</td>`;
+                            totalCurrentIncome+=transaction.total;
                     tables+=`
                         </tr>`;
                     }); 
                 tables += `
                 <tr>
-                    <td></td>
-                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -314,18 +292,16 @@ function rebuildTables() {
                 </thead>
                 <tbody>`;
                 totalCurrentExits = 0
-                   box.exitsActive.forEach(exit => {
-                       console.log('EXXX');
-                       console.log(exit)
+                   response.activeExits.forEach(exit => {
                        tables += `
                         <tr>
                             <td>${exit.name}</td>
                             <td>${ exit.category }</td>
-                            <td>${ exit.author.username}</td>
+                            <td>${ exit.user.username}</td>
                             <td>${ new Date(exit.clearDate).toISOString().substr(0,10)} a las ${makeHour(new Date(exit.clearDate))}</td>
-                            <td>$${exit.moneyAmount}</td>
+                            <td>$${exit.total}</td>
                         </tr>`
-                        totalCurrentExits+=exit.moneyAmount
+                        totalCurrentExits+=exit.total
                     });
                     tables += `
                     <tr>
@@ -333,16 +309,20 @@ function rebuildTables() {
                     <td></td>
                     <td></td>
                     <td><b>Total:</b></td>
-                    <td><b>$${totalCurrentExits}</b></td>
+                    <td><b>$${numberCommas(totalCurrentExits)}</b></td>
                     </tr>
                 </tbody>
             </table>
+            <div style="text-align: right;">
+                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color:#0505ef;text-transform: uppercase; letter-spacing: 2px; font-size: 20px;">Balance de corte:$${numberCommas((totalCurrentIncome-totalCurrentExits).toFixed(2))} </p> 
+            </div>
         </div>
+        
 
 
         <div class="table-container">
         <div class="pop-up-container">
-                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #90EE90; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de ingresos</p> 
+                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de ingresos</p> 
             </div>
 
             <table class="table table-light">
@@ -358,7 +338,6 @@ function rebuildTables() {
                 <tbody>
                 `;   totalHistoryIncome =0;
                      response.historyTransactions.forEach(transaction => {
-                         console.log('transaction from history')
                          transSort = $('#transactionSort').val();
 
                         tables += `
@@ -377,14 +356,14 @@ function rebuildTables() {
                     <td></td>
                     <td></td>
                     <td><b>Total:</b></td>
-                    <td><b>$${totalHistoryIncome}</b></td>
+                    <td><b>$${numberCommas(totalHistoryIncome)}</b></td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <div class="table-container">
         <div class="pop-up-container">
-        <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #FF7F7F; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de Egresos</p> 
+        <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif;  text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Historial de Egresos</p> 
     </div>
             <table class="table table-dark ">
                 <thead>
@@ -420,10 +399,14 @@ function rebuildTables() {
                     <td></td>
                     <td></td>
                     <td><b>Total:</b></td>
-                    <td><b>$${totalHistoryExits}</b></td>
+                    <td><b>$${numberCommas(totalHistoryExits)}</b></td>
                     </tr>
                 </tbody>
             </table>
+            <div style="text-align: right;">
+                <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color:#131372;text-transform: uppercase; letter-spacing: 2px; font-size: 20px;">Balance de historial:$${numberCommas((totalHistoryIncome-totalHistoryExits).toFixed(2))} </p> 
+            </div>
+
         </div>`;
        $('#contentTables').html(tables);  
     //    $("#search_val").val(response.search)
@@ -437,6 +420,16 @@ function rebuildTables() {
         rebuildTables();
     });
     $('#exitSort').change(function() {
+        // This function will be called every time a .custom-select element changes
+        rebuildTables();
+    });
+
+    $('#beginDate').change(function() {
+        // This function will be called every time a .custom-select element changes
+        rebuildTables();
+    });
+
+    $('#endDate').change(function() {
         // This function will be called every time a .custom-select element changes
         rebuildTables();
     });
@@ -457,7 +450,7 @@ console.log('TRANSACTIONS FROM PRINT TICKET FUNCTION');
     0x1B, 0x40, // Initialize the printer
     0x1B, 0x21, 0x20, // Set the font size to double height
     0x1B, 0x61, 0x01, // Align text to center
-    ...encoder.encode(`          ${box.name}`),
+    ...encoder.encode(`   ${box.name}`),
   ]);
 
   let receiptContent = '';
@@ -468,13 +461,17 @@ console.log('TRANSACTIONS FROM PRINT TICKET FUNCTION');
   receiptContent += 'Nombre\n                Cantidad         Total\n';
   receiptContent += '____________________________________________\n';
   transSort = $('#transactionSort').val();
+  totalTrans =0;
   historyTransactions.forEach(function (item, index) {
-    const subtotal = item.amount * item.service.price;
     let discountedTotal =0;
+    totalTrans+=item.total
     receiptContent +=
-        `${(transSort!='_id')?item.name.padEnd(20):item.service.name.padEnd(20)}\n                   ${item.amount.toString().padEnd(5)}       $${item.total.toString().padEnd(8)}\n`;
+        `${(transSort!='_id')?item.name.padEnd(20):item.service.name.padEnd(20)}\n                   ${item.amount.toString().padEnd(5)}       $${item.total.toLocaleString("en-US").padEnd(8)}\n`;
     
   });
+  receiptContent += '\n';
+  receiptContent += '             ' + 'Total Entradas:$'+`${totalTrans.toLocaleString("en-US")}`+'\n';
+  receiptContent += '\n';
 
   // Add a line break between the two tables
   receiptContent += '\n';
@@ -483,12 +480,19 @@ console.log('TRANSACTIONS FROM PRINT TICKET FUNCTION');
   // Print the exitsActive table
   receiptContent += 'Nombre\n               Categoria         Total\n';
   receiptContent += '____________________________________________\n';
-
+  totalExts =0
   historyExits.forEach(function (exit) {
+    totalExts+=exit.total
     receiptContent +=
-      `${exit.name.padEnd(20)}\n             ${exit.category.padEnd(15)}  $${exit.total.toString().padEnd(8)}\n`;
+      `${exit.name.padEnd(20)}\n             ${exit.category.padEnd(15)}  $${exit.total.toLocaleString("en-US").padEnd(8)}\n`;
   });
+  receiptContent += '\n';
+  receiptContent += '             ' + 'Total Salidas:$'+`${totalExts.toLocaleString("en-US")}`+'\n';
+  receiptContent += '\n';
 
+  receiptContent += '\n\n';
+  receiptContent += '             ' + 'Balance total:$'+`${(totalTrans-totalExts).toLocaleString("en-US")}`+'\n';
+  receiptContent += '\n\n';
  
  dateNow = getMexicoCityTime()
   hour = dateNow.getUTCHours(); // Get the hour component of the datetime
@@ -598,9 +602,7 @@ $(document).ready(function() {
 $('#genPDf').click(generatePDF)
 
 function generatePDF() {
-    console.log('generate llamado');
-    console.log(document.getElementById('contentTables').innerHTML);
-  fetch('https://clinicasanromanadmin-production.up.railway.app/exits/generate-pdf-account', {
+  fetch('https://clinicaabasolo.up.railway.app/exits/generate-pdf-account', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

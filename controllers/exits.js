@@ -911,7 +911,6 @@ module.exports.boxShowContent = async (req, res) => {
     const end = req.query.end||getMexicoCityTime();
     var search = req.query.search||'';
     search = new RegExp(escapeRegExp(search), 'gi');
-    console.log('2')
     const box = await MoneyBox.findById(id).populate([
         {
           path: 'transactionsActive',
@@ -926,7 +925,157 @@ module.exports.boxShowContent = async (req, res) => {
           },
         },
       ]);
-      console.log('3')
+    
+
+const activeTransactions = await MoneyBox.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(id) }
+    },
+    {
+      $lookup: {
+        from: "transactions",
+        localField: "transactionsActive",
+        foreignField: "_id",
+        as: "transactionsActive"
+      }
+    },
+    { $unwind: "$transactionsActive" },
+    {
+      $lookup: {
+        from: "services",
+        localField: "transactionsActive.service",
+        foreignField: "_id",
+        as: "serviceData"
+      }
+    },
+    { $unwind: "$serviceData" },
+    {
+      $lookup: {
+        from: "patients",
+        localField: "transactionsActive.patient",
+        foreignField: "_id",
+        as: "patientData"
+      }
+    },
+    { $unwind: "$patientData" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "transactionsActive.addedBy",
+        foreignField: "_id",
+        as: "userData"
+      }
+    },
+    { $unwind: "$userData" },
+    // Add other lookup stages for the 'exitsActive' field here...
+    {
+        $group: {
+            _id: {
+                $cond: {
+                  if: { $eq: [transactionSort, '_id'] },
+                  then: '$transactionsActive._id',
+                  else: `$${transactionSort}`
+                }
+              },
+            name: {
+                $first: {
+                $cond: {
+                    if: { $eq: [transactionSort, '_id'] },
+                    then: '$serviceData.name',
+                    else: `$${transactionSort}`
+                    }
+                }
+            },
+            discount: {$first:`$transactionsActive.discount`},
+            service:{$first:  "$serviceData"} ,
+            patient: {$first:'$patientData'},
+            amount: { $sum: "$transactionsActive.amount" },
+            user: {$first:'$userData'},
+            consumtionDate:  {$first:"$consumtionDate"} ,
+            total: {
+                $sum: {
+                  $cond: [
+                    { $eq: ["$serviceData.service_type", "supply"] },
+                    {
+                      $multiply: [
+                        { $subtract: [1, { $divide: ["$transactionsActive.discount", 100] }] },
+                        { $ifNull: [ { $multiply: ["$serviceData.sell_price", "$transactionsActive.amount"] }, 0 ] }
+                      ]
+                    },
+                    {
+                      $multiply: [
+                        { $subtract: [1, { $divide: ["$transactionsActive.discount", 100] }] },
+                        { $ifNull: [ { $multiply: ["$serviceData.price", "$transactionsActive.amount"] }, 0 ] }
+                      ]
+                    }
+                  ]
+                }
+              }
+      }
+    },
+    {
+        $project: {
+          _id: 0,
+          property: "$_id",
+          name: 1,
+          service: 1,
+          amount: 1,
+          user:1,
+          patient:1,
+          discount:1,
+          consumtionDate: 1,
+          total: 1
+        }
+      },
+  ]);
+const activeExits = await MoneyBox.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(id) }
+    },
+    {
+      $lookup: {
+        from: "exits",
+        localField: "exitsActive",
+        foreignField: "_id",
+        as: "exitsActive"
+      }
+    },
+    { $unwind: "$exitsActive" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "exitsActive.author",
+        foreignField: "_id",
+        as: "userData"
+      }
+    },
+    { $unwind: "$userData" },
+    {
+        $group: {
+          _id: `$exitsActive.${exitSort}`, 
+            name:  {$first:`$exitsActive.${exitSort}`},
+            category: {$first:`$exitsActive.category`},
+            user: {$first:'$userData'},
+            clearDate:  {$first:"$exitsActive.clearDate"} ,
+            total: {
+                $sum: 
+                  "$exitsActive.moneyAmount"
+              }
+      }
+    },
+    {
+        $project: {
+          _id: 0,
+          property: "$_id",
+          name: 1,
+          category: 1,
+          clearDate: 1,
+          user:1,
+          total: 1
+        }
+      },
+  ]);
+
     let dbQueriesTransactionsAnd =  [
         {relatedBoxes: mongoose.Types.ObjectId(id) },
         {terminalDate: { $gte: new Date( begin), $lte:  new Date(end) } },
@@ -939,8 +1088,6 @@ module.exports.boxShowContent = async (req, res) => {
         { 'serviceData.class': search }
       ];
 
-    console.log(dbQueriesTransactionsOr)
-    console.log('4')
     let dbQueriesExitsAnd =  [
         {relatedBoxes: mongoose.Types.ObjectId(id)},
         {clearDate: { $gte: new Date(begin), $lte: new Date(end) } },
@@ -949,12 +1096,7 @@ module.exports.boxShowContent = async (req, res) => {
         { name: search},
         { category: search},
     ]; 
-    console.log('5')
-    //other cases for the select element (other sorting options)
     let transactions = [];
-    // let trans = await Transaction.find({}).populate('realtedBoxes')
-    // console.log('TRANS')
-    // console.log(trans)
     transactions = await Transaction.aggregate([
         {
           $lookup: {
@@ -1032,12 +1174,8 @@ module.exports.boxShowContent = async (req, res) => {
         }
       ]);
 
-    console.log('transaction data')
-    console.log(transactions.length)
-    console.log('transaction data instance')
-    console.log(transactions[0])
     let exits = [];
-    let exs = await Exit.find();
+    // let exs = await Exit.find();
     exits = await Exit.aggregate([
         // ... rest of your aggregation pipeline
         {
@@ -1072,14 +1210,7 @@ module.exports.boxShowContent = async (req, res) => {
             }
           }
       ]);
-    //   console.log('exits sort')
-    //   console.log(exitSort)
-    //   console.log('EXITS')
-    //   console.log(exits.length)
-    //   console.log('EXITS instance')
-    //   console.log(exits[0]);
-    res.render(`exits/boxShowContent`,{box,'search':'','beginDate':begin,'endDate':end,'historyTransactions':transactions,'historyExits':exits});
-
+    res.render(`exits/boxShowContent`,{activeExits,activeTransactions,box,'search':'','beginDate':begin,'endDate':end,'historyTransactions':transactions,'historyExits':exits,});
 }
 
 
@@ -1196,7 +1327,6 @@ module.exports.makeCut = async (req, res, next) => {
 }
 
 
-
 module.exports.boxShowFiltered = async (req, res) => {
     console.log('FROM boxShowContent');
     const { id } = req.params;
@@ -1211,7 +1341,6 @@ module.exports.boxShowFiltered = async (req, res) => {
 
     search = new RegExp(escapeRegExp(search), 'gi');
      
-    console.log('2')
     const box = await MoneyBox.findById(id).populate([
         {
           path: 'transactionsActive',
@@ -1226,7 +1355,158 @@ module.exports.boxShowFiltered = async (req, res) => {
           },
         },
       ]);
-      console.log('3')
+
+const activeTransactions = await MoneyBox.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(id) }
+    },
+    {
+      $lookup: {
+        from: "transactions",
+        localField: "transactionsActive",
+        foreignField: "_id",
+        as: "transactionsActive"
+      }
+    },
+    { $unwind: "$transactionsActive" },
+    {
+      $lookup: {
+        from: "services",
+        localField: "transactionsActive.service",
+        foreignField: "_id",
+        as: "serviceData"
+      }
+    },
+    { $unwind: "$serviceData" },
+    {
+      $lookup: {
+        from: "patients",
+        localField: "transactionsActive.patient",
+        foreignField: "_id",
+        as: "patientData"
+      }
+    },
+    { $unwind: "$patientData" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "transactionsActive.addedBy",
+        foreignField: "_id",
+        as: "userData"
+      }
+    },
+    { $unwind: "$userData" },
+    // Add other lookup stages for the 'exitsActive' field here...
+    {
+        $group: {
+            _id: {
+                $cond: {
+                  if: { $eq: [transactionSort, '_id'] },
+                  then: '$transactionsActive._id',
+                  else: `$${transactionSort}`
+                }
+              },
+            name: {
+                $first: {
+                $cond: {
+                    if: { $eq: [transactionSort, '_id'] },
+                    then: '$serviceData.name',
+                    else: `$${transactionSort}`
+                    }
+                }
+            },
+            discount: {$first:`$transactionsActive.discount`},
+            service:{$first:  "$serviceData"} ,
+            patient: {$first:'$patientData'},
+            amount: { $sum: "$transactionsActive.amount" },
+            user: {$first:'$userData'},
+            consumtionDate:  {$first:"$consumtionDate"} ,
+            total: {
+                $sum: {
+                  $cond: [
+                    { $eq: ["$serviceData.service_type", "supply"] },
+                    {
+                      $multiply: [
+                        { $subtract: [1, { $divide: ["$transactionsActive.discount", 100] }] },
+                        { $ifNull: [ { $multiply: ["$serviceData.sell_price", "$transactionsActive.amount"] }, 0 ] }
+                      ]
+                    },
+                    {
+                      $multiply: [
+                        { $subtract: [1, { $divide: ["$transactionsActive.discount", 100] }] },
+                        { $ifNull: [ { $multiply: ["$serviceData.price", "$transactionsActive.amount"] }, 0 ] }
+                      ]
+                    }
+                  ]
+                }
+              }
+      }
+    },
+    {
+        $project: {
+          _id: 0,
+          property: "$_id",
+          name: 1,
+          service: 1,
+          amount: 1,
+          user:1,
+          patient:1,
+          discount:1,
+          consumtionDate: 1,
+          total: 1
+        }
+      },
+  ]);
+
+
+const activeExits = await MoneyBox.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(id) }
+    },
+    {
+      $lookup: {
+        from: "exits",
+        localField: "exitsActive",
+        foreignField: "_id",
+        as: "exitsActive"
+      }
+    },
+    { $unwind: "$exitsActive" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "exitsActive.author",
+        foreignField: "_id",
+        as: "userData"
+      }
+    },
+    { $unwind: "$userData" },
+    {
+        $group: {
+          _id: `$exitsActive.${exitSort}`, 
+            name:  {$first:`$exitsActive.${exitSort}`},
+            category: {$first:`$exitsActive.category`},
+            user: {$first:'$userData'},
+            clearDate:  {$first:"$exitsActive.clearDate"} ,
+            total: {
+                $sum: 
+                  "$exitsActive.moneyAmount"
+              }
+      }
+    },
+    {
+        $project: {
+          _id: 0,
+          property: "$_id",
+          name: 1,
+          category: 1,
+          clearDate: 1,
+          user:1,
+          total: 1
+        }
+      },
+  ]);
+
 
     let dbQueriesTransactionsAnd =  [
         {relatedBoxes: mongoose.Types.ObjectId(id) },
@@ -1238,9 +1518,6 @@ module.exports.boxShowFiltered = async (req, res) => {
         { 'patientData.class': search },
         { 'serviceData.class': search }
       ];
-
-    console.log(dbQueriesTransactionsOr)
-    console.log('4')
     let dbQueriesExitsAnd =  [
         {relatedBoxes: mongoose.Types.ObjectId(id)},
         {clearDate: { $gte: new Date(begin), $lte: new Date(end) } },
@@ -1250,11 +1527,7 @@ module.exports.boxShowFiltered = async (req, res) => {
         { category: search},
     ]; 
     console.log('5')
-    //other cases for the select element (other sorting options)
     let transactions = [];
-    // let trans = await Transaction.find({}).populate('realtedBoxes')
-    // console.log('TRANS')
-    // console.log(trans)
     transactions = await Transaction.aggregate([
         {
           $lookup: {
@@ -1287,8 +1560,16 @@ module.exports.boxShowFiltered = async (req, res) => {
         { $match: { $and: dbQueriesTransactionsAnd } },
         {
           $group: {
-            _id: `$${transactionSort}`, // group by firstOrder sort
-            name: { $first: `$${transactionSort}`},
+            _id:  `$${transactionSort}`,
+            name: {
+                $first: {
+                $cond: {
+                    if: { $eq: [transactionSort, '_id'] },
+                    then: '$serviceData.name',
+                    else: `$${transactionSort}`
+                    }
+                }
+            },
             discount:{$first: `$discount`},
             service: { $first: "$serviceData" },
             patient:{$first: '$patientData'},
@@ -1331,13 +1612,7 @@ module.exports.boxShowFiltered = async (req, res) => {
           }
         }
       ]);
-
-    // console.log('transaction data')
-    // console.log(transactions.length)
-    // console.log('transaction data instance')
-    // console.log(transactions[0])
     let exits = [];
-    let exs = await Exit.find();
     exits = await Exit.aggregate([
         // ... rest of your aggregation pipeline
         {
@@ -1372,10 +1647,9 @@ module.exports.boxShowFiltered = async (req, res) => {
             }
           }
       ]);
-      console.log('exits!')
-
-      console.log(exits);
-    res.json({box,search,'beginDate':begin,'endDate':end,'historyTransactions':transactions,'historyExits':exits});
+      console.log('BOXX')
+      console.log(box.transactionsActive.length)
+    res.json({box,activeExits,search,'beginDate':begin,'endDate':end,'activeTransactions':activeTransactions,'historyTransactions':transactions,'historyExits':exits});
      }catch(e){
          console.log('error')
          console.log(e)

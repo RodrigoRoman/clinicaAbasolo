@@ -60,17 +60,11 @@
     
     });
     function removeFromBox(removeBoxId){
-            console.log('remove from box')
             let currentRequest = null;
             const data = {
                 'removeParentId':removeBoxId,
             };
-            console.log('data to be sent')
-            console.log(data)
-
             let tables = '';
-            console.log('the box')
-            console.log(box)
             $.ajax({
             url: `/exits/removeBoxFrom/${box._id}`,
             method: 'PUT',
