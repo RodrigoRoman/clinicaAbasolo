@@ -1439,23 +1439,56 @@ const activeTransactions = await MoneyBox.aggregate([
                     }
                   ]
                 }
-              }
+              },
+              patientCount: {  $addToSet: "$transactionsActive.patient" 
+              },
+              classCount: { $push: "$serviceData.class" } // Change $addToSet to $push
       }
     },
     {
-        $project: {
-          _id: 0,
-          property: "$_id",
-          name: 1,
-          service: 1,
-          amount: 1,
-          user:1,
-          patient:1,
-          discount:1,
-          consumtionDate: 1,
-          total: 1
+      $addFields: {
+        classCount: {
+          $size: "$classCount"
+        },
+        patientCount: {
+          $size: "$patientCount"
         }
-      },
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        property: "$_id",
+        name: 1,
+        service: 1,
+        amount: {
+          $cond: {
+            if: {
+              $or: [
+                { $eq: [transactionSort, "_id"] },
+                { $eq: [transactionSort, "serviceData.name"] }
+                // Add more conditions here if needed
+              ]
+            },
+            then: "$amount",
+            else: {
+              $cond: {
+                if: { $eq: [transactionSort, "serviceData.class"] },
+                then: "$classCount",
+                else:  "$patientCount"
+              }
+            }
+          }
+        },
+        user: 1,
+        patient: 1,
+        discount: 1,
+        consumtionDate: 1,
+        total: 1,
+        serviceCount: 1,
+        classCount: 1
+      }
+    }
   ]);
 
 
@@ -1488,6 +1521,7 @@ const activeExits = await MoneyBox.aggregate([
             category: {$first:`$exitsActive.category`},
             user: {$first:'$userData'},
             clearDate:  {$first:"$exitsActive.clearDate"} ,
+            amount: { $sum: 1 }, // Count the number of elements in the group
             total: {
                 $sum: 
                   "$exitsActive.moneyAmount"
@@ -1502,7 +1536,8 @@ const activeExits = await MoneyBox.aggregate([
           category: 1,
           clearDate: 1,
           user:1,
-          total: 1
+          total: 1,
+          amount: 1
         }
       },
   ]);
@@ -1594,23 +1629,61 @@ const activeExits = await MoneyBox.aggregate([
                   }
                 ]
               }
-            }
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-            property: "$_id",
-            name: 1,
-            service: 1,
-            amount: 1,
-            user:1,
-            patient:1,
-            discount:1,
-            consumtionDate: 1,
-            total: 1
+            },
+            patientCount: {  $addToSet: "$patientData._id" 
+            },
+            classCount: { $push: "$serviceData.class" } // Change $addToSet to $push
+    }
+  },
+  {
+    $addFields: {
+      classCount: {
+        $size: {
+          $filter: {
+            input: "$classCount",
+            cond: { $ne: ["$$this", ""] }
           }
         }
+      },
+      patientCount: {
+        $size: "$patientCount"
+      }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      property: "$_id",
+      name: 1,
+      service: 1,
+      amount: {
+        $cond: {
+          if: {
+            $or: [
+              { $eq: [transactionSort, "_id"] },
+              { $eq: [transactionSort, "serviceData.name"] }
+              // Add more conditions here if needed
+            ]
+          },
+          then: "$amount",
+          else: {
+            $cond: {
+              if: { $eq: [transactionSort, "serviceData.class"] },
+              then: "$classCount",
+              else:  "$patientCount"
+            }
+          }
+        }
+      },
+      user: 1,
+      patient: 1,
+      discount: 1,
+      consumtionDate: 1,
+      total: 1,
+      serviceCount: 1,
+      classCount: 1
+    }
+  }
       ]);
     let exits = [];
     exits = await Exit.aggregate([
@@ -1634,6 +1707,8 @@ const activeExits = await MoneyBox.aggregate([
                 clearDate:{ $first: '$clearDate'},
                 user:{ $first: "$userData" },
                 total: { $sum: "$moneyAmount" },
+                amount: { $sum: 1 }, // Count the number of elements in the group
+
         }},
           {
             $project: {
@@ -1643,7 +1718,8 @@ const activeExits = await MoneyBox.aggregate([
               category: 1,
               clearDate: 1,
               user: 1,
-              total: 1
+              total: 1,
+              amount:1
             }
           }
       ]);
@@ -1794,7 +1870,7 @@ module.exports.generate_pdf_stock = async (req, res) => {
     </div>
      <div class="m-2" >
         ${content}
-        </div>
+      </div>
     </body>
     </html>
     `);

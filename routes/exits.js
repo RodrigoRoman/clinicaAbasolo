@@ -41,11 +41,11 @@ router.route('/resetAll')
     .put(exits.resetAllRefill)
 
 router.route('/:id')
-    .delete(isLoggedIn, isLoggedIn, isDinamicDirectAdmin, catchAsync(exits.deleteExit))
+    .delete(isLoggedIn, isLoggedIn, isDirectAdminOrCaja, catchAsync(exits.deleteExit))
 
-router.get('/payments', isLoggedIn,isDinamicDirectAdmin, catchAsync(exits.index_exits))
+router.get('/payments', isLoggedIn,isDirectAdminOrCaja, catchAsync(exits.index_exits))
 
-router.get('/searchAllExits', isLoggedIn,isDinamicDirectAdmin, catchAsync(exits.searchAllExits))
+router.get('/searchAllExits', isLoggedIn,isDirectAdminOrCaja, catchAsync(exits.searchAllExits))
 
 
 router.route('/hospital_account')

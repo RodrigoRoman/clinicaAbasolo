@@ -235,42 +235,57 @@ function rebuildTables() {
         activeTransactions= response.activeTransactions;
 
         tables += `
-        <div class="table-container">
-        <div class="pop-up-container">
+            <div class="table-container">
+              <div class="pop-up-container">
                 <p class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #90EE90; text-transform: uppercase; letter-spacing: 2px;  font-size: 20px">Ingresos actuales</p> 
-            </div>
-            <table class="table  table-success">
+              </div>
+              <table class="table table-success">
                 <thead class="thead-primary">
-                    <tr>
-                        <th>Nombre        </th>
-                        <th>Usuario        </th>
-                        <th>Fecha-Hora</th>
-                        <th>Cantidad</th>
-                        <th>Total</th>
-                    </tr>
+                  <tr>
+                    <th>Nombre</th>
+                    ${
+                      $('#transactionSort').val() === 'serviceData.name' || $('#transactionSort').val() === '_id'
+                        ? `<th>Usuario</th>
+                          <th>Fecha-Hora</th>
+                          <th>Cantidad</th>
+                          <th>Total</th>`
+                        : `
+                          <th>Cantidad</th>
+                          <th>Total</th>`
+                    }
+                  </tr>
                 </thead>
-                <tbody>`
+                <tbody>`;
                 totalCurrentIncome = 0;
                 response.activeTransactions.forEach(transaction => {
                         tables += `
                         <tr>
-                            <td>${ transaction.name}</td>
+                        ${
+                          $('#transactionSort').val() === 'serviceData.name' || $('#transactionSort').val() === '_id'
+                            ? `<td>${ transaction.name}</td>
                             <td>${ transaction.user.username }</td>
                             <td>${ new Date(transaction.consumtionDate).toISOString().substr(0,10)} a las ${makeHour(new Date(transaction.consumtionDate))}</td>
-                            <td>${ transaction.amount}</td>`;
-                                tables += `
-                            <td>$${transaction.total}</td>`;
-                            totalCurrentIncome+=transaction.total;
-                    tables+=`
+                            <td>${ transaction.amount}</td>
+                            <td>$${numberCommas(transaction.total)}</td>`
+                            : `
+                            <td>${ transaction.name}</td>
+                            <td>${ transaction.amount}</td>
+                            <td>$${numberCommas(transaction.total)}</td>`
+                        }
                         </tr>`;
+                        totalCurrentIncome+=transaction.total;
                     }); 
                 tables += `
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td><b>Total:</b></td>
-                    <td><b>$${numberCommas(totalCurrentIncome.toFixed(2))}</b></td>
+                <tr> ${$('#transactionSort').val() === 'serviceData.name' || $('#transactionSort').val() === '_id'
+                ?`<td></td>
+                <td></td>
+                <td></td>
+                <td><b>Total:</b></td>
+                <td><b>$${numberCommas(totalCurrentIncome)}</b></td>`
+                :`<td></td>
+                <td><b>Total:</b></td>
+                <td><b>$${numberCommas(totalCurrentIncome)}</b></td>`
+              }
                     </tr>
                 </tbody>
             </table>
@@ -282,34 +297,68 @@ function rebuildTables() {
             </div>
             <table class="table table-danger">
                 <thead>
-                    <tr>
-                        <th>Nombre      </th>
+                    <tr>`
+                    if(data.exitSort != 'category'){
+                        tables += `<td>Nombre</td>`
+                    }
+                    tables += `
+                    ${
+                      $('#exitSort').val() === 'name' || $('#exitSort').val() === '_id'
+                      ?
+                       `
                         <th>Categoria   </th>
                         <th>Usuario</th>
                         <th>Fecha-Hora</th>
-                        <th>Total</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>`
+                        :`
+                        <th>Categoria   </th>
+                        <th>Cantidad</th>
+                        <th>Total</th>`
+                    }
                     </tr>
                 </thead>
                 <tbody>`;
                 totalCurrentExits = 0
                    response.activeExits.forEach(exit => {
+                     
                        tables += `
-                        <tr>
-                            <td>${exit.name}</td>
-                            <td>${ exit.category }</td>
-                            <td>${ exit.user.username}</td>
-                            <td>${ new Date(exit.clearDate).toISOString().substr(0,10)} a las ${makeHour(new Date(exit.clearDate))}</td>
-                            <td>$${exit.total}</td>
+                        <tr>`
+                        if(data.exitSort != 'category'){
+                          tables += `<td>Nombre</td>`
+                      }
+                      tables += `
+                        ${
+                          $('#exitSort').val() === 'name' || $('#exitSort').val() === '_id'?
+                          `
+                          <td>${ exit.category }</td>
+                          <td>${ exit.user.username}</td>
+                          <td>${ new Date(exit.clearDate).toISOString().substr(0,10)} a las ${makeHour(new Date(exit.clearDate))}</td>
+                          <td>${ exit.amount }</td>
+                          <td>$${numberCommas(exit.total)}</td>`
+                          :`
+                          <td>${ exit.category }</td>
+                          <td>${ exit.amount }</td>
+
+                           <td>$${numberCommas(exit.total)}</td>`
+                        }
                         </tr>`
                         totalCurrentExits+=exit.total
                     });
+
                     tables += `
-                    <tr>
+                    <tr> ${$('#exitSort').val() === 'name' || $('#exitSort').val() === '_id'
+                    ?`<td></td>
                     <td></td>
                     <td></td>
                     <td></td>
+
                     <td><b>Total:</b></td>
-                    <td><b>$${numberCommas(totalCurrentExits)}</b></td>
+                    <td><b>$${numberCommas(totalCurrentExits)}</b></td>`
+                    :`<td></td>
+                    <td><b>Total:</b></td>
+                    <td><b>$${numberCommas(totalCurrentExits)}</b></td>`
+                  }
                     </tr>
                 </tbody>
             </table>
@@ -327,36 +376,51 @@ function rebuildTables() {
 
             <table class="table table-light">
                 <thead class="theady">
-                    <tr>
-                        <th>Nombre        </th>
-                        <th>Usuario</th>
-                        <th>Fecha-Hora</th>
-                        <th>Cantidad</th>
-                        <th>Total</th>
-                    </tr>
+                <tr>
+                <th>Nombre</th>
+                ${
+                  $('#transactionSort').val() === 'serviceData.name' || $('#transactionSort').val() === '_id'
+                    ? `<th>Usuario</th>
+                      <th>Fecha-Hora</th>
+                      <th>Cantidad</th>
+                      <th>Total</th>`
+                    : `
+                      <th>Cantidad</th>
+                      <th>Total</th>`
+                }
+              </tr>
                 </thead>
                 <tbody>
                 `;   totalHistoryIncome =0;
                      response.historyTransactions.forEach(transaction => {
-                         transSort = $('#transactionSort').val();
-
-                        tables += `
-                        <tr>
-                            <td>${(transSort!='_id')?transaction.name:transaction.service.name}</td>
-                            <td>${transaction.user.username}</td>
-                            <td>${new Date(transaction.consumtionDate).toISOString().substr(0,10)} a las ${makeHour(new Date(transaction.consumtionDate))}</td>
-                            <td>${transaction.amount }</td>
-                            <td>$${ transaction.total}</td>
-                        </tr>`;
+                      tables += `
+                      <tr>
+                      ${
+                        $('#transactionSort').val() === 'serviceData.name' || $('#transactionSort').val() === '_id'
+                          ? `<td>${ transaction.name}</td>
+                          <td>${ transaction.user.username }</td>
+                          <td>${ new Date(transaction.consumtionDate).toISOString().substr(0,10)} a las ${makeHour(new Date(transaction.consumtionDate))}</td>
+                          <td>${ transaction.amount}</td>
+                          <td>$${numberCommas(transaction.total)}</td>`
+                          : `
+                          <td>${ transaction.name}</td>
+                          <td>${ transaction.amount}</td>
+                          <td>$${numberCommas(transaction.total)}</td>`
+                      }
+                      </tr>`;
                         totalHistoryIncome+=transaction.total;
                     }); 
                 tables += `
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td><b>Total:</b></td>
-                    <td><b>$${numberCommas(totalHistoryIncome)}</b></td>
+                <tr> ${$('#transactionSort').val() === 'serviceData.name' || $('#transactionSort').val() === '_id'
+                ?`<td></td>
+                <td></td>
+                <td></td>
+                <td><b>Total:</b></td>
+                <td><b>$${numberCommas(totalHistoryIncome)}</b></td>`
+                :`<td></td>
+                <td><b>Total:</b></td>
+                <td><b>$${numberCommas(totalHistoryIncome)}</b></td>`
+              }
                     </tr>
                 </tbody>
             </table>
@@ -372,34 +436,61 @@ function rebuildTables() {
                         tables += `<td>Nombre</td>`
                     }
                     tables += `
+                    ${
+                      $('#exitSort').val() === 'name' || $('#exitSort').val() === '_id'
+                      ?
+                       `
                         <th>Categoria   </th>
                         <th>Usuario</th>
                         <th>Fecha-Hora</th>
-                        <th>Total</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>`
+                        :`
+                        <th>Categoria   </th>
+                        <th>Cantidad</th>
+                        <th>Total</th>`
+                    }
                     </tr>
                 </thead>
                 <tbody>
                 `
                 totalHistoryExits = 0
                 response.historyExits.forEach(exit => { 
-                        tables += `<tr>`
-                        if(data.exitSort != 'category'){
-                            tables += `<td>${exit.name }</td>`
-                        }
-                        tables += `
-                            <td>${exit.category }</td>
-                            <td>${exit.user.username}</td>
-                            <td>${new Date(exit.clearDate).toISOString().substr(0,10)} a las ${makeHour(new Date(exit.clearDate))}</td>
-                            <td>$${exit.total}</td>
-                        </tr>`
+                      tables += `
+                      <tr>`
+                      if(data.exitSort != 'category'){
+                        tables += `<td>Nombre</td>`
+                    }
+                    tables += `
+                      ${
+                        $('#exitSort').val() === 'name' || $('#exitSort').val() === '_id'?
+                        `
+                        <td>${ exit.category }</td>
+                        <td>${ exit.user.username}</td>
+                        <td>${ new Date(exit.clearDate).toISOString().substr(0,10)} a las ${makeHour(new Date(exit.clearDate))}</td>
+                        <td>${ exit.amount }</td>
+                        <td>$${numberCommas(exit.total)}</td>`
+                        :`
+                        <td>${ exit.category }</td>
+                        <td>${ exit.amount }</td>
+                        <td>$${numberCommas(exit.total)}</td>`
+                      }
+                      </tr>`
                         totalHistoryExits+=parseFloat(exit.total)
                      });
-                    tables += `
-                    <tr>
-                    <td></td>
-                    <td></td>
-                    <td><b>Total:</b></td>
-                    <td><b>$${numberCommas(totalHistoryExits)}</b></td>
+
+                     tables += `
+                <tr> ${$('#exitSort').val() === 'name' || $('#exitSort').val() === '_id'
+                ?`<td></td>
+                <td></td>
+                <td></td>
+                <td><b>Total:</b></td>
+                <td><b>$${numberCommas(totalHistoryExits)}</b></td>`
+                :`<td></td>
+                <td><b>Total:</b></td>
+                <td><b>$${numberCommas(totalHistoryExits)}</b></td>`
+              }
+
                     </tr>
                 </tbody>
             </table>
@@ -602,7 +693,7 @@ $(document).ready(function() {
 $('#genPDf').click(generatePDF)
 
 function generatePDF() {
-  fetch('https://clinicaabasolo.up.railway.app/exits/generate-pdf-account', {
+  fetch('http://localhost:3000/exits/generate-pdf-account', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

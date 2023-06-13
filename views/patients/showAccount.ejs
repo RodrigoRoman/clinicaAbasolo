@@ -91,6 +91,8 @@ let newPatient = patientNoHonorary.concat(honoraries);
                             sub_amount = 0; subtotal_class = 0;
                         let price = 0;
                         (item.amount).forEach(function(amnt,i){
+                            console.log('the item')
+                            console.log(item)
                             if(item.service_type == "supply"){price = item.sell_price[i]}else{price = item.price[i]}
                             let item_subtotal = (amnt*(price-(price*(item.discount*0.01)))).toFixed(2)
                             // let item_subtotal = +(price * amnt).toFixed(2);

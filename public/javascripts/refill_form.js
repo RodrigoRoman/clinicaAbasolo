@@ -499,7 +499,6 @@ receiptContent += `           _____________________\n\n`;
       console.log('generate llamado');
       console.log(tableId)
       console.log(document.getElementById(tableId).innerHTML);
-  
       fetch('https://clinicaabasolo.up.railway.app/exits/generate-pdf-stock', {
           method: 'POST',
           headers: {

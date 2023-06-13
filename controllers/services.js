@@ -542,11 +542,11 @@ module.exports.generate_pdf_exists = async (req, res) => {
     <body>
     <div class = 'd-flex justify-content-center align-items-center mb-4 mt-4'>
         <div class="pop-up-container ">
-            <h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px">Stock ${getMexicoCityTime().toLocaleDateString()} </h5> </div>
+            <h5 class="display-3 font-weight-bold text-center" style="font-family: Helvetica, Arial, sans-serif; color: #4A4A4A; text-transform: uppercase; letter-spacing: 2px;  font-size: 40px">Existencias ${getMexicoCityTime().toLocaleDateString()} </h5> </div>
         </div>
     </div>
 
-    <div class="row" id="suppliesContent" >
+    <div class="row mx-4" id="suppliesContent" >
         ${content}
         </div>
     </body>

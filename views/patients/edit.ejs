@@ -58,10 +58,11 @@ d = patient.admissionDate
             </div>
                 <div class="d-flex justify-content-center align-items-center mb-4 mt-4">
                     <select class="btn btn-outline-secondary btn-lg custom-select ml-2" name="patient[serviceType]" value = "<%=patient.serviceType%>" style="max-width: 300px">
-                        <option <%= patient.serviceType == 'Central' ? 'selected' : '' %> id="farmacia" value="Farmacia">Farmacia</option>
+                        <option <%= patient.serviceType == 'Ventas de Farmacia' ? 'selected' : '' %> id="farmacia" value="Ventas de Farmacia">Venta de Farmacia</option>
                         <option <%= patient.serviceType == 'Consulta' ? 'selected' : '' %> id="consulta" value="Consulta">Consulta</option>
                         <option <%= patient.serviceType == 'Hospitalizacion' ? 'selected' : '' %> id="hospitalizacion" value="Hospitalizacion">Hospitalizacion</option>
                         <option <%= patient.serviceType == 'Emergencia' ? 'selected' : '' %>  id="emergencia" value="Emergencia">Emergencia</option>
+                        <option <%= patient.serviceType == 'Suministro' ? 'selected' : '' %>  id="suministro" value="Suministro">Suministro</option>
                         <option <%= patient.serviceType == 'Cirugia' ? 'selected' : '' %> id="cirugia" value="Cirugia">Cirugia</option>
                         <option <%= patient.serviceType == 'Unidad de Cuidados Intensivos (UCI)' ? 'selected' : '' %> id="uci" value="Unidad de Cuidados Intensivos (UCI)">Unidad de Cuidados Intensivos (UCI)</option>
                         <option <%= patient.serviceType == 'Laboratorios Clinico' ? 'selected' : '' %> id="labClinic" value="Laboratorios Clinico">Laboratorio Clinicos</option>

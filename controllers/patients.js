@@ -316,6 +316,8 @@ module.exports.showPatient = async (req, res) => {
 
 
 module.exports.showDischargedPatient= async (req, res) => {
+    console.log('ins discharged')
+
     const patient = await Patient.aggregate([  
         {$match: {_id:  mongoose.Types.ObjectId(req.params.id)}}, 
         {$group: {
@@ -379,6 +381,7 @@ module.exports.showDischargedPatient= async (req, res) => {
 
 
 module.exports.patientAccount = async (req, res) => {
+    console.log('inside patient account')
     let {begin,end} = req.query;
     let pat = await Patient.findById(req.params.id);
     //variable for local time 
@@ -429,7 +432,7 @@ module.exports.patientAccount = async (req, res) => {
          },
          { $project: { fromService: 0 } },
          {$group: {
-            _id: { name:"$name", discount: "$discount" }, // Group by name and discount
+            _id: { name:"$name", discount: "$discount", service_type: "$service_type" }, // Group by name and discount
             patientName:{$last:"$patientName"},
             class:{$last:"$class"},
             name: {$last:"$name"},
@@ -458,7 +461,7 @@ module.exports.patientAccount = async (req, res) => {
          },
          { $project: { fromService: 0 } },
         {$group: {
-            _id:"$class", // Group by name and discount
+            _id: { class:"$class", service_type: "$service_type" }, // Group by name and discount
             patientName:{$last:"$patientName"},
             class:{$last:"$class"},
             serviceName: {$push:"$name"},
@@ -470,7 +473,6 @@ module.exports.patientAccount = async (req, res) => {
             price: {$push:"$price"},
             cost: {$push:0},
             discount: { $last: "$discount"}, // Add discount
-
             expiration: { $push:"$expiration"},
             sell_price: { $push:"$sell_price"},
             buy_price: { $push: "$buy_price"},

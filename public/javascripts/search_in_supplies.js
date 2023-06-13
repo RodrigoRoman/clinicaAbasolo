@@ -600,18 +600,17 @@ $('#genPDf').click(generatePDF)
 
 function generatePDF() {
   var content = document.getElementById('suppliesContent').innerHTML;
-  content = content.replace(/<li class="list-group-item d-flex justify-content-center align-items-center">[\s\S]*?<\/li>/g, '');
-  content = content.replace(/<div class="d-flex justify-content-around mx-1 my-1">[\s\S]*?<\/div>/g, '');
-  content = content.replace(/<li class=" d-flex justify-content-center align-items-center">[\s\S]*?<\/li>/g, '');
 
+  // Convert the content into a table
+  var tableContent = convertToTable(content);
 
-  fetch('https://clinicaabasolo.up.railway.app/services/generate-pdf-exists', {
+  fetch('http://localhost:3000/services/generate-pdf-exists', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      content: content, // Get the content of your div
+      content: tableContent, // Send the table content to the server
     }),
   })
   .then(response => response.blob())
@@ -624,4 +623,55 @@ function generatePDF() {
     a.click();
   })
   .catch(error => console.error('Error:', error));
+}
+
+function convertToTable(content) {
+  // Create a new div element to hold the table
+  var div = document.createElement('div');
+  div.innerHTML = content;
+
+  // Find the elements containing the data
+  var supplyItems = div.getElementsByClassName('col-3');
+
+  // Create the table HTML with Bootstrap classes
+  var tableHTML = '<table class="table table-striped">';
+
+  // Create the table header row
+  tableHTML += '<thead>' +
+    '<tr>' +
+    '<th>Nombre</th>' +
+    '<th>Principio</th>' +
+    '<th>Clase</th>' +
+    '<th>Cantidad</th>' +
+    '</tr>' +
+    '</thead>';
+
+  // Create the table body
+  tableHTML += '<tbody>';
+
+  // Iterate over the supply items and extract the data
+  for (var i = 0; i < supplyItems.length; i++) {
+    var supplyItem = supplyItems[i];
+
+    // Extract the relevant data from the supply item
+    var name = supplyItem.querySelector('.card-subtitle').textContent;
+    var principle = supplyItem.querySelector('h6').textContent;
+    var supplyClass = supplyItem.querySelector('.card-title').textContent;
+    var stock = supplyItem.querySelector('.border').textContent;
+
+    // Build the table row HTML with Bootstrap classes
+    var rowHTML = '<tr>' +
+      '<td>' + name + '</td>' +
+      '<td>' + principle + '</td>' +
+      '<td>' + supplyClass + '</td>' +
+      '<td>' + stock + '</td>' +
+      '</tr>';
+
+    // Add the row HTML to the table body
+    tableHTML += rowHTML;
+  }
+
+  tableHTML += '</tbody></table>';
+
+  return tableHTML;
 }

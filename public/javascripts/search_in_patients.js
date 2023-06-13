@@ -27,6 +27,9 @@ const newDate = {d:date.getUTCDate(), m : date.getUTCMonth()+1,// JavaScript mon
 y : date.getUTCFullYear()};
 return  newDate.y+ "-" + ((newDate.m.toString().length>1)?newDate.m:"0"+newDate.m)+ "-" + ((newDate.d.toString().length>1)?newDate.d:"0"+newDate.d);
 }
+function numberCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 function makeHour(dateString) {
     const date = new Date(dateString);
     const options = { hour: 'numeric', minute: 'numeric', hour12: false };
@@ -95,12 +98,12 @@ function foundPatients(event) {
                                 
                                 if (this.payed && (response.currentUser.role == 'directAdmin')) {
                                     if (!this.discharged) {
-                                      patientsContent += `<li class="list-group-item border border-danger">Total:$${this.totalReceived}. Cobrada por: ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
+                                      patientsContent += `<li class="list-group-item border border-danger">Total:$${numberCommas(this.totalReceived)}. Cobrada por: ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
                                       ${makeHour(this.chargedDate)} 
                                      
                                        </li>`;
                                     } else {
-                                    patientsContent += `<li class="list-group-item border ">Total:$${this.totalReceived}. ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
+                                    patientsContent += `<li class="list-group-item border ">Total:$${numberCommas(this.totalReceived)}. ${this.receivedBy.username} ${new Date(this.chargedDate).toLocaleDateString('es-US', options)}
                                     ${makeHour(this.chargedDate)} 
                                          </li>`;
                                     }
