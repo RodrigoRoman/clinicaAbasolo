@@ -693,7 +693,7 @@ $(document).ready(function() {
 $('#genPDf').click(generatePDF)
 
 function generatePDF() {
-  fetch('http://localhost:3000/exits/generate-pdf-account', {
+  fetch('https://clinicaabasolo.up.railway.app/exits/generate-pdf-account', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
