@@ -223,10 +223,11 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
       const b = begin.toISOString().substring(0,10);
       const e = end.toISOString().substring(0,10);
       %>
-      <%if(currentUser.role == "directAdmin" || currentUser.role == "caja"){%>
-        <a href = "/patients/<%=patient._id%>/makePDF?begin=<%=b%>&end=<%=e%>&name=<%=patient.name%>">
+      <a href = "/patients/<%=patient._id%>/makePDF?begin=<%=b%>&end=<%=e%>&name=<%=patient.name%>&role=<%=currentUser.role%>">
           <button type="button" class="btn btn-outline-secondary"><i class="fas fa-file-pdf"></i></button>
         </a>
+      <%if(currentUser.role == "directAdmin" || currentUser.role == "caja"){%>
+        
         <%if(currentUser.role == 'directAdmin'){%>
         <form class="d-inline" action="/patients/<%=patient._id%>/discharge?_method=PUT" method="POST">
           <button class="btn btn-outline-warning ml-1">Dar de alta</button>

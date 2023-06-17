@@ -31,6 +31,8 @@ let honoraries = patient.filter((el)=>{
 
 let newPatient = patientNoHonorary.concat(honoraries);
 %>
+  
+  
  <%- include('../partials/navbar')%>
     <body>
         <div class = "toPDF">
@@ -69,10 +71,12 @@ let newPatient = patientNoHonorary.concat(honoraries);
                         <tr class="border-bottom border-dark reduced">  
                             <th scope="col"><h6>Clase</h6></th>
                             <th scope="col"><h6>Nombre</h6></th> 
-                            <th scope="col"><h6>Cantidad</h6></th>  
-                            <th scope="col"><h6>Precio Unitario</h6></th>
-                            <th scope="col"><h6>Descuento</h6></th>
-                            <th scope="col"><h6>Subtotal</h6></th>
+                            <th scope="col"><h6>Cantidad</h6></th> 
+                            <%if(role != 'nurse'){%>
+                                <th scope="col"><h6>Precio Unitario</h6></th>
+                                <th scope="col"><h6>Descuento</h6></th>
+                                <th scope="col"><h6>Subtotal</h6></th>
+                            <%}%>
                         </tr>  
                     </thead>
                     <tbody>
@@ -83,16 +87,16 @@ let newPatient = patientNoHonorary.concat(honoraries);
                                 <th></th> 
                                 <th></th>  
                                 <th></th>
+                                <%if(role != 'nurse'){%>
                                 <th></th>
                                 <th></th>
                                 <th></th> 
+                                <%}%>
                             </tr>
                         <%
                             sub_amount = 0; subtotal_class = 0;
                         let price = 0;
                         (item.amount).forEach(function(amnt,i){
-                            console.log('the item')
-                            console.log(item)
                             if(item.service_type == "supply"){price = item.sell_price[i]}else{price = item.price[i]}
                             let item_subtotal = (amnt*(price-(price*(item.discount*0.01)))).toFixed(2)
                             // let item_subtotal = +(price * amnt).toFixed(2);
@@ -100,10 +104,12 @@ let newPatient = patientNoHonorary.concat(honoraries);
                         <tr class = "reduced">  
                             <td></td>
                             <td><%=item.serviceName[i]%></td> 
-                            <td><%=Math.round(amnt)%></td>  
+                            <td><%=Math.round(amnt)%></td> 
+                            <%if(role != 'nurse'){%>
                             <td>$<%=numberCommas(price)%></td>
                             <td><%=item.discount%>%</td>
                             <td>$<%=numberCommas(item_subtotal)%></td>  
+                            <%}%>
                         </tr> 
                         <%
                         console.log('aqui')
@@ -114,6 +120,8 @@ let newPatient = patientNoHonorary.concat(honoraries);
                         console.log(total)
                         subtotal_class = +(subtotal_class).toFixed(2)
                     })%>
+                    <%if(role != 'nurse'){%>
+
                         <tr class = "subRed border">  
                             <th></th>
                             <th scope="row">Subtotal</th>  
@@ -122,13 +130,16 @@ let newPatient = patientNoHonorary.concat(honoraries);
                             <th scope="row"></th>  
                             <th scope="row">$<%=numberCommas(subtotal_class)%></th> 
                         </tr>
+                    <%}%>
                 <%})%>
                     </tbody> 
                 </table> 
-
                 <div>
+
                     <%total = +(total).toFixed(2)%>
-                    <h5 class = "float-right border border-secondary rounded"><span class = "mx-2 my-2">Total: $<%=numberCommas(total)%></span></h5>
+                    <h5 class = "float-right border border-secondary rounded">
+                        <span class = "mx-2 my-2"><%= role !== 'nurse' ? `Total: $${numberCommas(total)}` : '' %>
+                        </span></h5>
                 </div>
             </div>
         </div>        

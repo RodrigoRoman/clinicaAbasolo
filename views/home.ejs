@@ -27,13 +27,17 @@
     %>
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
         <header class="mb-auto">
-            <div>
-                <h3 class="float-md-left mb-0">Clinica Abasolo</h3>
-                
+            <div class="row align-items-center">
+              <div class="col-md-auto">
+                <div class="d-flex align-items-center justify-content-end">
+                  <h3 class="mb-0">Clinica Abasolo</h3>
+                  <img src="/imgs/clinica_abasolo.png" class="image_print" alt="clinica" style="height: 80px; width: auto; margin-left: 200px; margin-top:0px;">
+                </div>
+              </div>
             </div>
-        </header>
-        
+          </header>
         <main class="px-3">
+
             <p><i>"<%=phrases.sample()%>"</i></p>
            <% if(currentUser) {%>
             <div class="container my-5">

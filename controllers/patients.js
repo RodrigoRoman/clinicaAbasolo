@@ -488,45 +488,48 @@ module.exports.patientAccount = async (req, res) => {
     }
     begin = req.query.begin;
     end = req.query.end;
+    console.log('role-----')
+    console.log(req.query.role)
     patient.sort((a,b)=>a.class.localeCompare(b.class,"es",{sensitivity:'base'}))
-    res.render(`patients/showAccount`, { patient,begin,end});
+    console.log('el usuario')
+    res.render(`patients/showAccount`, { patient,begin,end,'role':req.query.role});
 }
 
 
 
 module.exports.accountToPDF = async (req,res) =>{ 
-    let {begin,end,name} = req.query;               
-    // const browser = await puppeteer.launch();       // run browser
-    const chromeOptions = {
-        headless: true,
-        defaultViewport: null,
-        args: [
-            "--incognito",
-            "--no-sandbox",
-            "--single-process",
-            "--no-zygote"
-        ],
-    };
-    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'], ignoreDefaultArgs: ['--disable-extensions']});
-    const page = await browser.newPage();           // open new tab
-    
-    // await page.goto(`https://pure-brushlands-42473.herokuapp.com/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
-    //     waitUntil: 'networkidle0'}); 
-    // await page.goto(`https://warm-forest-49475.herokuapp.com/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
-    //     waitUntil: 'networkidle0'});          // go to site
+    let { begin, end, name,role } = req.query;
+
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    ignoreDefaultArgs: ['--disable-extensions'],
+  });
+  const page = await browser.newPage();
+
+  try {
+    const currentUser = res.locals.currentUser; // Get the current user
+    console.log('from account to pdf')
+    console.log(req.query)
     await page.goto(
-        `https://clinicaabasolo.up.railway.app/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
-          waitUntil: 'networkidle0'});
-    // await page.goto(
-    // `http://localhost:3000/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}`,{
-    //     waitUntil: 'networkidle0'});
+      `https://clinicaabasolo.up.railway.app/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}&role=${role}`,
+      { waitUntil: 'networkidle0' }
+    );
+
+    // Pass the currentUser to the page using page.evaluate()
+    await page.evaluate((currentUser) => {
+      // Assign the currentUser to a global variable on the page
+      window.currentUser = currentUser;
+    }, currentUser);
 
     const dom = await page.$eval('.toPDF', (element) => {
-        return element.innerHTML
-    }) // Get DOM HTML
-    await page.setContent(dom)   // HTML markup to assign to the page for generate pdf
-    await page.addStyleTag({url: "https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"});
-    await page.addStyleTag({content: `.image_print{
+      return element.innerHTML;
+    });
+    await page.setContent(dom);
+    await page.addStyleTag({
+      url: 'https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css',
+    });
+    await page.addStyleTag({
+      content: `.image_print{
             position:absolute;
             top:10px;
             left:200px;
@@ -540,12 +543,18 @@ module.exports.accountToPDF = async (req,res) =>{
             .reduced {
                 font-size: 60% !important;
                 line-height: 1 !important;
-              }`})
-    const pdf = await page.pdf({landscape: false})
-    await browser.close(); 
-    res.contentType("application/pdf");
+              }`,
+    });
+
+    const pdf = await page.pdf({ landscape: false });
+    await browser.close();
+    res.contentType('application/pdf');
     res.send(pdf);
-}
+  } catch (e) {
+    console.log('error');
+    console.log(e);
+  }
+};
 
 
 module.exports.dischAccountPDF = async (req,res) =>{ 
