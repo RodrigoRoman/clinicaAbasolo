@@ -495,67 +495,69 @@ module.exports.patientAccount = async (req, res) => {
     res.render(`patients/showAccount`, { patient,begin,end,'role':req.query.role});
 }
 
-
-
-module.exports.accountToPDF = async (req,res) =>{ 
-    let { begin, end, name,role } = req.query;
-
-  const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    ignoreDefaultArgs: ['--disable-extensions'],
-  });
-  const page = await browser.newPage();
-
-  try {
-    const currentUser = res.locals.currentUser; // Get the current user
-    console.log('from account to pdf')
-    console.log(req.query)
-    await page.goto(
-      `https://clinicaabasolo.up.railway.app/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}&role=${role}`,
-      { waitUntil: 'networkidle0' }
-    );
-
-    // Pass the currentUser to the page using page.evaluate()
-    await page.evaluate((currentUser) => {
-      // Assign the currentUser to a global variable on the page
-      window.currentUser = currentUser;
-    }, currentUser);
-
-    const dom = await page.$eval('.toPDF', (element) => {
-      return element.innerHTML;
+module.exports.accountToPDF = async (req, res) => {
+    let { begin, end, name, role } = req.query;
+  
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      ignoreDefaultArgs: ['--disable-extensions'],
     });
-    await page.setContent(dom);
-    await page.addStyleTag({
-      url: 'https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css',
-    });
-    await page.addStyleTag({
-      content: `.image_print{
-            position:absolute;
-            top:10px;
-            left:200px;
-            width:200px;
-            height: 100px;
-        }
-        .subRed {
-            font-size: 70% !important;
-            line-height: 1 !important;
+    const page = await browser.newPage();
+  
+    try {
+      const currentUser = res.locals.currentUser; // Get the current user
+      console.log('from account to pdf');
+      console.log(req.query);
+      await page.goto(
+        `https://clinicaabasolo.up.railway.app/patients/${req.params.id}/showAccount?begin=${begin}&end=${end}&role=${role}`,
+        { waitUntil: 'networkidle0' }
+      );
+  
+      // Pass the currentUser to the page using page.evaluate()
+      await page.evaluate((currentUser) => {
+        // Assign the currentUser to a global variable on the page
+        window.currentUser = currentUser;
+      }, currentUser);
+  
+      const dom = await page.$eval('.toPDF', (element) => {
+        return element.innerHTML;
+      });
+      await page.setContent(dom);
+      await page.addStyleTag({
+        url: 'https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css',
+      });
+      await page.addStyleTag({
+        content: `.image_print{
+              position:absolute;
+              top:10px;
+              left:200px;
+              width:200px;
+              height: 100px;
           }
-            .reduced {
-                font-size: 60% !important;
-                line-height: 1 !important;
-              }`,
-    });
-
-    const pdf = await page.pdf({ landscape: false });
-    await browser.close();
-    res.contentType('application/pdf');
-    res.send(pdf);
-  } catch (e) {
-    console.log('error');
-    console.log(e);
-  }
-};
-
+          .subRed {
+              font-size: 70% !important;
+              line-height: 1 !important;
+            }
+              .reduced {
+                  font-size: 60% !important;
+                  line-height: 1 !important;
+                }`,
+      });
+  
+      const pdf = await page.pdf({ format: 'A4' }); // Generate PDF with A4 format
+  
+      await browser.close();
+  
+      // Set the response content type
+      res.contentType('application/pdf');
+  
+      // Send the PDF file to the client
+      res.send(pdf);
+    } catch (e) {
+      console.log('error');
+      console.log(e);
+    }
+  };
 
 module.exports.dischAccountPDF = async (req,res) =>{ 
     let {begin,end,name} = req.query;               
