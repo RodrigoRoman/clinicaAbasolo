@@ -436,6 +436,7 @@ module.exports.patientAccount = async (req, res) => {
             patientName:{$last:"$patientName"},
             class:{$last:"$class"},
             name: {$last:"$name"},
+            unit: {$last:"$unit"},
             treatingDoctor:{$last:"$treatingDoctor"},
             service_type : {$last:"$service_type"},
             rfc : {$last:"$rfc"},
@@ -472,6 +473,7 @@ module.exports.patientAccount = async (req, res) => {
             admissionDate : {$last:"$admissionDate"},
             price: {$push:"$price"},
             cost: {$push:0},
+            service_unit:{$push:"$unit"},
             discount: { $last: "$discount"}, // Add discount
             expiration: { $push:"$expiration"},
             sell_price: { $push:"$sell_price"},

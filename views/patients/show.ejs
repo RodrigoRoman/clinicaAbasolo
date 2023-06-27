@@ -63,7 +63,9 @@ let total = 0;
       // Make a new object with amount to the same level as price, name and the other fields of servie
       if(patient.servicesCar){
        let serviceCar = (patient.servicesCar).map((el) =>{
-         if((el.consumtionDate>=begin) && (el.consumtionDate<=end)){return Object.assign(Object.assign({},el.service._doc),{trans_id:el._id,terminalDate:el.terminalDate,amount:el.amount,toggle:el.toggle,consumtionDate:el.consumtionDate,author:el.addedBy.username,discount:el.discount})}});
+         if((el.consumtionDate>=begin) && (el.consumtionDate<=end)){return Object.assign(Object.assign({},el.service._doc),{
+           service_unit:el.service.unit,
+           trans_id:el._id,terminalDate:el.terminalDate,amount:el.amount,toggle:el.toggle,consumtionDate:el.consumtionDate,author:el.addedBy.username,discount:el.discount})}});
       serviceCar = serviceCar.filter(el => el!= undefined);
       patientCar = serviceCar.sort((a, b) => b.consumtionDate - a.consumtionDate);
     }
@@ -112,12 +114,11 @@ let timeElements = patientCar.filter(el=>(timeUnits.includes(el.unit)));
           <tr>
             <td class= "item-name" alt = "<%=item._id%>"><%=item.name%></td>
             <td ><small class = "text-muted" id="transID" alt = "<%=item.trans_id%>"><%=item.class%></small></td>
-            <td>X <span class = "item-amount"><%=item.amount%></span></td>
+            <td>X <span class = "item-amount"><%=(item.service_unit=='Dinamico')?1:item.amount%></span></td>
             <%let price = (item.service_type == "supply")?item.sell_price:item.price %>
             <%if(currentUser.role == "directAdmin" || currentUser.role == "dinamicAdmin"||currentUser.role == "caja"){%>
-              <td class = "item-price">$ <%= numberCommas(price)%></td>
+              <td class = "item-price">$ <%= (item.service_unit=="Dinamico")?item.amount:numberCommas(price)%></td>
             <%}%>
-            
             <td class = "item-price"><%=makeDMYHour(new Date(item.consumtionDate))%></td>
             <%
             let subtotal = +(item.amount*(price-(price*(item.discount*0.01)))).toFixed(2);%>

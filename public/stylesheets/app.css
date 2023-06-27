@@ -435,7 +435,7 @@ input[type="number"] {
   
   .number-input input[type=number] {
     font-family: sans-serif;
-    max-width: 3rem;
+    max-width: 4rem;
     max-height: 2rem;
     padding: .1rem;
     border: none;
