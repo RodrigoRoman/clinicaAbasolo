@@ -1251,7 +1251,7 @@ module.exports.searchTransactionBox = async (req, res) => {
     console.log('called Search trans boc');
     const nDate = getMexicoCityTime()
     let default_begin = getMexicoCityTime();
-    default_begin.setDate( default_begin.getDate() - 31 );
+    default_begin.setDate( default_begin.getDate() - 14 );
     let beginDate = req.query.begin || default_begin;
     let endDate =req.query.end || nDate;
     // let {search,sorted} = req.query;
@@ -1331,7 +1331,7 @@ module.exports.boxShowFiltered = async (req, res) => {
     console.log('FROM boxShowContent');
     const { id } = req.params;
     let default_begin = getMexicoCityTime();
-    default_begin.setDate( default_begin.getDate() - 31 );
+    default_begin.setDate( default_begin.getDate() - 14 );
     const begin = req.query.begin ||default_begin;
     const end = req.query.end||getMexicoCityTime();
     var search = req.query.search||'';
