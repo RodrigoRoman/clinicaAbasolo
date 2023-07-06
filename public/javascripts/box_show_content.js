@@ -325,7 +325,7 @@ function rebuildTables() {
                        tables += `
                         <tr>`
                         if(data.exitSort != 'category'){
-                          tables += `<td>Nombre</td>`
+                          tables += `<td>${exit.name}</td>`
                       }
                       tables += `
                         ${
@@ -459,7 +459,7 @@ function rebuildTables() {
                       tables += `
                       <tr>`
                       if(data.exitSort != 'category'){
-                        tables += `<td>Nombre</td>`
+                        tables += `<td>${exit.name}</td>`
                     }
                     tables += `
                       ${
