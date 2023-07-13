@@ -1241,7 +1241,7 @@ module.exports.searchExitsBox = async (req, res) => {
     }
     console.log('the exits!!')
     console.log(exits)
-    //return exits and the sorted argument for reincluding it
+    //return exits and the sorted argument for reincluding i
     return res.json({"exits":exits,"search":req.query.search,endDate,beginDate});
     
 }
