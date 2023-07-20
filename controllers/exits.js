@@ -1239,8 +1239,6 @@ module.exports.searchExitsBox = async (req, res) => {
         res.locals.error = 'Ningun producto corresponde a la busqueda';
         res.json({})
     }
-    console.log('the exits!!')
-    console.log(exits)
     //return exits and the sorted argument for reincluding i
     return res.json({"exits":exits,"search":req.query.search,endDate,beginDate});
     
@@ -1254,7 +1252,7 @@ module.exports.searchTransactionBox = async (req, res) => {
     default_begin.setDate( default_begin.getDate() - 14 );
     let beginDate = req.query.begin || default_begin;
     let endDate =req.query.end || nDate;
-    // let {search,sorted} = req.query;
+    // let {search,sorted} = req.query
     search = req.query.search;
     sorted = req.query.sorted;
     boxId = req.query.boxId;
