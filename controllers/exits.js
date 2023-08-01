@@ -1237,9 +1237,9 @@ module.exports.searchExitsBox = async (req, res) => {
     exits = await Exit.find({ $or: dbQueries }).sort({clearDate: -1});
     if (!exits) {
         res.locals.error = 'Ningun producto corresponde a la busqueda';
-        res.json({})
+        res.json({});
     }
-    //return exits and the sorted argument for reincluding i
+    //return exits and the sorted argument for reincluding 
     return res.json({"exits":exits,"search":req.query.search,endDate,beginDate});
     
 }
